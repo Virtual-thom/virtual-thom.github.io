@@ -1,0 +1,83 @@
+---
+sitemap : false
+---
+@import "modest.css";
+@import "_syntax-highlighting.scss";
+body{
+  padding:0;
+  margin:0;
+  background-color: darkgreen;
+	line-height:1.3em;
+	font-size:1.2em;
+}
+.w600{
+	max-width:600px;
+	margin:0 auto;
+}
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  transition: 0.3s;
+  border-radius: 5px; /* 5px rounded corners */
+  padding:10px;
+}
+.container{
+  padding:0 1% ;
+  max-width:80%;
+  margin:0 auto;
+  background-color: whitesmoke;
+}
+#site-footer{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+#footer-disclaimer{
+  grid-column: 1 / span 3;
+}
+#site-header h1, #site-footer div {
+  justify-self: center;
+}
+#site-header h1{
+  margin: 0;
+  font-size: 1rem;
+}
+#site-header nav ul{
+	margin:0;
+	padding:0;
+}
+#site-header nav {
+	position: fixed;
+	top: 5px; 
+	left: 5px; 
+}
+/*
+#page-content{
+  display:grid;
+  grid-template-columns: 2fr 2fr;
+}
+*/
+ul.post-list {
+  list-style-type: none;
+}
+ul.post-list li,
+.pagination li {
+  display:inline;
+  margin: 0 10px 0 0 ;
+}
+ul.post-list-with-type li:not(:last-child):after{
+  content:" |";
+}
+.svg-icon{
+  width:30px;
+  fill:white;
+}
+.hidden{
+	display:none;
+}
+@media (max-width: 576px) {
+.container{
+  max-width:99%;
+}
+.svg-icon{
+  fill:black;
+}
+}

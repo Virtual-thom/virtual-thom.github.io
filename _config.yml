@@ -1,0 +1,44 @@
+# Site settings
+title: Virtual-Thom | Blog-notes VTOM et informatique
+email: virtual-thom@protonmail.com
+description: "Blog-notes VTOM, informatique, industrialisation, ordonnancement, DevOps"
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "https://virtual-thom.github.io" # the base hostname & protocol for your site
+github_username:  Virtual-thom
+github_url: "https://github.com/Virtual-thom/virtual-thom.github.io"
+permalink: /:title/
+
+#timezone: FR
+#locale: fr_FR
+
+# Build settings
+markdown_ext: "markdown,mkdown,mkdn,mkd,md"
+markdown: kramdown
+
+kramdown:
+  input: GFM
+  
+highlighter: rouge
+  
+include: [".htaccess"]
+exclude: ["bower.json", "package.json", "node_modules", "Gemfile", "Gemfile.lock","_build", "vendor", ".bundle"]
+
+excerpt_separator: '<!--more-->'
+
+paginate: 10
+
+compression: true
+
+gzip: true
+
+sass:
+  style: compressed
+  sass_dir: _sass
+
+plugins:
+  - jekyll-sitemap
+  - jekyll-paginate
+  - jekyll-redirect-from
+  - jekyll-coffeescript
+  - jemoji
+  - jekyll-seo-tag

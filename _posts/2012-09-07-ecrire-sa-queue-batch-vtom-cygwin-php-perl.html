@@ -1,0 +1,280 @@
+---
+layout: post
+title: Ecrire sa queue batch VTOM (cygwin, php, perl, sap)
+date: 2012-09-07 13:39
+author: Virtual Thom
+categories: [Cmd, cmd, cygwin, Ordonnancement, PERL, perl, PHP, php, queue, queue batch, queues batch, sap, Script, shell, shell, Visual TOM, Visual TOM, VTOM, VTOM]
+---
+<p>Dans cet article, nous verrons comment scripter de nouvelles queues batch VTOM (autres que celles fournies par défaut) et comment les mettre en place.
+VTOM est en cela simple et puissant à la fois. Il permet de définir des contextes d'environnement par queue batch.
+En gros, tout ce que vous pouvez lancer à la main depuis une invite de commande, VTOM peut aussi le lancer (et même ce que vous ne pouvez pas, comme lancer une programme SAP avec ses variantes, grâce à des connecteurs comme vtom2sap)</p>
+
+<!--more-->
+<p>La queue batch n'est jamais qu'un script que vous allez pouvoir personnaliser.
+Dans le monde Unix, le bdaemon (normalement installé en root avec le sticky bit)</p>
+<pre>28901447  336 -rw<strong>s</strong>r-xr-x 1 root root  336732 jui  8  2011 bdaemon
+</pre>
+va "forker" la queue avec :
+<ul>
+	<li>en paramètres, ceux définis sous VTOM</li>
+	<li>en utilisateur de lancement, l'utilisateur défini sous VTOM</li>
+</ul>
+Regardez comment les choses fonctionnent ci-après avec les PID et le PPID :
+<pre>User ID ParentID                                                   
+root <strong>12672</strong>     1 /opt/vtom/abm/bin/bdaemon
+vtom <em>7424</em> <strong>12672</strong>  -ksh /opt/vtom/admin/tom_submit.ksh param1 param2 param3
+vtom 7457  <em>7424</em>  /opt/vtom/scripts/luke.sh param1 param2 param3
+vtom 8792  <em>7424</em>  /opt/vtom/abm/bin/tsend -sT -r0 -mtermine (0)
+</pre>
+
+<p>C'est aussi dans la queue batch que vous allez définir le "layout" de votre log (autre que ceux que retourne le script en entrée standard et erreur). Vous pouvez aussi rajouter des pré-traitements et des posts-traitements pour chaque queue si vous le souhaitez (ex. définir un contexte oracle pour lancer un dump, envoyer une alerte à nagios, un mail, etc. etc.)</p>
+
+<p><strong>Un petit mot sur le tsend</strong>. Ce binaire permet de renvoyer au TOM_REMOTE_SERVER définit (par défaut, celui qui a ordonnancé le traitement) l'état dans lequel on veut que soit le traitement sous VTOM.
+Généralement, on récupère le code retour du script, on le traite comme étant OK ou KO et on renvoi le tsend en fonction.
+Pour info, l'option tsend -r permet d'afficher le code retour directement sous VTOM entre crochets.</p>
+
+<i>&lt;edit 17/12/2014&gt;</i>
+Attention ! pour les clients en DMZ (connectToClient = 0), le tsend avec les options -e TOM_ENVIRONMENT -a ... -j ... ne fonctionnent pas. Il faut enlever ces options sinon le tsend tente de communiquer avec le vtserver, ce qui n'est pas possible pour les clients en DMZ.
+<i>&lt;edit&gt;</i>
+
+<p>
+Je vais détailler la queue Cygwin et mettre en téléchargement les autres. (qui sont sensiblement les mêmes hormis SAP)
+</p>
+<h1>Queue Cygwin :</h1>
+Le système d'exploitation de votre client VTOM est Windows et vous souhaitez émuler un shell unix ? Cygwin est là pour vous (ou MKS mais payant, personnellement j'ai migré sous cygwin sans soucis)
+<a title="Queue cygwin" href="/wp-content/uploads/Submit_queue_cygwin.txt" target="_blank">Submit_queue_cygwin</a> A renommer en .bat et path des binaires à modifier
+<pre lang="dos">@echo off
+rem inclut le répertoire binaire de cygwin dans le path
+set PATH=e:cygwinbin;%PATH%
+set CYG=bash.exe
+
+rem les deux commandes qui suivent
+rem obligent à définir un path+script et non un binaire comme echo
+rem au pire, il faut encapsuler votre binaire dans un .sh
+
+rem path WINDOWS en path UNIX
+rem substitution de caractères %nom:a=b% tous les a deviennent des b
+set SCRIPT_PATH=%TOM_SCRIPT:=/%
+
+rem transforme les sauts de ligne etc windows en unix
+%CYG% -c 'dos2unix %SCRIPT_PATH%' 
+echo.
+rem Layout du log
+echo _________________________________________
+echo.
+echo Contexte Visual TOM du traitement
+echo Machine.............: %COMPUTERNAME%
+echo Machine VTOM........: %TOM_HOST%
+echo Utilisateur.........: %TOM_USER%
+echo Script..............: %TOM_SCRIPT%
+rem petite boucle pour récupérer les paramètres
+:argloop
+shift
+if "%0"=="" goto argend
+set arg=%arg% %0
+goto argloop
+:argend
+rem Je viens de voir dans mes variables d'environnement %TOM_SCRIPT_ARGS% 
+rem à voir si ça marche auquel cas pas besoin de cette boucle
+echo Parametres..........: %arg%
+echo Serveur Visual TOM..: %TOM_REMOTE_SERVER%
+echo Traitement..........: %TOM_JOB%
+echo Application.........: %TOM_APPLICATION%
+echo Environnement.......: %TOM_ENVIRONMENT%
+echo Job ID..............: %TOM_JOB_ID%
+echo Mode Execution......: %TOM_JOB_EXEC%
+echo Date d'exploitation.: %TOM_DATE%
+echo Valeur de la date...: %TOM_DATE_VALUE%
+echo Log des erreurs.....: %TOM_LOG_PATH_E%
+echo Log des sorties.....: %TOM_LOG_PATH_O%
+echo Action sur les logs.: (%TOM_LOG_ACTION%)
+echo Directory des logs..: %TOM_LOG_DIR%
+echo.
+echo _________________________________________
+echo Debut de l'execution du traitement %TOM_ENVIRONMENT% / %TOM_APPLICATION% / %TOM_JOB%
+date /T
+rem troncature de caractères %nomdelavariable:~+ou-début,nombredecaractères% 
+echo %time:~+0,8%
+echo.
+rem exécution du script et récupération du code retour
+%CYG% -c "%SCRIPT_PATH% %arg%"
+set TOM_STATUS=%ERRORLEVEL%
+echo.
+date /T
+echo %time:~+0,8%
+echo Fin du traitement"'
+echo _________________________________________
+echo Determination du Status de terminaison
+echo.
+
+rem c'est ici qu'on va pouvoir gérer les codes retours
+rem rien oblige à ce que 0 soit le seul code retour OK
+rem mais c'est le cas le plus courant
+if "%TOM_STATUS%"=="0" goto TERMINE
+goto ERREUR
+
+:ERREUR
+rem le fameux tsend qui permet de statuer le traitement sous VTOM
+rem l'option -r"n°coderetour" est bien pratique pour visualiser le code retour
+rem directement entre crochet sur le traitement dans VTOM 
+%ABM_BIN%tsend -sE  -r"%TOM_STATUS%" -m'ERRORLEVEL=%TOM_STATUS%'
+echo Exit-^>%TOM_STATUS% - Abort sans acquitement
+goto FIN
+
+:TERMINE
+%ABM_BIN%tsend -sT -r"%TOM_STATUS%"
+echo Exit-^>%TOM_STATUS% * Terminaison avec acquitement
+
+:FIN
+if not "%TOM_LOG_ACTION%"=="   " call %ABM_BIN%Gestlog_wnt.bat
+echo _________________________________________
+echo Fin d'exécution de la file d'attente
+exit %TOM_STATUS%
+:DIE</pre>
+<h1>Queue Perl :</h1>
+<a title="Queue PERL" href="/wp-content/uploads/Submit_queue_perl.txt" target="_blank">Submit_queue_perl</a> A renommer en .bat et path des binaires à modifier
+Je tiens à préciser que c'est une queue batch écrite en .bat pour lancer des scripts perl mais elle n'est pas écrite en perl.
+<h1>Queue Powershell VTOM</h1>
+<a title="Queue Powershell VTOM" href="/wp-content/uploads/submit_queue_ps1.bat.txt" target="_blank">Submit_queue_ps1</a> A renommer en .bat
+<h1>Queue Php :</h1>
+<a title="Queue PHP" href="/wp-content/uploads/Submit_queue_php.txt" target="_blank">Submit_queue_php</a> A renommer en .bat et path des binaires à modifier
+<h1>Variables VTOM pour la queue batch :</h1>
+Beaucoup d'objets ou de champs définis sous VTOM sont variabilisés et vous pouvez les traiter comme bon vous semble dans vos queues batch.
+<pre>Description                     Variable Windows ou Linux
+Script :                        %TOM_SCRIPT% ou $TOM_SCRIPT
+Machine nom logique :           $TOM_LOGICAL_HOST
+Machine nom physique :          %TOM_HOST% ou $TOM_HOST
+Utilisateur de lancement :      %TOM_USER% ou $TOM_USER
+Serveur Visual TOM :            %TOM_REMOTE_SERVER% ou $TOM_REMOTE_SERVER
+Traitement :                    %TOM_JOB% ou $TOM_JOB
+Application :                   %TOM_APPLICATION% ou $TOM_APPLICATION
+Environnement :                 %TOM_ENVIRONMENT% ou $TOM_ENVIRONMENT
+Job ID :                        %TOM_JOB_ID% ou $TOM_JOB_ID
+Mode Exécution :                %TOM_JOB_EXEC% ou $TOM_JOB_EXEC
+Date d'exploitation :           %TOM_DATE% ou $TOM_DATE
+Valeur de la date :             %TOM_DATE_VALUE% ou $TOM_DATE_VALUE
+Log des erreurs :               %TOM_LOG_PATH_E% ou $TOM_LOG_PATH_E (edit 2015 : n'existe plus, remplacé par TOM_LOG)
+Log des sorties :               %TOM_LOG_PATH_O% ou $TOM_LOG_PATH_O (edit 2015 : n'existe plus, remplacé par TOM_LOG)
+Action sur les logs :           %TOM_LOG_ACTION% ou $TOM_LOG_ACTION
+Répertoire des logs :           %TOM_LOG_DIR% ou $TOM_LOG_DIR
+Paramètres du script :          $TOM_SCRIPT_ARGS
+Champ famille :                 $TOM_FAMILY
+Répertoire racine :             $TOM_HOME
+
+
+exemple pour les voir toutes, on valorise le champ script d'un job VTOM sous Linux : 
+env |  grep "TOM_" | sort
+
+TOM_ABORT_SIGNAL=9
+TOM_ADMIN=/opt/vtom/vtom/admin
+TOM_APPLICATION=APP
+TOM_BACKUP=/opt/vtom/backup
+TOM_BASES=/opt/vtom/bases
+TOM_BIN=/opt/vtom/vtom/vtom/bin
+TOM_DATE=DATE_TEST
+TOM_DATE_VALUE=07/08/2015
+TOM_ENVIRONMENT=TEST
+TOM_FAMILY=
+TOM_HOME=/opt/vtom/vtom
+TOM_HOST=localhost
+TOM_JOB_EXEC=NORMAL
+TOM_JOB_ID=11934
+TOM_JOB=JOB_OK
+TOM_JOB_MAX_RETRY=1
+TOM_JOB_POINT=0
+TOM_JOB_REMAIN_RETRY=1
+TOM_JOB_RETRY=0
+TOM_LOG_ACTION=   
+TOM_LOGICAL_HOST=Localhost
+TOM_LOG=/opt/vtom/logs/TEST_APP_JOB_OK_150807-114115
+TOM_PERIODICITY=DAY
+TOM_PORT_tomDBd=30001
+TOM_PORT_vtserver=30007
+TOM_QUEUE_PRIORITY=5
+TOM_QUEUE=queue_ksh
+TOM_RECOVERY_MODE=NO
+TOM_REMOTE_SERVER=xxxxx
+TOM_REXX_NAME=rexx
+TOM_SCRIPT_ARGS=
+TOM_SCRIPT=env | sort
+TOM_STILL_WAIT=yes
+TOM_SUBMITTER=/opt/vtom/vtom/admin/tom_submit
+TOM_TRACES=/opt/vtom/traces
+TOM_USER_ADMIN=vtom
+TOM_USER=vtom
+TOM_VISUAL=/opt/vtom/vtom/visual
+</pre>
+<strong><em>Petite astuce</em></strong> :
+Vous voulez connaître toutes les variables envoyées à votre queue ?
+La queue fonctionne comme n'importe quel script. Configurez votre queue, ne mettez que la commande SET ou ENV (rajouter le tsend si vous ne voulez pas d'erreur). Regarder le log et vous aurez toutes les variables d'environnement y compris celles des objets envoyés par VTOM à la queue.
+<h1>Mettre en place une queue batch sous :</h1>
+<h2 id="install_windows">Windows :</h2>
+Pour qu'elle soit prise en compte, une nouvelle queue_bactch doit être rajoutée dans le vtom.ini (le plus souvent dans votre répertoire racine de windows, %SYSTEMROOT%) avec le nombre d'exécutions simultanées.
+ABM_QUEUES=/queue_wnt:10 /queue_cygwin:10
+
+Le nom de la queue doit être du type : Submit_queue_nom.bat
+Le queue doit être placé dans votre répertoire bin client (le plus souvent VTOMABMBIN, %ABM_BIN%)
+<h2>Unix :</h2>
+Vous devriez avoir quelque chose dans ce style :
+<pre>[/opt/vtom/abm/config]#ls
+managers  queues
+</pre>
+Utilisateurs pouvant gérer le bdaemon, dont <strong>adminc</strong> (client VTOM)
+<pre>[/opt/vtom/abm/config]#cat managers
+root
+vtom
+</pre>
+Dans le répertoire queues, vous devez créer votre répertoire :
+<pre>[/opt/vtom/abm/config/queues]#cp -p queue_ksh queue_oracle
+
+[/opt/vtom/abm/config/queues]#ls -lisa
+28901425 4 drwxr-xr-x  2 vtom vtom 4096 jui  8  2011 $job$
+28901428 4 drwxr-xr-x  2 vtom vtom 4096 jui  8  2011 $none$
+28901419 4 drwxr-xr-x  2 vtom vtom 4096 jui  8  2011 queue_csh
+28901431 4 drwxr-xr-x  2 vtom vtom 4096 avr 18 16:51 queue_ksh
+28934469 4 drwxr-xr-x  2 vtom vtom 4096 sep 20  2011 queue_mig
+28901431 4 drwxr-xr-x  2 vtom vtom 4096 avr 18 16:51 queue_oracle
+28901434 4 drwxr-xr-x  2 vtom vtom 4096 jui  8  2011 queue_perl
+28901439 4 drwxr-xr-x  2 vtom vtom 4096 mar 31  2011 queue_rexx
+28901437 4 drwxr-xr-x  2 vtom vtom 4096 sep  9  2011 queue_sap
+28901422 4 drwxr-xr-x  2 vtom vtom 4096 jui  8  2011 queue_sh
+28901416 4 drwxr-xr-x  2 vtom vtom 4096 jui  8  2011 queue_tcsh
+
+[/opt/vtom/abm/config/queues/queue_oracle]#ls -lisa
+28901495 4 -rwxr-xr-x  1 vtom vtom   28 avr 18 16:51 queue.conf
+28901433 4 -rwxr-xr-x  1 vtom vtom   10 mar 31  2011 users
+</pre>
+Pour ne pas m'embrouiller, je mets le même nom partout
+<pre>[/opt/vtom/abm/config/queues/queue_oracle]#cat queue.conf
+queue_oracle
+64
+-1
+/opt/vtom/abm/bin/oracle
+20
+</pre>
+<p>
+Ici 64 = nombre de jobs max en simultanés, -1 = nombre max illimité de jobs en attente,
+/opt/vtom/abm/bin/oracle le shell ou le lien vers un shell,
+<strong>Attention !</strong> Le lien vers le shell doit exister
+au pire il faut créer un lien symbolique (ln -s /bin/ksh /opt/vtom/abm/bin/oracle)</p>
+<p>20 = sert pour prioriser mais j'ai jamais utilisé</p>
+
+Pour que n'importe quel utilisateur puisse lancer la queue :
+<pre>[/opt/vtom/abm/config/queues/queue_ksh]#cat users
+any:-1:-1
+</pre>
+Ou alors, par exemple, je veux que l'utilisateur oracle ne lance que 3 jobs à la fois avec un nombre max illimité de jobs en attente :
+<pre>[/opt/vtom/abm/config/queues/queue_ksh]#cat users
+oracle:3:-1
+</pre>
+Votre queue doit être créer dans le répertoire admin avec les autres tom_submit.xxx
+<pre>[/opt/vtom/admin]cp -p tom_submit.ksh tom_submit.oracle
+</pre>
+<p>N'oubliez pas de redémarrer l'agent VTOM.</p>
+<p>Pour vérifier quelles sont les queues prises en compte par le client :</p>
+<pre>bstat
+# ou 
+adminc (état)</pre>
+
+
+A vous de personnaliser comme bon vous semble votre nouvelle queue_oracle !

@@ -1,0 +1,125 @@
+---
+layout: post
+title: Modification mot de passe en masse sur les clients VTOM
+date: 2014-01-21 15:42
+author: Virtual Thom
+comments: true
+categories: [Ordonnancement, shell, Visual TOM, VTOM]
+---
+Ce script permet de générer des traitements VTOM qui vont modifier les mots de passe sur les clients. Les clients doivent avoir été installés en root. <!--more--> La commande qui permet de changer de mot de passe sans avoir de question prompt attendant une réponse : Pour un HPUX
+<pre lang="bash">/usr/sam/lbin/usermod.sam -p `echo ${mdp} | /usr/lbin/makekey` ${utilisateur}"</pre>
+Pour un LINUX
+<pre lang="bash">echo ${mdp}|passwd --stdin ${utilisateur}"</pre>
+Pour le reste, quasiment tout est commenté pour bien comprendre le script mais n'hésitez pas si vous avez des questions.
+<pre lang="bash">##########################################################
+# AUTEUR : Virtual Thom
+# VERSION : 1.0
+# DATE : 01/01/2014
+#
+# set -n # Decommenter pour debug syntax sans exécution
+# NOTE: Ne pas oublier de recommenter !
+# set -x # Decommenter pour debug
+#
+# d'apres une idee originale de DukeAstar mon idole
+# ameliore par son padawan forever
+#
+##########################################################
+#       VARIABLES
+##########################################################
+args="$*" #tous les arguments dans la variable args
+mdp="$1" #mot de passe en premier argument du script
+test -z "$mdp" && echo "Erreur\n${0##*/} -h"
+shift #suppression du premier parametre de $*
+listeOS="${*:-LINUX HPIA64 NT}" #tous les autres paramètres après le mot de passe, quelques OS par defaut
+abscisse=200 #position horizontale de depart
+ordonnee=100 #position verticale de depart
+abscisseEspace=200 #espacement horizontal
+ordonneeEspace=100 #espacement vertical
+i=0 #compteur de boucle pour changer de colone 
+envVTOM="VTOM_DEV" #Environnement VTOM (doit exister)
+appVTOM="MODIF_MDP" #Application VTOM (doit exister vide)
+#Supprimer tous les jobs dans cette application une fois que tout est fini
+jobVTOM='' #Job VTOM sera le nom de la machine tronque a 16 caracteres
+tailleNoeudGraphiqueJob="130x26" #taille du noeud graphique job VTOM
+utilisateur="vtom" #utilisateur dont le mot de passe doit changer
+repLogClient="/opt/vtom/logs/" #repertoire log client
+
+##########################################################
+#       FONCTIONS
+##########################################################
+usage(){
+ script=${0##*/} ;
+ #script=${script%.*} ;
+ echo "" ;
+ echo "Creation de Job VTOM pour modification de mot de passe Linux et HPUX"
+ echo ""
+ echo "Usage :" ;
+ echo " ${script} motdepasse"
+ echo "    1 seul parametre obligatoire qui correspond au mot de passe." 
+ echo "Attention ! VTOM doit etre installe en root sur les clients pour que ce script fonctionne"
+ echo ""
+ echo ""
+ exit 123 
+}
+ajouterJob(){
+ OS=$1
+ ficTemp="/tmp/`uuidgen`fictemp"
+# Le principe ici va etre de lister les machines par type d'OS. la commande vtmachine -tag (sur le serveur VTOM) permet de le faire. awk -F"|" permet de définir le délimiteur car la commande vtmachine place les informations en colonne séparée par | . 
+ vtmachine -tag | awk -F"|" '$8 ~ /'${OS}'/ {print $2}' | sort | sed 's/\s//g' > ${ficTemp}
+	
+ while read machine #tant qu'il y a une ligne (l'entrée se fait au niveau du done)
+  do
+   geom="${ordonnee}+${abscisse}" #geometrie pour placer le noeud graphique du job mdp VTOM
+   geomNett="`expr ${ordonnee} + 30`+${abscisse}" #geometrie pour placer le noeud graphique du job de nettoyage VTOM
+   #Attention a la tailleNoeudGraphiqueJob pour ne pas que les jobs VTOM se chevauchent
+   #ma maniere de supprimer des logs
+   scriptNett='find '${repLogClient}' -name "*'${envVTOM}'_'${appVTOM}'_'${jobVTOM}'*" -exec rm {} \;' 
+   jobVTOM=${machine:0:16} #${var:pos:length} pour une substitution de variable a position 0 de longueur 16
+   case "${OS}" in
+     "HPIA64")
+       script="/usr/sam/lbin/usermod.sam -p `echo ${mdp} | /usr/lbin/makekey` ${utilisateur}"
+      ;;
+     "LINUX")
+       script="echo ${mdp}|passwd --stdin ${utilisateur}"
+      ;;
+     *)
+       echo "Le type d'OS $OS n'est pas pris en charge pas ce script."
+       break
+      ;;
+   esac
+ #ajout du job de modification du mot de passe
+ vtaddjob /Nom=${envVTOM}/${appVTOM}/${jobVTOM} /Script="#${script}" /Geom=${tailleNoeudGraphiqueJob}+${geom} /Machine=${machine} /Queue=queue_ksh /status=NO /User=root
+ #ajout du job de nettoyage des logs (car il contient le mot de passe)
+ vtaddjob /Nom="${envVTOM}/${appVTOM}/${jobVTOM:0:12}Nett" /Script="#${scriptNett}" /Geom=${tailleNoeudGraphiqueJob}+${geomNett} /Machine=${machine} /Queue=queue_ksh /status=NO /User=root
+
+ ordonnee=`expr ${ordonnee} + 100` #ordonnee incr
+ i=`expr $i + 1`
+
+ if test "$i" -gt "20"
+ then
+  abscisse=`expr ${abscisse} + 300` #abscisse incr
+  i=0
+  ordonnee=100
+ fi
+	
+done < ${ficTemp}
+	
+ #ne fonctionne pas sur certains interpreteur shell type cygwin
+ #sinon permet de s'affranchir d'un fichier tampon et passer directement la commande dans while
+ #done < <(vtmachine -tag | awk -F"|" '$8 ~ /'${OS}'/ {print $2}' | sort | sed 's/\s//g')
+	
+ rm -f ${ficTemp}
+}
+
+##########################################################
+#       SCRIPT
+##########################################################
+test "$1" == "-h" && usage
+
+for OS in $(echo $listeOS)
+do
+	ajouterJob $OS
+done
+echo "Les jobs sont NON-PLANIFIE"
+echo "Supprimer tous les jobs dans cette application une fois que tout est fini"
+</pre>

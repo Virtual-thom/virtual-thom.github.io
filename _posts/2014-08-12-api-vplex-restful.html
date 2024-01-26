@@ -1,0 +1,34 @@
+---
+layout: post
+title: VPLEX Element Manager API, ou API VPLEX RESTful
+date: 2014-08-12 13:02
+author: Virtual Thom
+comments: true
+categories: [api vplex, curl, RESTful, SAN, Script, shell, Stockage, VPLEX, vplex, XML]
+---
+<p>On ne peut pas automatiser, simplement et rapidement, une commande VPLEX Cli depuis un serveur d'administration distant. Et pour cause, lorsqu'on se connecte en ssh sur VPLEX, il faut de nouveau s'authentifier sur le vplexcli pour effectuer des commandes.
+</p>
+<p>
+Mais qu'à cela ne tienne, EMC² a prévu des API web pour le VPLEX et on peut faire beaucoup de chose par des requêtes RESTful avec le client curl : requêtes pour administrer, superviser, récupérer des logs, etc.
+</p>
+<!--more-->
+
+Je joins <a title="VPLEX-Element-Manager-API-Guide.pdf" href="/wp-content/uploads/docu52647_VPLEX-Element-Manager-API-Guide.pdf">VPLEX-Element-Manager-API-Guide</a>, la documentation officielle, pour avoir tous les détails API VPLEX RESTful. Même si elle est très bien faite, n'hésitez pas à me demander comment ça marche selon vos besoins spécifiques.
+
+Ci-après, un exemple de script pour générer un configdump en xml et le télécharger depuis un serveur tiers. Le configdump est une copie de la configuration du VPLEX (je m'en sers notamment pour créer des jobs de datamobility).
+<pre lang="bash">cluster="cluster-1"
+mdp=$(openssl enc -d -aes-256-cbc -in luke.dat -pass pass:votrepassphrase)
+ipManagmentVPLEX="xxx.xxx.xxx.xxx"
+dateNow=`date +"%d%m%Y_%H%M%S"`
+pathDumpXML="/var/log/VPlex/cli/wwwroot/outgoing"
+configDumpXML="configdump_${cluster}_${dateNow}.xml"
+
+# génère le configdump du cluster rentré en paramètre
+curl -k  -H 'Username:admin' -H "Password:$mdp" "https://$ipManagmentVPLEX/vplex/cluster+configdump" -X POST -d "{\"args\":\"-c $cluster -f $pathDumpXML/$configDumpXML\"}"
+
+# download le fichier, le path ne doit pas être mis. Seul le nom du fichier, il va chercher directement dans /var/log/VPlex/cli/wwwroot/outgoing
+curl -k  -H 'Username:admin' -H "Password:$mdp" "https://$ipManagmentVPLEX/vplex/downloadfile/$configDumpXML" > $configDumpXML
+</pre>
+Je vous renvoie sur mon article <a title="Encrypter un mot de passe avec openssl" href="/encrypter-un-mot-de-passe-avec-openssl/">Encrypter un mot de passe avec openssl</a> pour la ligne :
+<pre lang="bash">mdp=$(openssl enc -d -aes-256-cbc -in luke.dat -pass pass:votrepassphrase)
+</pre>

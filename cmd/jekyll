@@ -1,0 +1,6 @@
+# sur c9
+bundle exec jekyll serve --host $IP --port $PORT --baseurl ''
+# ou # --config _config.yml,_local_config.yml
+
+# vérifier le statut (fichier CNAME avec le nom de domaine doit être renseigné)
+github-pages health-check

@@ -1,0 +1,108 @@
+---
+layout: default
+titre-court: home
+---
+<nav>
+  <ul class="pagination">
+    {% if paginator.previous_page %}
+    <li>
+      <a href="{{ paginator.previous_page_path }}" class="Précédant">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    {% endif %} {% for page in (1..paginator.total_pages) %} {% if paginator.page == page %}
+    <li class="active">
+      <span>{{ page }}</span>
+    </li>
+    {% elsif page == 1 %}
+    <li>
+      <a href="{{ '/index.html' | prepend: site.baseurl | replace: '//', '/' }}">{{ page }}</a>
+    </li>
+    {% else %}
+    <li>
+      <a
+        href="{{ site.paginate_path | prepend: site.baseurl | replace: '//', '/' | replace: ':num', page }}">{{ page }}</a>
+    </li>
+    {% endif %} {% endfor %} {% if paginator.next_page %}
+    <li>
+      <a href="{{ paginator.next_page_path }}" aria-label="Suivant">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
+<ul class="post-list post-list-with-type">
+  {% for post in paginator.posts %}
+  <li>
+    <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+  </li>
+  {% endfor %}
+</ul>
+{% for post in paginator.posts %}
+{% if forloop.first == true %}
+<div id="page-first-post">
+
+  <div itemscope itemtype="http://schema.org/Article" class="post">
+
+    <article class="post-content" itemprop="articleBody">
+      <h1 itemprop="name about headline" class="post-title">{{ post.title }}</h1>
+      {{ post.excerpt }}
+      (voir plus)
+      <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+      <p class="post-meta">
+        <time class="post-meta" itemprop="datePublished dateModified"
+          datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%d-%m-%Y" }}</time>
+      </p>
+    </article>
+  </div>
+</div>
+{% endif %}
+{% endfor %}
+<ul class="post-list">
+  {% for post in paginator.posts %}
+  {% if forloop.first != true %}
+  <li>
+    <div class="card">
+      <h4><a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h4>
+      <p>{{ post.excerpt }}</p>
+      {% if post.excerpt != post.content %}
+          <a href="{{ site.baseurl }}{{ post.url }}">Article complet ici</a>
+      {% endif %}
+    </div>
+
+  </li>
+  {% endif %}
+  {% endfor %}
+</ul>
+<!-- Pagination links -->
+<nav>
+  <ul class="pagination">
+    {% if paginator.previous_page %}
+    <li>
+      <a href="{{ paginator.previous_page_path }}" class="Précédant">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    {% endif %} {% for page in (1..paginator.total_pages) %} {% if paginator.page == page %}
+    <li class="active">
+      <span>{{ page }}</span>
+    </li>
+    {% elsif page == 1 %}
+    <li>
+      <a href="{{ '/index.html' | prepend: site.baseurl | replace: '//', '/' }}">{{ page }}</a>
+    </li>
+    {% else %}
+    <li>
+      <a
+        href="{{ site.paginate_path | prepend: site.baseurl | replace: '//', '/' | replace: ':num', page }}">{{ page }}</a>
+    </li>
+    {% endif %} {% endfor %} {% if paginator.next_page %}
+    <li>
+      <a href="{{ paginator.next_page_path }}" aria-label="Suivant">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>

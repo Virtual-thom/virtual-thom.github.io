@@ -1,0 +1,20 @@
+---
+layout: default  
+title: Plan
+---
+<h3>Pages</h3>
+<ul class="post-list post-list-with-type">
+{% for page in site.pages %}
+  <li>
+	  <a class="post-link" href="{{ page.url | prepend: site.baseurl }}">{% if page.name == "index.html" and page.dir != "/" %}{{ page.dir}}{% else %}{{ page.name }}{% endif %}</a>
+  </li>
+{% endfor %}
+</ul>
+<h3>Posts</h3>
+<ul class="post-list post-list-with-type">
+{% for post in site.posts %}
+  <li>
+    <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+  </li>
+{% endfor %}
+</ul>

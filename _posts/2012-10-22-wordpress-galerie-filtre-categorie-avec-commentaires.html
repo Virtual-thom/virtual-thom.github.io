@@ -1,0 +1,50 @@
+---
+layout: post
+title: Wordpress - Galerie filtree categorie sans plugin avec commentaire (avec son shortcode)
+date: 2012-10-22 21:20
+author: Virtual Thom
+comments: true
+categories: [category, category_name, galerie, galerie, galerie sans plugin, gallery, gallery without plugin, my shortcode, PHP, shortcode, shortcode, Wordpress, wordpress, wordpress galerie, wp_query]
+---
+Ce tutorial est un exemple. Vous pouvez adapter le code à vos besoins sans problème. J'utilise les fonctions de base de Wordpress. Pas de plugin. Avec mon propre shortcode (que vous allez apprendre à faire).
+<ol>
+	<li>Créer plusieurs Articles. Chaque article aura un ou plusieurs attachements (des images), et une catégorie.
+<a href="/wp-content/uploads/wordpress_galerie_tuto_1.png"><img title="wordpress_galerie_tuto_1" src="/wp-content/uploads/wordpress_galerie_tuto_1-300x111.png" alt="wordpress_galerie_tuto_1" /></a></li>
+	<li>Ceci est optionnel, mais personnellement je préfère n'avoir des commentaires que sur ma photo ou mon image, je définis donc mon lien sur l'attachement et non sur l'article :
+<a href="/wp-content/uploads/wordpress_galerie_tuto_2.png"><img title="wordpress_galerie_tuto_2" src="/wp-content/uploads/wordpress_galerie_tuto_2-300x162.png" alt="" /></a>
+L'intérêt est double car lorsqu'on cliquera sur le thumbnail de notre future galerie, on arrivera sur la page d'attachement de l'image et non sur l'article. J'ai fait ça pour garder la possibilité d'avoir plusieurs images par articles.</li>
+	<li>Créer son shortcode, rien de bien sorcier. Rajouter votre bout de code dans le fichier functions.php de votre thème.
+<pre lang="php"> 
+// votrethemes/functions.php
+/* 
+ * My Shortcode
+ *
+*/
+function myGallery( $atts ) {
+// Modification article suite aux commentaires de Dominique
+// Ici rajout de l'attribut  columns pour définir le nombre de colonnes à l'affichage
+// On peut rajouter autant d'attribut que l'on veut (voir sur http://codex.wordpress.org/Gallery_Shortcode pour la liste des attributs de gallery par défaut de Wordpress)
+(isset($atts['columns'])) ? $columns = $atts['columns'] : $columns = "3"  ; // Rajout de l'attribut columns (3 par défaut, sinon le définir dans votre shortcode)
+
+$categoryName = $atts['category'] ;
+$htmlOut = "" ;
+$the_query = new WP_Query('category_name='. $categoryName) ;
+while ( $the_query->have_posts() ) : $the_query->the_post(); 
+	$childrenPosts = get_children('post_parent='. get_the_ID()) ;
+	foreach($childrenPosts as $childrenPost){
+			$childrenPostsId[] = $childrenPost->ID ;
+	}
+endwhile; // end of the loop. 
+$childrenPostsIdImplode = implode(",",$childrenPostsId) ;
+$htmlOut .= do_shortcode('[gallery include="'.$childrenPostsIdImplode.'" columns="'.$columns.'"]') ; // Modification article suite commentaires Dominique
+wp_reset_postdata();
+return ($htmlOut) ;
+}
+add_shortcode( 'myGallery', 'myGallery' );</pre>
+</li>
+	<li>Créer une page ou un article et écrire son shortcode.
+<pre>[myGallery category="galerie-saisons-hiver" columns="3"]</pre>
+La catégorie devra être le nom court, c'est l'identifiant de la catégorie, vous le verrez dans Articles > Catégories
+Et voilà le résultat :
+<a href="/wp-content/uploads/wordpress_galerie_tuto_3.png"><img title="wordpress_galerie_tuto_3" src="/wp-content/uploads/wordpress_galerie_tuto_3-300x187.png" alt="wordpress_galerie_tuto_3" /></a></li>
+</ol>

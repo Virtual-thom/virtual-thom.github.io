@@ -1,0 +1,127 @@
+---
+layout: page
+title: Virtual Thom CV | Analyste d'exploitation VTOM
+#titre-court: CV
+description: Curriculum Vitae de Virtual Thom, analyste d'exploitation, export ordonnancement VTOM
+---
+<div id="cv" class="print">
+  <div id="moi" itemscope itemtype ="http://schema.org/Person">
+    <div>
+    <div id="nom-complet">
+      <h2 itemprop="name">{{ site.data.moi.prenom }}</h2>
+      <h1 itemprop="familyName">{{ site.data.moi.nom }}</h1>
+    </div>
+    <div id="metier">
+      <h2 itemprop="jobTitle">{{ site.data.moi.metier }}</h2>
+    </div>
+    <div id="coordonnees">
+      <h3>Coordonnées</h3>
+      <ul class="bg-success">
+        <li itemprop="telephone"><span class="glyphicon glyphicon-phone"></span>{{ site.data.moi.mobile }}</li>
+        <li itemprop="email"><span class="glyphicon glyphicon-envelope"></span>{{ site.data.moi.email }}</li>
+        <li itemprop="url"><span class="glyphicon glyphicon-globe"></span>{{ site.data.moi.home }}</li>
+        <li itemprop="address"><span class="glyphicon glyphicon-home"></span>{{ site.data.moi.residence }}</li>
+        <li><span class="glyphicon glyphicon-user"></span>&Acirc;ge {{ site.time| date:'%Y'| minus: site.data.moi.anniversaire-a }} ans, {{ site.data.moi.famille }}<span class="hidden" itemprop="birthDate">{{ site.data.moi.anniversaire-a }}-{{ site.data.moi.anniversaire-m }}-{{ site.data.moi.anniversaire-j }}</span></li>
+        <li><span class="glyphicon glyphicon-plane"></span>{{ site.data.moi.permis }}</li>
+      </ul>
+    </div>
+    </div>
+  </div><!-- End #moi -->
+  
+  <div class="clearfix"></div>
+  
+  <div id="cv-inside" class="bg-success">
+    
+  <div id="presentation">
+    <h1>En résumé</h1>
+    
+    {% assign annee_exp_totale = site.time | date:'%Y' | minus:'2007' %}
+    {% assign annee_text = "ans" %}
+    {% capture annee_exp_totale %}{{ annee_exp_totale }} {{ annee_text }}{% endcapture %}
+    
+    <p id="accroche">{{ site.data.moi.accroche | replace: 'annee_exp_totale',annee_exp_totale | replace:'employeur_actuel',site.data.moi.employeur_actuel }}</p>  
+    <a href="{{ site.data.moi.downloadcv }}" title="CV Virtual Thom"><span class="glyphicon glyphicon-download-alt"></span>Télécharger CV en pdf</a>
+  </div>
+  
+  <div id="experiences">
+    <h1 class="titres-cv panel-slide">Expériences Professionnelles</h1>
+    <ul class="liste-cv">
+      {% assign experiences = site.data.experiences | sort:"annee" | reverse %}
+      {% for experience in experiences %}
+        <li id="{{ experience.nomCourt }}">
+          <h2><span class="glyphicon glyphicon-calendar"></span><span>{{ experience.annee }}</span> : {{ experience.nomLong }}</h2>
+          <span class="glyphicon glyphicon-globe"></span>{% if experience.lieu %}{{ experience.lieu}}  | {% endif %}{{ experience.ville }}
+          <div class="clearfix"></div>
+          {% if experience.garant %}<span class="glyphicon glyphicon-earphone"></span>Réf. {{ experience.garant }}{% endif %}
+          {% if(experience.description.fonctions) %}
+          {% for fonction in experience.description.fonctions %}
+          <ul class="liste-fonctions">
+              <li><h3><span class="glyphicon glyphicon-user"></span>{{ fonction.fonction }}</h3></li>
+              <li>
+              <ul class="liste-taches">
+                {% for tache in fonction.taches %}
+                  <li>{{ tache }}</li>
+                {% endfor %}
+              </ul><!-- .liste-taches -->
+              </li>
+          </ul><!-- .liste-fonctions -->
+          {% endfor %}
+          {% else %}
+            <ul class="liste-descriptions">
+            {% for description in experience.description %}
+              <li>{{ description }}</li>
+            {% endfor %}
+            </ul><!-- .liste-descriptions -->
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul><!-- .liste-experiences -->
+    <div class="titres-separator"><span class="glyphicon glyphicon-menu-down"></span></div>
+  </div><!-- End #experiences -->
+  <div id="formations">
+    <h1 class="titres-cv panel-slide">Formations</h1>
+    <ul class="liste-cv">
+    {% for formation in site.data.formations %}
+      <li id="{{ formation.nomCourt }}">
+        <h2><span class="glyphicon glyphicon-calendar"></span><span>{{ formation.annee }}</span> : {{ formation.nomLong }}</h2>
+        <ul class="liste-descriptions">
+        {% for description in formation.description %}
+          <li>{{ description }}</li>
+        {% endfor %}
+        </ul><!-- .liste-descriptions -->
+      </li>
+    {% endfor %}
+    </ul>
+    <div class="titres-separator"><span class="glyphicon glyphicon-menu-down"></span></div>
+  </div><!-- End  #formations -->
+  <div id="competences">
+    <h1 class="titres-cv panel-slide">Compétences</h1>
+    <ul class="liste-cv">
+    {% for competence in site.data.competences %}
+      <li id="{{ competence.nomCourt }}">
+        <h2>{{ competence.nomLong }}</h2>
+        <ul class="liste-descriptions">
+        {% for description in competence.competences %}
+          <li>{{ description.nom }} {% for page in (1..description.niveau) %}<span class="glyphicon glyphicon-star"></span><span class="no-css">*</span>{% endfor %}</li>
+        {% endfor %}
+        </ul><!-- .liste-descriptions -->
+      </li>
+    {% endfor %}
+    </ul>
+    <div class="titres-separator"><span class="glyphicon glyphicon-menu-down"></span></div>
+  </div><!-- End  #competneces -->
+  <div id="loisirs" class="no-print">
+    <h1 class="titres-cv panel-slide">Expériences Personnelles</h1>
+    <ul class="liste-cv">
+      {% for loisir in site.data.loisirs %}
+        <li>
+          {{ loisir }}
+        </li>
+      {% endfor %}
+    </ul>
+    <div class="titres-separator"><span class="glyphicon glyphicon-menu-down"></span></div>
+  </div><!-- End  #loisirs -->
+  
+  </div><!-- .bg-sucess -->
+
+</div><!-- End  #cv -->
