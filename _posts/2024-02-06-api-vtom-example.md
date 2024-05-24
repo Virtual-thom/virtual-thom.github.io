@@ -6,7 +6,7 @@ author: Virtual Thom
 ---
 Petit script python pour donner un exemple de ce qu'il est désormais possible de faire avec les API VTOM. 
 Le besoin : écrire dans un fichier texte la liste de tous les agents de plusieurs unités de soumission qui match un certain patern (ex tous les agents des "lot_1" de "win" commanençant par "PATCH"). 
-<!-- more -->
+<!--more-->
  
 Pour info en v7.1, l'API `/vtom/public/domain/2.0/submitUnits` est censée donner la liste des unités de soumissions avec les agents mais elle est buggée acutellement. Elle ne renvoie pas les agents associés.  
 ```
