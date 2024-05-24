@@ -1,7 +1,7 @@
 ---
 layout: post
 title: vtexport parametresjson modèle de job - démultiplication de chaine vtom
-date: 2024-25-24 13:39
+date: 2024-05-24 13:39
 author: Virtual Thom
 categories: [script, python, vtexport, Visual TOM, Visual TOM, VTOM, VTOM]
 ---
