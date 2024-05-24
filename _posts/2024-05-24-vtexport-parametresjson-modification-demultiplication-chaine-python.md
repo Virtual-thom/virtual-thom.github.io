@@ -80,7 +80,7 @@ def parametresjsonReplace(a):
   return a
 
 # Boucle sur les banques (1 app par banque)
-for _XXXBANQUEXXX in ["BANQUE_POPULAIRE","BECM","BNPPARIBAS","CITIBANK","etc", "etc"]:
+for _XXXBANQUEXXX in ["BANQUE_POP","BEC","BNP","CITI","etc"]:
   espacementX = 350 # mon espacement par rapport à la taille de mes boites de job VTOM
   coordX = 0        # on commence à 0 et on prendra la position des jobs du modèle
 
@@ -124,3 +124,6 @@ for %%f in (e:\temp\ta\*.txt) do (
     vtimport -f "%%f"
 )
 ```
+
+Dernier truc, me semble que j'ai dû virer les icons de l'export du modèle, j'avais des caractères chelou en utf8.  
+
