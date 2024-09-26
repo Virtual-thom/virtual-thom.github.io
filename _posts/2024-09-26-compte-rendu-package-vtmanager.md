@@ -4,7 +4,7 @@ title: Compte rendu package vtmanager
 date: 2024-09-26 09:00:00
 author: Virtual Thom
 ---
-Note à moi même, les données et comptes rendus des livraisons de paquets via vtom sont stockées sur le client dans le répertoire du manager/bin, dans le fichier db.dat sqlite3.  
+Note à moi même, les données et comptes rendus des livraisons de paquets via vtom sont stockés sur le client dans le répertoire du manager/bin, dans le fichier db.dat sqlite3.  
 ```
 $ cd $TOM_HOME/manager/bin
 $ /bin/sqlite3 db.dat
