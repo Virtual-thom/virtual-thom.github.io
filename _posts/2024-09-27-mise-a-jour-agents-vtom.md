@@ -29,7 +29,8 @@ Pour Linux, le bout de script pour l'espace disque est vraiment pour un cas pers
 Sélectionner le paquet VT-CS-Linxxx.Z > modifier le paquet >  
  * pour les mêmes raisons, supprimer de l'aborescence les queues "dites standard" admin/tom_submit.ksh sh bash etc
  * rajouter des lignes dans le script de pré-installation déjà existant
-```
+
+```ksh
 # lignes à rajouter en début de script, spécifique à mon contexte
 set -x ; # parceque j'aime bien voir ce qu'il se passe dans le compte rendu d'exécution dans "Suivre des installations des paquets"
 unalias -a ; # pour pallier aux alias interactifs
