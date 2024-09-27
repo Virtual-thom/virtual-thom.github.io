@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Mise à jour des Agents VTOM via "Gestion des paquets vtom"
-date: 2024-09-27 22:00:00
+date: 2024-09-27 18:00:00
 author: Virtual Thom
 ---
 On n'a plus aucune excuse pour ne plus avoir nos agents vtom à jour avec la livraison par package vtom.  
