@@ -8,7 +8,7 @@ On n'a plus aucune excuse pour ne plus avoir nos agents vtom à jour avec la liv
 Ci-après une façon de faire et mes problèmes rencontrés avec leurs workaround vus avec Absyss pour certains, d'autres, tout bête, mais tellement insuportable, genre des alias sur linux en root rm = rm -i (merci Stephan pour l'idée de résolution)  
 <!--more-->
 v712  
-Bon déjà il faut le savoir, les paquets qu'on télécharge les VT-CS-(Linux|Win|AIX|etc).Z donnés par Absyss, sont utilisables directement tels quels.  
+Bon déjà il faut le savoir, les paquets qu'on télécharge les VT-CS-(Linux|Win|AIX|etc).Z fournis par Absyss, sont utilisables directement tels quels.  
 Le principe est de déposer dans votre répertoire de dépôt (sur le serveur VTOM) ces fichiers VT-CSxxx.Z.  
 Outils > "Gestion de paquets" > Ajout d'un dépôt si ce n'est pas déjà fait qui pointe vers votre répertoire avec vos paquets sur le serveur VTOM.  
 
