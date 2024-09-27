@@ -6,7 +6,7 @@ author: Virtual Thom
 ---
 On n'a plus aucune excuse pour ne plus avoir nos agents vtom à jour avec la livraison par package vtom.  
 Ci-après une façon de faire et mes problèmes rencontrés avec leurs workaround vus avec Absyss pour certains, d'autres, tout bête, mais tellement insuportable, genre des alias sur linux en root rm = rm -i (merci Stephan pour l'idée de résolution)  
-<!-- more -->
+<!--more-->
 v712  
 Bon déjà il faut le savoir, les paquets qu'on télécharge les VT-CS-(Linux|Win|AIX|etc).Z donnés par Absyss, sont utilisables directement tels quels.  
 Le principe est de déposer dans votre répertoire de dépôt (sur le serveur VTOM) ces fichiers VT-CSxxx.Z.  
