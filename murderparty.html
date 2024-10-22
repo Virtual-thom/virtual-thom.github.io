@@ -1,6 +1,11 @@
 <html>
   <head>
     <title>Le fantome de Thomas - Lettre à mes amis</title>
+    <style>
+        .revel {
+            display: none;
+        }
+    </style>
   </head>
   <body>
     <h1>le fantome de thomas - lettre à mes amis</h1>
@@ -27,9 +32,18 @@
       Thomas <span id="revel">ASNAR</span>
     </div>
     <script>
-      document.querySelector("#revel").on('click', e => {
-        console.log(e)
-      })
+      let clickCount = 0;
+        const revelElement = document.getElementById('revel');
+        const revelSpans = document.querySelectorAll('.revel');
+
+        revelElement.addEventListener('click', () => {
+            clickCount++;
+            if (clickCount === 4) {
+                revelSpans.forEach(span => {
+                    span.style.display = 'inline';
+                });
+            }
+        });
     </script>
   </body>
 </html>
