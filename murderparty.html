@@ -13,14 +13,22 @@
           font-weight: 400;
           font-style: normal;
         }
+        .revel {
+          color: purple; 
+        }
+        .container {
+          margin : 0 auto ;
+          max-width: 80%;
+        }
     </style>
   </head>
   <body>
+    <div class="container">
     <h1>le fantome de thomas - lettre à mes amis</h1>
     <h3>mes très Chers amis,</h3>
     <pre>Si vous LIsez cette lettre, c'est Que je sUis mort, Et c'est pRobablement l'un de vous qui a fait le coup.
     <span class="revel">
-      Bravo ! pour trouver où se trouvent les indices, je vous ai fait une lettre cachée dans la cage aux oiseaux
+      Bravo ! pour trouver où se trouvent les indices, vous trouverez une lettre cachée dans la cage aux oiseaux
     </span>
     C'est pourquoi, je vous ai invité ce Soir poUr découvRir qui est Mon meurtrier, sOn mobile et soN arme du crime.
     <span class="revel">
@@ -36,9 +44,11 @@
     </span>
     Je vous embrasse foRt et vous souhaitE bon courage dans votre quête. X
     </pre>
+
     <div>
       Thomas <span id="revel">ASNAR</span>
     </div>
+          </div>
     <script>
       let clickCount = 0;
         const revelElement = document.getElementById('revel');
