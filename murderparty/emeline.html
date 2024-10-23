@@ -88,14 +88,19 @@
       allInputNode = document.querySelectorAll(".enigme input")
       allInputNode.forEach( inputNode => {
         inputNode.addEventListener("keyup", e => {
-          let indexEnigme = e.target.parentElement.id.replace("enigme","")
+          let indexEnigme = parseInt(e.target.parentElement.id.replace("enigme","")) - 1
           let valueEnigme = e.target.value
-          document.querySelector(`#enigme${indexEnigme} span.ok`).classList.remove("revel");
-          document.querySelector(`#enigme${indexEnigme} span.ko`).classList.remove("revel");
+          let okNode = document.querySelector(`#enigme${indexEnigme} span.ok`)
+          let koNode = document.querySelector(`#enigme${indexEnigme} span.ko`)
+          okNode.classList.remove("revel");
+          koNode.classList.remove("revel");
           if(valueEnigme == REPONSES[indexEnigme]){
-            document.querySelector(`#enigme${indexEnigme} span.ko`).classList.add("revel");
+            koNode.classList.add("revel");
+          }else if(valueEnigme == ""){
+            okNode.classList.add("revel");
+            koNode.classList.add("revel");
           }else{
-            document.querySelector(`#enigme${indexEnigme} span.ok`).classList.add("revel");
+            okNode.classList.add("revel");
           }
         })
       })
