@@ -90,8 +90,8 @@
         inputNode.addEventListener("keyup", e => {
           let indexEnigme = parseInt(e.target.parentElement.id.replace("enigme","")) - 1
           let valueEnigme = e.target.value
-          let okNode = document.querySelector(`#enigme${indexEnigme} span.ok`)
-          let koNode = document.querySelector(`#enigme${indexEnigme} span.ko`)
+          let okNode = document.querySelector(`#enigme${indexEnigme + 1} span.ok`)
+          let koNode = document.querySelector(`#enigme${indexEnigme + 1} span.ko`)
           okNode.classList.remove("revel");
           koNode.classList.remove("revel");
           if(valueEnigme == REPONSES[indexEnigme]){
