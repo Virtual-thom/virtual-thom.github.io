@@ -19,16 +19,26 @@
           font-variation-settings:
             "wdth" 100;
         }
-        .revel {
+        .ko {
           color: red; 
+        }
+        .ok {
+          color: green; 
         }
         .container {
           margin : 0 auto ;
           max-width: 80%;
         }
-        .signature {
-          width:100%;
-          text-align : right ;
+        input {
+            height:40px;
+        }
+        .enigme {
+          display: flex;
+          gap: 30px;
+          align-items: center;
+        }
+        img {
+          max-width:400px;
         }
     </style>
   </head>
@@ -36,7 +46,8 @@
     <div class="container">
     <h3>Emeline et la Belote</h3>
     <pre>Résolver ces énigmes vous donnera un code à rentrer sur la page du dénouement
-Règles : 
+
+  Règles : 
       Suites logiques de carte à jouer
       
       Entrez un nombre à côté de chaque suite (un message validera la suite)
@@ -47,16 +58,16 @@ Règles :
       Additionner tous les nombres de chaque suite vous donnera le code final pour Emeline
       
     </pre>
-    <div id="enigme1">
+    <div id="enigme1" class="enigme">
       <img src="emeline_1.jpg" >
     </div>
-    <div id="enigme2">
+    <div id="enigme2" class="enigme">
       <img src="emeline_2.jpg" >
     </div>
-    <div id="enigme3">
+    <div id="enigme3" class="enigme">
       <img src="emeline_3.jpg" >
     </div>  
-    <div id="enigme4">
+    <div id="enigme4" class="enigme">
       <img src="emeline_4.jpg" >
     </div>
     <script>
