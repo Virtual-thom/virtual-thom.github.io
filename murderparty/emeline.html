@@ -36,6 +36,7 @@
           display: flex;
           gap: 30px;
           align-items: center;
+          margin-bottom : 30px;
         }
         img {
           max-width:400px;
@@ -60,18 +61,36 @@
     </pre>
     <div id="enigme1" class="enigme">
       <img src="emeline_1.jpg" >
+      <input type="text">
+      <span class="revel ok">Bonne réponse</span>
+      <span class="revel ko">Mauvaise réponse</span>
     </div>
     <div id="enigme2" class="enigme">
       <img src="emeline_2.jpg" >
+      <input type="text">
+      <span class="revel ok">Bonne réponse</span>
+      <span class="revel ko">Mauvaise réponse</span>
     </div>
     <div id="enigme3" class="enigme">
       <img src="emeline_3.jpg" >
+      <input type="text">
+      <span class="revel ok">Bonne réponse</span>
+      <span class="revel ko">Mauvaise réponse</span>
     </div>  
     <div id="enigme4" class="enigme">
       <img src="emeline_4.jpg" >
+      <input type="text">
+      <span class="revel ok">Bonne réponse</span>
+      <span class="revel ko">Mauvaise réponse</span>
     </div>
     <script>
-      
+      let reponses = [ "3241", "25", "43", "24" ]
+      allInputNode = document.querySelectorAll(".enigme input")
+      allInputNode.forEach( inputNode => {
+        inputNode.addEventListener("change", e => {
+          console.log(e)
+        })
+      })
     </script>
   </body>
 </html>
