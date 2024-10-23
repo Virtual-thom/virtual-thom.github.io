@@ -87,7 +87,7 @@
       const REPONSES = [ "3241", "25", "43", "24" ]
       allInputNode = document.querySelectorAll(".enigme input")
       allInputNode.forEach( inputNode => {
-        inputNode.addEventListener("onkeyup", e => {
+        inputNode.addEventListener("keyup", e => {
           let indexEnigme = e.target.parentElement.id.replace("enigme","")
           let valueEnigme = e.target.value
           document.querySeletor(`#enigme${indexEnigme} span.ok`).classList.remove("revel");
