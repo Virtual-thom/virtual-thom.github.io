@@ -87,7 +87,7 @@
       let reponses = [ "3241", "25", "43", "24" ]
       allInputNode = document.querySelectorAll(".enigme input")
       allInputNode.forEach( inputNode => {
-        inputNode.addEventListener("change", e => {
+        inputNode.addEventListener("onkeyup", e => {
           console.log(e)
         })
       })
