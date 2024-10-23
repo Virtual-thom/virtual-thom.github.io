@@ -84,11 +84,19 @@
       <span class="revel ko">Mauvaise réponse</span>
     </div>
     <script>
-      let reponses = [ "3241", "25", "43", "24" ]
+      const REPONSES = [ "3241", "25", "43", "24" ]
       allInputNode = document.querySelectorAll(".enigme input")
       allInputNode.forEach( inputNode => {
         inputNode.addEventListener("onkeyup", e => {
-          console.log(e)
+          let indexEnigme = e.target.parentElement.id.replace("enigme","")
+          let valueEnigme = e.target.value
+          document.querySeletor(`#enigme${indexEnigme} span.ok`).classList.remove("revel");
+          document.querySeletor(`#enigme${indexEnigme} span.ko`).classList.remove("revel");
+          if(valueEnigme == REPONSES[indexEnigme]){
+            document.querySeletor(`#enigme${indexEnigme} span.ko`).classList.add("revel");
+          }else{
+            document.querySeletor(`#enigme${indexEnigme} span.ok`).classList.add("revel");
+          }
         })
       })
     </script>
