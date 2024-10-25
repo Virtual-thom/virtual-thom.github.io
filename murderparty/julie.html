@@ -1,9 +1,13 @@
 <html>
   <head>
     <title>Le fantome de Thomas - Julie, Paul et Thomas</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=Mr+Dafoe&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="puzzle.css">
+    <script src="puzzle.js"></script>
     <style>
         .revel {
             display: none;
@@ -11,42 +15,15 @@
         pre {
           white-space : pre-wrap;
         }
-        body, body pre{
-          font-family: "Inconsolata", monospace;
-          font-optical-sizing: auto;
-          font-weight: <weight>;
-          font-style: normal;
-          font-variation-settings:
-            "wdth" 100;
-        }
-        .ko {
-          color: red; 
-        }
-        .ok {
-          color: green; 
-        }
-        .container {
-          margin : 0 auto ;
-          max-width: 80%;
-        }
-        input {
-            height:40px;
-        }
-        .enigme {
-          display: flex;
-          gap: 30px;
-          align-items: center;
-          margin-bottom : 30px;
-        }
-        img {
-          max-width:400px;
-        }
     </style>
   </head>
   <body>
-    <div class="container">
     <h3>Thomas et Paul ...</h3>
-    <pre>
+    <div id="puzzle">
+      <div id="board"></div>
+      <div id="pieces"></div>
+    </div>
+    <pre id="solution" class="revel">
 C3C1 357 UN 73X73 3N 1337 5P34K J35P3r3 QU3 V0U5 C0MPr3N3Z C3 QU3 V0U5 1153Z
 7r015 D3UX UN QU47r3 357 13 C0D3 53Cr37
 r3N7r3Z C3 C0D3 5Ur 13 5173 DU Qr C0D3  
