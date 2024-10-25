@@ -22,13 +22,13 @@ img {
 
 
 #pieces {
-    width: 568px;
-    height: 327px;
+    width: 810px;
+    height: 242px;
     border: 2px solid purple;
 
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(10, 1fr);
 }
 
 #pieces img {
