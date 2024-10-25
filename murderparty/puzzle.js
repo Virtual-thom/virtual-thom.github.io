@@ -13,6 +13,7 @@ window.onload = function() {
             let tile = document.createElement("img");
             tile.id = index
             tile.src = "./images/blank.jpg";
+            tile.draggable = true
 
             //DRAG FUNCTIONALITY
             tile.addEventListener("dragstart", dragStart); //click on image to drag
@@ -45,6 +46,7 @@ window.onload = function() {
     for (let i = 0; i < pieces.length; i++) {
         let tile = document.createElement("img");
         tile.src = "./images/" + pieces[i] + ".jpg";
+        tile.draggable = true
 
         //DRAG FUNCTIONALITY
         tile.addEventListener("dragstart", dragStart); //click on image to drag
@@ -100,5 +102,4 @@ function dragEnd() {
     currTile.src = otherImg;
     otherTile.src = currImg;
     checkTiles()
-    console.log(otherTile.src.replace(/.*images\/(.*)\.jpg/,"$1"), otherTile.id)
 }
