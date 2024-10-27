@@ -22,10 +22,13 @@
         }
         pre {
           white-space : pre-wrap;
+        }
+        pre, #codes > div {
           border-radius: 20px;
           background-color: purple;
           color: yellow;
           padding: 20px;
+          margin : 5px ;
         }
         .revel {
           color: red; 
@@ -46,9 +49,51 @@
   Vous ne devez venir sur cette page que si vous êtes allés au bout de tous les indices. Avez-vous bien tous les codes ?
       </pre>
       <button type="text" id="revel-button">Révéler</button>
-  
+      
       <div id="codes" class="revel">
-        bonjour
+        <div>Entrez dans les champs les codes que vous avez trouvés, devinez, calculez, etc.</div>
+        <div id="alix">
+          Est-ce que la tisane d'Alix était empoisonnée ? 
+          <input type="text">
+          <span class="revel ok">Bonne réponse</span>
+          <span class="revel ko">Mauvaise réponse</span>
+        </div>
+        <div id="camille">
+          Camille a-t-elle écoulé ses fromages avariés à la maison ?
+          <input type="text">
+          <span class="revel ok">Bonne réponse</span>
+          <span class="revel ko">Mauvaise réponse</span>
+        </div>
+        <div id="chloe">
+          Est-ce que Chloé gagnera un jour à un jeu sur BGA ???
+          <input type="text">
+          <span class="revel ok">Bonne réponse</span>
+          <span class="revel ko">Mauvaise réponse</span>
+        </div>
+        <div id="emeline">
+          Avez-vous calculé le code final des énigmes de logique à cartes pour Emeline ?
+          <input type="text">
+          <span class="revel ok">Bonne réponse</span>
+          <span class="revel ko">Mauvaise réponse</span>
+        </div>
+        <div id="julie">
+          Au moins maintenant, vous connaissez notre code pour chiffrer nos messages avec Paul ?
+          <input type="text">
+          <span class="revel ok">Bonne réponse</span>
+          <span class="revel ko">Mauvaise réponse</span>
+        </div>
+        <div id="laure">
+          Laure est-elle aussi vénale qu'on le pense, avez-vous trouver son code ?
+          <input type="text">
+          <span class="revel ok">Bonne réponse</span>
+          <span class="revel ko">Mauvaise réponse</span>
+        </div>
+        <div id="leila">
+          Leila serait-elle passée à l'acte avec tous ces romans ?
+          <input type="text">
+          <span class="revel ok">Bonne réponse</span>
+          <span class="revel ko">Mauvaise réponse</span>
+        </div>
       </div>
     </div>
     <script>
