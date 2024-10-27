@@ -65,7 +65,7 @@ function checkTiles(){
     let solution = true
     let allTilesBoard = document.querySelectorAll("#board img")
     allTilesBoard.forEach(tile => {
-        if(tile.src.replace(/.*images\/(.*)\.jpg/,"$1") != tile.id){
+        if(tile.src.replace(/.*images\/(.*)\.png/,"$1") != tile.id){
             solution = false
         }
     })
@@ -103,6 +103,6 @@ function dragEnd() {
     let otherImg = otherTile.src;
     currTile.src = otherImg;
     otherTile.src = currImg;
-    console.log(currTile.id, otherTile.src.replace(/.*images\/(.*)\.jpg/,"$1"))
+    console.log(currTile, currTile.id, otherTile, otherTile.src.replace(/.*images\/(.*)\.png/,"$1"))
     checkTiles()
 }
