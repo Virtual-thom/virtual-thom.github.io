@@ -6,33 +6,27 @@ img {
     cursor:move;
 }
 #board {
-    width: 542px;
-    height: 407px;
+    width: 545px;
+    height: 410px;
     border: 2px solid purple;
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
 }
 
-#board img {
-    width: 110px;
-    height: 83px;
+#board img , #pieces img{
+    width: 108px;
+    height: 81px;
     border: 0.5px solid lightblue;
 }
 
 
 #pieces {
     width: 1102px;
-    height: 248px;
+    height: 250px;
     border: 2px solid purple;
 
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(10, 1fr);
-}
-
-#pieces img {
-    width: 108px;
-    height: 81px;
-    border: 0.5px solid lightblue;
 }
