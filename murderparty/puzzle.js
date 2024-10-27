@@ -30,7 +30,7 @@ window.onload = function() {
 
     //pieces
     let pieces = [];
-    for (let i=1; i <= rows*columns; i++) {
+    for (let i=0; i < rows*columns; i++) {
         pieces.push(i.toString()); //put "1" to "25" into the array (puzzle images names)
     }
     pieces.reverse();
