@@ -1,0 +1,53 @@
+<html>
+  <head>
+    <title>Le fantome de Thomas - Le grand final</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=Mr+Dafoe&display=swap" rel="stylesheet">
+    <style>
+        .revel {
+            display: none;
+        }
+        pre {
+          white-space : pre-wrap;
+        }
+        body, body pre{
+          font-family: "Inconsolata", monospace;
+          font-optical-sizing: auto;
+          font-weight: <weight>;
+          font-style: normal;
+          font-variation-settings:
+            "wdth" 100;
+        }
+        .revel {
+          color: red; 
+        }
+        .container {
+          margin : 0 auto ;
+          max-width: 80%;
+        }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h3>Le dénouement</h3>
+      <pre>
+  Vous ne devez venir sur cette page que si vous êtes allés au bout de tous les indices. Avez-vous bien tous les codes ?
+      </pre>
+      <button type="text" id="revel-button">Révéler</button>
+  
+      <div class="revel">
+        bonjour
+      </div>
+    </div>
+    <script>
+      
+        const revelElement = document.getElementById('revel');
+        const revelButtonEl = document.getElementById('revel-button')
+
+        revelButtonEl.addEventListener('click', () => {
+          revelElement.classList.toggle("revel")
+        });
+    </script>
+  </body>
+</html>
