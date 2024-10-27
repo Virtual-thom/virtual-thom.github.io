@@ -42,7 +42,7 @@
   <body>
     <div class="container">
       <h3>Le dénouement</h3>
-      <pre>
+      <pre id="avertissement">
   Vous ne devez venir sur cette page que si vous êtes allés au bout de tous les indices. Avez-vous bien tous les codes ?
       </pre>
       <button type="text" id="revel-button">Révéler</button>
@@ -54,10 +54,12 @@
     <script>
       
         const revelElement = document.getElementById('codes');
+        const avertissementElement = document.getElementById('avertissement');
         const revelButtonEl = document.getElementById('revel-button')
 
         revelButtonEl.addEventListener('click', () => {
           revelElement.classList.toggle("revel")
+          avertissementElement.classList.toggle("revel")
         });
     </script>
   </body>
