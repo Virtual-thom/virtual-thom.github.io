@@ -6,12 +6,13 @@ img {
     cursor:move;
 }
 #board {
-    width: 545px;
-    height: 410px;
+    width: 550px;
+    height: 415px;
     border: 2px solid purple;
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
+    margin-bottom: 10px;
 }
 
 #board img , #pieces img{
