@@ -103,6 +103,6 @@ function dragEnd() {
     let otherImg = otherTile.src;
     currTile.src = otherImg;
     otherTile.src = currImg;
-    console.log(currImg.id, otherImg.id)
+    console.log(currTile.id, otherTile.src.replace(/.*images\/(.*)\.jpg/,"$1"))
     checkTiles()
 }
