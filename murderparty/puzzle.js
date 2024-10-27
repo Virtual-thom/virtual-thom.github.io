@@ -65,13 +65,17 @@ function checkTiles(){
     let solution = true
     let allTilesBoard = document.querySelectorAll("#board img")
     allTilesBoard.forEach(tile => {
-        if(tile.src.replace(/.*images\/(.*)\.png/,"$1") != tile.id){
+        if(correspondance.indexOf(parseInt(tile.src.replace(/.*images\/(.*)\.png/,"$1"))) != tile.id){
             solution = false
         }
     })
+
     if(solution){
         document.querySelector("#solution").classList.remove("revel")
-        document.querySelector("#puzzle").classList.add("revel")
+        let floues = [6, 21, 23]
+        for(let i = 0 ; i < floues.length ; i++) {
+            document.getElementById(correspondance.indexOf(floues[i])).src = "./images/" + floues[i] + "_clair.png"
+        }
     }
 }
 //DRAG TILES
@@ -103,6 +107,6 @@ function dragEnd() {
     let otherImg = otherTile.src;
     currTile.src = otherImg;
     otherTile.src = currImg;
-    console.log(otherTile.id, otherTile.src.replace(/.*images\/(.*)\.png/,"$1"), correspondance.indexOf(otherTile.src.replace(/.*images\/(.*)\.png/,"$1")), correspondance)
+    console.log(otherTile.id, otherTile.src.replace(/.*images\/(.*)\.png/,"$1"), correspondance.indexOf(parseInt(otherTile.src.replace(/.*images\/(.*)\.png/,"$1"))), correspondance)
     checkTiles()
 }
