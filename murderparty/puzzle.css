@@ -6,8 +6,8 @@ img {
     cursor:move;
 }
 #board {
-    width: 540px;
-    height: 405px;
+    width: 542px;
+    height: 407px;
     border: 2px solid purple;
     margin: 0 auto;
     display: grid;
@@ -22,8 +22,8 @@ img {
 
 
 #pieces {
-    width: 810px;
-    height: 242px;
+    width: 812px;
+    height: 244px;
     border: 2px solid purple;
 
     margin: 0 auto;
@@ -32,7 +32,7 @@ img {
 }
 
 #pieces img {
-    width: 79px;
-    height: 79px;
+    width: 108px;
+    height: 81px;
     border: 0.5px solid lightblue;
 }
