@@ -1,6 +1,6 @@
 var rows = 5;
 var columns = 5;
-var index = 1;
+var index = 0;
 
 var currTile;
 var otherTile;
