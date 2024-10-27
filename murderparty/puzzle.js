@@ -4,6 +4,8 @@ var index = 0;
 
 var currTile;
 var otherTile;
+let correspondance = [1, 15, 14, 5, 3, 12, 9, 20, 8, 17, 4, 24, 23, 21, 11, 2, 19, 6, 13, 22, 10, 16, 0, 18, 7];
+
 
 window.onload = function() {
     //initialize the 5x5 board
@@ -101,5 +103,6 @@ function dragEnd() {
     let otherImg = otherTile.src;
     currTile.src = otherImg;
     otherTile.src = currImg;
+    console.log(currImg.id, otherImg.id)
     checkTiles()
 }
