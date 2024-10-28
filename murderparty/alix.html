@@ -87,7 +87,7 @@
           let koNode = document.querySelector(`#enigme${indexEnigme + 1} span.ko`)
           okNode.classList.remove("revel");
           koNode.classList.remove("revel");
-          let newRegex = new Regex(REPONSES[indexEnigme], 'i')
+          let newRegex = new RegExp(REPONSES[indexEnigme], 'i')
           if(valueEnigme.match(newRegex)){
             koNode.classList.add("revel");
           }else if(valueEnigme == ""){
