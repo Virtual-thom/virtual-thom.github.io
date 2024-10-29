@@ -52,6 +52,12 @@
       
       <div id="codes" class="revel">
         <div>Entrez dans les champs les codes que vous avez trouvés, devinez, calculez, etc.</div>
+         <div class="enigme" id="chloe">
+          Est-ce que Chloé gagnera un jour à un jeu sur BGA ???
+          <input type="text">
+          <span class="revel ok">Bonne réponse</span>
+          <span class="revel ko">Mauvaise réponse</span>
+        </div>
         <div class="enigme" id="alix">
           Est-ce que la tisane d'Alix était empoisonnée ? 
           <input type="text">
@@ -60,12 +66,6 @@
         </div>
         <div class="enigme" id="camille">
           Camille a-t-elle écoulé ses fromages avariés à la maison ?
-          <input type="text">
-          <span class="revel ok">Bonne réponse</span>
-          <span class="revel ko">Mauvaise réponse</span>
-        </div>
-        <div class="enigme" id="chloe">
-          Est-ce que Chloé gagnera un jour à un jeu sur BGA ???
           <input type="text">
           <span class="revel ok">Bonne réponse</span>
           <span class="revel ko">Mauvaise réponse</span>
@@ -124,11 +124,19 @@ const REPONSES = {
   "laure" : "60",
   "leila" : "tir"
 }
+const SOLUTIONS = {
+  "alix" : false,
+  "camille" : false,
+  "chloe" : false,
+  "emeline" : false,
+  "julie" : false,
+  "laure" : false,
+  "leila" : false
+}
 allInputNode = document.querySelectorAll(".enigme input")
 
 function checkSolutions(){
-    let solution = false
-    if(solution){
+    if(!Object.values(SOLUTIONS).some(value => value === false)){
         document.querySelector("#solution").classList.remove("revel")
         document.querySelector("#codes").classList.add("revel")
     }
@@ -145,12 +153,15 @@ allInputNode.forEach( inputNode => {
     let regex = new RegExp(REPONSES[indexEnigme],'i')
     if(valueEnigme.match(regex) ){
       koNode.classList.add("revel");
+      SOLUTIONS[indexEnigme] = true
       checkSolutions()
     }else if(valueEnigme == ""){
       okNode.classList.add("revel");
       koNode.classList.add("revel");
+      SOLUTIONS[indexEnigme] = false
     }else{
       okNode.classList.add("revel");
+      SOLUTIONS[indexEnigme] = false
     }
   })
 })
