@@ -23,7 +23,7 @@
         pre {
           white-space : pre-wrap;
         }
-        pre, #codes > div {
+        pre, #codes > div , #solution > div {
           border-radius: 20px;
           background-color: purple;
           color: yellow;
@@ -52,60 +52,116 @@
       
       <div id="codes" class="revel">
         <div>Entrez dans les champs les codes que vous avez trouvés, devinez, calculez, etc.</div>
-        <div id="alix">
+        <div class="enigme" id="alix">
           Est-ce que la tisane d'Alix était empoisonnée ? 
           <input type="text">
           <span class="revel ok">Bonne réponse</span>
           <span class="revel ko">Mauvaise réponse</span>
         </div>
-        <div id="camille">
+        <div class="enigme" id="camille">
           Camille a-t-elle écoulé ses fromages avariés à la maison ?
           <input type="text">
           <span class="revel ok">Bonne réponse</span>
           <span class="revel ko">Mauvaise réponse</span>
         </div>
-        <div id="chloe">
+        <div class="enigme" id="chloe">
           Est-ce que Chloé gagnera un jour à un jeu sur BGA ???
           <input type="text">
           <span class="revel ok">Bonne réponse</span>
           <span class="revel ko">Mauvaise réponse</span>
         </div>
-        <div id="emeline">
+        <div class="enigme" id="emeline">
           Avez-vous calculé le code final des énigmes de logique à cartes pour Emeline ?
           <input type="text">
           <span class="revel ok">Bonne réponse</span>
           <span class="revel ko">Mauvaise réponse</span>
         </div>
-        <div id="julie">
+        <div class="enigme" id="julie">
           Au moins maintenant, vous connaissez notre code pour chiffrer nos messages avec Paul ?
           <input type="text">
           <span class="revel ok">Bonne réponse</span>
           <span class="revel ko">Mauvaise réponse</span>
         </div>
-        <div id="laure">
+        <div class="enigme" id="laure">
           Laure est-elle aussi vénale qu'on le pense, avez-vous trouver son code ?
           <input type="text">
           <span class="revel ok">Bonne réponse</span>
           <span class="revel ko">Mauvaise réponse</span>
         </div>
-        <div id="leila">
+        <div class="enigme" id="leila">
           Leila serait-elle passée à l'acte avec tous ces romans ?
           <input type="text">
           <span class="revel ok">Bonne réponse</span>
           <span class="revel ko">Mauvaise réponse</span>
         </div>
       </div>
+      <div id="solution" class="revel">
+        <div>
+<pre>
+(Les Chalans doivent lire ... au moins la première phrase)
+Bravo, Félicitations
+Vous avez trouvé tous les codes ! Vous allez enfin savoir qui m'a tué.
+La tueuse est celle qui avait non pas un mobile, mais deux ! 
+Lui faire perdre la face aux yeux de tous ses amis à la Pelle Jaune à cause de ma piètre prestation à la Belote était une chose.
+Mais quand elle a appris que j'avais été au concert de System Of a Down, ça l'a décidée à passer à l'acte !
+</pre>
+
+Fallait bien que ça tombe sur quelqu'un ;)
+<img src="emeline.jpg">
+<br>
+Bonne Nouvelle (enfin pour moi) !
+Toutes les filles doivent me faire un bisous (soufflé de loin) pour que mon fantôme revienne à la vie !
+        </div>
+      </div>
     </div>
     <script>
-      
-        const revelElement = document.getElementById('codes');
-        const avertissementElement = document.getElementById('avertissement');
-        const revelButtonEl = document.getElementById('revel-button')
+const REPONSES = {
+  "alix" : "",
+  "camille" : "",
+  "chloe" : "",
+  "emeline" : "110",
+  "julie" : "3214",
+  "laure" : "60",
+  "leila" : "tir"
+}
+allInputNode = document.querySelectorAll(".enigme input")
 
-        revelButtonEl.addEventListener('click', () => {
-          revelElement.classList.toggle("revel")
-          avertissementElement.classList.toggle("revel")
-        });
+function checkSolutions(){
+    let solution = true
+    if(solution){
+        document.querySelector("#solution").classList.remove("revel")
+        document.querySelector("#codes").classList.add("revel")
+    }
+}
+
+allInputNode.forEach( inputNode => {
+  inputNode.addEventListener("keyup", e => {
+    let valueEnigme = e.target.value
+    let indexEnigme = e.target.parentElement.id
+    let okNode = document.querySelector(`#${indexEnigme} span.ok`)
+    let koNode = document.querySelector(`#${indexEnigme} span.ko`)
+    okNode.classList.remove("revel");
+    koNode.classList.remove("revel");
+    let regex = new RegExp(REPONSES[indexEnigme],'i')
+    if(valueEnigme.match(regex) ){
+      koNode.classList.add("revel");
+      checkSolutions()
+    }else if(valueEnigme == ""){
+      okNode.classList.add("revel");
+      koNode.classList.add("revel");
+    }else{
+      okNode.classList.add("revel");
+    }
+  })
+})
+const revelElement = document.getElementById('codes');
+const avertissementElement = document.getElementById('avertissement');
+const revelButtonEl = document.getElementById('revel-button')
+
+revelButtonEl.addEventListener('click', () => {
+  revelElement.classList.toggle("revel")
+  avertissementElement.classList.toggle("revel")
+});
     </script>
   </body>
 </html>
