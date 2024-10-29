@@ -61,6 +61,15 @@ window.onload = function() {
         document.getElementById("pieces").append(tile);
     }
 }
+
+function showScreamer() {
+    document.getElementById('screamer').style.display = 'flex';
+    document.getElementById('screamer-audio').play();
+}
+function hideScreamer() {
+    document.getElementById('screamer').style.display = 'none';
+}
+
 function checkTiles(){
     let solution = true
     let allTilesBoard = document.querySelectorAll("#board img")
@@ -76,6 +85,8 @@ function checkTiles(){
         for(let i = 0 ; i < floues.length ; i++) {
             document.getElementById(correspondance.indexOf(floues[i])).src = "./images/" + floues[i] + "_clair.png"
         }
+        setTimeout(showScreamer, 2000);
+        setTimeout(hideScreamer, 6000);
     }
 }
 //DRAG TILES
@@ -107,6 +118,6 @@ function dragEnd() {
     let otherImg = otherTile.src;
     currTile.src = otherImg;
     otherTile.src = currImg;
-    console.log(otherTile.id, otherTile.src.replace(/.*images\/(.*)\.png/,"$1"), correspondance.indexOf(parseInt(otherTile.src.replace(/.*images\/(.*)\.png/,"$1"))), correspondance)
+    //console.log(otherTile.id, otherTile.src.replace(/.*images\/(.*)\.png/,"$1"), correspondance.indexOf(parseInt(otherTile.src.replace(/.*images\/(.*)\.png/,"$1"))), correspondance)
     checkTiles()
 }
