@@ -5,7 +5,7 @@ date: 2025-03-22 11:00:00
 author: Virtual Thom
 ---
 Les fonctions VTOM, c'est une sacré dinguerie quand même, j'étais complètement passé à côté (sorties en v71 vers là à priori).  
-![Fonctions VTOM](assets/img/fonctions_vtom.png)
+![Fonctions VTOM](assets/img/fonctions_vtom.png)  
 
 Quelques infos en vrac :  
 * documentation ici pour la 721e : [Formules de calcul et fonctions](https://docs.absyss.com//vtom/721e/fr/Visual_TOM_Guide_Utilisateur/#formules-de-calcul)
