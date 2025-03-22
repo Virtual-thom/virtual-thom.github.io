@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Fonctions VTOM
-date: 2025-03-22 11:00:00
+date: 2025-03-22
 author: Virtual Thom
 ---
 Les fonctions VTOM, c'est une sacré dinguerie quand même, j'étais complètement passé à côté (sorties en v71 vers là à priori).  
