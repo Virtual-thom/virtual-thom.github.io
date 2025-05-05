@@ -7,6 +7,7 @@ url: "https://virtual-thom.github.io" # the base hostname & protocol for your si
 github_username:  Virtual-thom
 github_url: "https://github.com/Virtual-thom/virtual-thom.github.io"
 permalink: /:title/
+google_analytics: G-Z8Y7902GRV
 
 #timezone: FR
 #locale: fr_FR
