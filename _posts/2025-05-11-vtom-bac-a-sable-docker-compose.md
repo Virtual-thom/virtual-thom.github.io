@@ -218,6 +218,8 @@ soit passer par le terminal, soit par l'interface graphique du Docker Desktop.
 ```sh
 docker compose up -d
 ```
+![Docker Desktop](/assets/img/docker-desktop-compose.png "Docker Desktop")
+
 
 ## Accès
 Accès au client léger : `https://localhost:30002/xvision/`
