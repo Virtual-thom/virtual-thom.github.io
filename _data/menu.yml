@@ -1,10 +1,4 @@
 entries:
-    - title: info
-      entries:
-        - title: Tous les anciens posts ont été migrés vers /archives !
-          url: /archives
-        - title: L'idée c'est de repartir sur des posts un peu plus récents que `Ecrire sa queue batch` qui date de 2012.<br>Je remettrai peut-être Disqus sur le nouveau. A voir. Sinon un forum why not.
-
     - title: tous les posts
       post_list:
             limit: 50
@@ -14,6 +8,8 @@ entries:
 
     - title: quelques liens
       entries:
+        - title: les anciens posts dans /archives
+          url: /archives
         - title: "<a href='/about'>about Thom</a>"
         - title: sitemap
           url: plan.html
