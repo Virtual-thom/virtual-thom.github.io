@@ -12,13 +12,6 @@ entries:
             show_more_text: See archive...
             show_more_url: archive.html
 
-    - title: par category
-      post_list:
-            category: vtom
-            show_more: true
-            show_more_text: See more posts...
-            show_more_url: vtom.html
-
     - title: quelques liens
       entries:
         - title: "<a href='/about'>about Thom</a>"

@@ -1,5 +1,5 @@
-# {{ site.description }}
-Tous les anciens posts ont été migrés vers [archives]({{ site.url }}/archives) !  
+# Blog-notes Visual TOM d'Absyss, informatique, industrialisation, ordonnancement, DevOps 
+Tous les anciens posts ont été migrés vers [archives](https://virtual-thom.github.io/archives) !  
 On se refait une peau neuve avec le fabuleux simplissime thème de riggraz. Je laisse le README en dessous.  
 L'idée c'est de repartir sur des posts 2025 un peu plus "neufs" que "Ecrire sa queue batch" qui date de 1934.  
 
