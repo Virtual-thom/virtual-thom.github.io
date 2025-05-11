@@ -223,3 +223,7 @@ docker compose up -d
 
 ## Accès
 Accès au client léger : `https://localhost:30002/xvision/`
+
+Quand vous créez l'agent docker dans le référentiel vtom, il faut mettre le nom que vous avez mis dans le docker-compose. 
+Moi c'est `agent` 
+![VTOM agent docker](/assets/img/docker-agent.png "VTOM agent docker")
