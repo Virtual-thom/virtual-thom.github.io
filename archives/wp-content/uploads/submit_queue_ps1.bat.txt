@@ -1,0 +1,62 @@
+@echo OFF
+
+echo ______________________________________________________________________
+echo Contexte Visual TOM du traitement
+echo.
+echo Machine             : %TOM_HOST%
+echo Utilisateur         : %TOM_USER%
+echo Script              : %TOM_SCRIPT%
+echo Serveur Visual TOM  : %TOM_REMOTE_SERVER%
+echo Traitement          : %TOM_JOB%
+echo Application         : %TOM_APPLICATION%
+echo Environnement       : %TOM_ENVIRONMENT%
+echo Job ID              : %TOM_JOB_ID%
+echo Mode Execution      : %TOM_JOB_EXEC%
+echo Date d'exploitation : %TOM_DATE%
+echo Valeur de la date   : %TOM_DATE_VALUE%
+echo Log des erreurs     : %TOM_LOG_PATH_E%
+echo Log des sorties     : %TOM_LOG_PATH_O%
+echo Action sur les logs : (%TOM_LOG_ACTION%)
+echo Directory des logs  : %TOM_LOG_DIR%
+echo _______________________________________________________________________
+echo Debut de l'execution du script ...
+date /T
+time /T
+echo _______________________________________________________________________
+
+
+echo.
+:argloop
+shift
+if [%0]==[] goto argend
+echo %0
+set arg=%arg% %0
+goto argloop
+:argend
+
+PowerShell.exe -ExecutionPolicy Unrestricted -NonInteractive -File "%TOM_SCRIPT%" %arg%
+
+set RETCODE=%ERRORLEVEL%
+if %RETCODE% equ 0 goto TERMINE
+goto ERREUR
+
+:ERREUR
+%ABM_BIN%\tsend -sE -r%RETCODE% -m"Job en erreur (%RETCODE%)"
+echo _______________________________________________________________________
+echo Fin d'exécution du script
+date /T
+time /T
+echo Exit %RETCODE% donc pas d'acquitement
+echo _______________________________________________________________________
+if not "%TOM_LOG_ACTION%"=="   " call Gestlog_wnt.bat
+exit %RETCODE%
+
+:TERMINE
+%ABM_BIN%\tsend -sT -r%RETCODE% -m"Job termine (%RETCODE%)"
+echo _______________________________________________________________________
+echo Fin d'exécution du script
+date /T
+time /T
+echo Exit 0 donc acquitement
+if not "%TOM_LOG_ACTION%"=="   " call Gestlog_wnt.bat
+exit 0

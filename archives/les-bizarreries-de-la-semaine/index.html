@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="apple-touch-icon" href="https://virtual-thom.github.io/archives/apple-touch-icon.png">
+  <link rel="icon" href="https://virtual-thom.github.io/archives/favicon.ico" />
+  <!-- Remplacé par Jekyll SEO (sinon apparait en double)
+  <title>les bizarreries de la semaine</title>
+  <meta name="description" content="Quelques bizarreries de le semaine :  Script batch : Le echo ne modifie pas le errorlevel !  Attention aux &amp; dans les paramètres ou dans les ressources V...">
+  --> 
+  
+  <link rel="canonical" href="https://virtual-thom.github.io/archives/les-bizarreries-de-la-semaine/">
+  
+  <link rel="stylesheet" media="screen" href="https://virtual-thom.github.io/archives/assets/main.css">
+  
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>les bizarreries de la semaine | Virtual-Thom Blog-notes VTOM et informatique</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="les bizarreries de la semaine" />
+<meta name="author" content="Virtual Thom" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Quelques bizarreries de le semaine : Script batch : Le echo ne modifie pas le errorlevel ! Attention aux &amp; dans les paramètres ou dans les ressources VTOM. Ca peut avoir comme résultat assez drôle de n’afficher aucun log VTOM tout en ayant un retour tsend Les fichiers avec extension .i dans le répertoire de logs VTOM est normal depuis la 5.7xx ! Il semblerait que ça serve aux alarmes. fichier log sur le client VTOM à 0 ko ou pas la fin de la log. Mais, le job se statue bien. Dans mon cas, c’est un bug, le tsend du client vers le serveur de backup VTOM était bloqué (impossible de communiquer avec le backup) Quelques bouts de code de la semaine : Script PERL : charger un fichier XML et récupérer des informations #!/usr/bin/perl use XML::LibXML ; # Load DOM du fichier XML my $dom = XML::LibXML-&gt;new()-&gt;parse_file($ARGV[0]) ; # Item à récupérer my $item = $ARGV[1] ; my $logVTOM = $dom-&gt;findvalue(&#39;/runResponse/runReturn/item/name[contains(text(),\&#39;flowResult\&#39;)]/../value&#39;) ; my $flowResponse = $dom-&gt;findvalue(&#39;/runResponse/runReturn/item/name[contains(text(),\&#39;flowResponse\&#39;)]/../value&#39;) ; # On clean le flowResult pour construire un résultat XML et on charge le DOM en mémoire $logVTOM =~ s/.*(&lt;VTOM_RESULT&gt;.*)/$1/ ; $logVTOM =~ s/(.*&lt;\/VTOM_RESULT&gt;).*/$1/ ; my $domLogVTOM = XML::LibXML-&gt;load_xml( string =&gt; $logVTOM ) ; print $domLogVTOM-&gt;findvalue(&#39;/VTOM_RESULT/VTOM_STDERR&#39;) if($item eq &quot;VTOM_STDERR&quot;); print $domLogVTOM-&gt;findvalue(&#39;/VTOM_RESULT/VTOM_STDOUT&#39;) if($item eq &quot;VTOM_STDOUT&quot;); print $domLogVTOM-&gt;findvalue(&#39;/VTOM_RESULT/VTOM_CR&#39;) if($item eq &quot;VTOM_CR&quot;); print $flowResponse if($item eq &quot;flowResponse&quot;); Script VTOM : lister les machines Windows VTOM et y associer l’utilisateur Log On “AbsyssBatchManager” vtmachine | grep -i Win | awk -F&quot;|&quot; &#39;{print $2}&#39; | sed &#39;s/[ ]//g&#39; | while read machine; do vtmachine -i $machine ; done &gt; /var/tmp/vtmachine_windows_infotag.txt egrep &quot;(Logical Name|Username)&quot; /var/tmp/vtmachine_windows_infotag.txt | awk -F&quot;|&quot; &#39;{print $3}&#39; | sed &#39;s/[ ]//g&#39; &gt; /var/tmp/liste_machine_user_windows.txt compteur=0; while read line ; do echo -en &quot;$line&quot; ; if test `expr $compteur % 2` -eq 1 ; then echo &quot;&quot; ; else echo -en &quot;;&quot; ; fi ; compteur=`expr $compteur + 1` ; done &lt; /var/tmp/liste_machine_user_windows.txt (Attention des fois le vtmachine /info ne donne pas de Username) lister les dates communes à plusieurs environnements (dangereux ! ne pas faire ça, sinon on ne sait pas quel moteur va faire basculer la date) tlist env/date | sort -u -k&quot;2,2&quot; -k&quot;1,1&quot; | awk &#39;{print $2}&#39; | uniq -c | awk &#39;$1 &gt; 1&#39; 2 date_system 2 prod_0_agp 2 prod_0_jour 2 prod_0_saveUn Petite astuce pour récupérer le dernier startup tomcat avec le log catalina.out date --date=&quot;$(grep -B 1 &quot;INFO: Server startup&quot; catalina.out | grep -v &quot;INFO: Server startup&quot; | tail -n1 | awk &#39;{$NF=&quot;&quot;;$(NF-1)=&quot;&quot; ;print}&#39;)&quot; # Si on décortique, # on grep INFO: Server startup et la ligne d&#39;avant, on affiche la ligne d&#39;avant seulement sans les deux derniers champs (pour récupérer seulement l&#39;heure de démarrage) ouvrir les ports des firewalls pour les flux VTOM, c’est sympa mais des fois, iptables bloque aussi : cp -p /etc/sysconfig/iptables /etc/sysconfig/iptables.$(date +%Y%m%d) #Editer le fichier /etc/sysconfig/iptables #Ajouter avant la ligne &quot;-A INPUT -j REJECT --reject-with icmp-host-prohibited&quot; les 2 lignes suivantes : -A INPUT -s x.x.x.x/32 -p tcp -m state --state NEW -m tcp --dport 30004 -j ACCEPT #Relancer le serice iptables : service iptables stop service iptables start" />
+<meta property="og:description" content="Quelques bizarreries de le semaine : Script batch : Le echo ne modifie pas le errorlevel ! Attention aux &amp; dans les paramètres ou dans les ressources VTOM. Ca peut avoir comme résultat assez drôle de n’afficher aucun log VTOM tout en ayant un retour tsend Les fichiers avec extension .i dans le répertoire de logs VTOM est normal depuis la 5.7xx ! Il semblerait que ça serve aux alarmes. fichier log sur le client VTOM à 0 ko ou pas la fin de la log. Mais, le job se statue bien. Dans mon cas, c’est un bug, le tsend du client vers le serveur de backup VTOM était bloqué (impossible de communiquer avec le backup) Quelques bouts de code de la semaine : Script PERL : charger un fichier XML et récupérer des informations #!/usr/bin/perl use XML::LibXML ; # Load DOM du fichier XML my $dom = XML::LibXML-&gt;new()-&gt;parse_file($ARGV[0]) ; # Item à récupérer my $item = $ARGV[1] ; my $logVTOM = $dom-&gt;findvalue(&#39;/runResponse/runReturn/item/name[contains(text(),\&#39;flowResult\&#39;)]/../value&#39;) ; my $flowResponse = $dom-&gt;findvalue(&#39;/runResponse/runReturn/item/name[contains(text(),\&#39;flowResponse\&#39;)]/../value&#39;) ; # On clean le flowResult pour construire un résultat XML et on charge le DOM en mémoire $logVTOM =~ s/.*(&lt;VTOM_RESULT&gt;.*)/$1/ ; $logVTOM =~ s/(.*&lt;\/VTOM_RESULT&gt;).*/$1/ ; my $domLogVTOM = XML::LibXML-&gt;load_xml( string =&gt; $logVTOM ) ; print $domLogVTOM-&gt;findvalue(&#39;/VTOM_RESULT/VTOM_STDERR&#39;) if($item eq &quot;VTOM_STDERR&quot;); print $domLogVTOM-&gt;findvalue(&#39;/VTOM_RESULT/VTOM_STDOUT&#39;) if($item eq &quot;VTOM_STDOUT&quot;); print $domLogVTOM-&gt;findvalue(&#39;/VTOM_RESULT/VTOM_CR&#39;) if($item eq &quot;VTOM_CR&quot;); print $flowResponse if($item eq &quot;flowResponse&quot;); Script VTOM : lister les machines Windows VTOM et y associer l’utilisateur Log On “AbsyssBatchManager” vtmachine | grep -i Win | awk -F&quot;|&quot; &#39;{print $2}&#39; | sed &#39;s/[ ]//g&#39; | while read machine; do vtmachine -i $machine ; done &gt; /var/tmp/vtmachine_windows_infotag.txt egrep &quot;(Logical Name|Username)&quot; /var/tmp/vtmachine_windows_infotag.txt | awk -F&quot;|&quot; &#39;{print $3}&#39; | sed &#39;s/[ ]//g&#39; &gt; /var/tmp/liste_machine_user_windows.txt compteur=0; while read line ; do echo -en &quot;$line&quot; ; if test `expr $compteur % 2` -eq 1 ; then echo &quot;&quot; ; else echo -en &quot;;&quot; ; fi ; compteur=`expr $compteur + 1` ; done &lt; /var/tmp/liste_machine_user_windows.txt (Attention des fois le vtmachine /info ne donne pas de Username) lister les dates communes à plusieurs environnements (dangereux ! ne pas faire ça, sinon on ne sait pas quel moteur va faire basculer la date) tlist env/date | sort -u -k&quot;2,2&quot; -k&quot;1,1&quot; | awk &#39;{print $2}&#39; | uniq -c | awk &#39;$1 &gt; 1&#39; 2 date_system 2 prod_0_agp 2 prod_0_jour 2 prod_0_saveUn Petite astuce pour récupérer le dernier startup tomcat avec le log catalina.out date --date=&quot;$(grep -B 1 &quot;INFO: Server startup&quot; catalina.out | grep -v &quot;INFO: Server startup&quot; | tail -n1 | awk &#39;{$NF=&quot;&quot;;$(NF-1)=&quot;&quot; ;print}&#39;)&quot; # Si on décortique, # on grep INFO: Server startup et la ligne d&#39;avant, on affiche la ligne d&#39;avant seulement sans les deux derniers champs (pour récupérer seulement l&#39;heure de démarrage) ouvrir les ports des firewalls pour les flux VTOM, c’est sympa mais des fois, iptables bloque aussi : cp -p /etc/sysconfig/iptables /etc/sysconfig/iptables.$(date +%Y%m%d) #Editer le fichier /etc/sysconfig/iptables #Ajouter avant la ligne &quot;-A INPUT -j REJECT --reject-with icmp-host-prohibited&quot; les 2 lignes suivantes : -A INPUT -s x.x.x.x/32 -p tcp -m state --state NEW -m tcp --dport 30004 -j ACCEPT #Relancer le serice iptables : service iptables stop service iptables start" />
+<link rel="canonical" href="https://virtual-thom.github.io/archives/les-bizarreries-de-la-semaine/" />
+<meta property="og:url" content="https://virtual-thom.github.io/archives/les-bizarreries-de-la-semaine/" />
+<meta property="og:site_name" content="Virtual-Thom Blog-notes VTOM et informatique" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-08-06T17:58:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="les bizarreries de la semaine" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Virtual Thom"},"dateModified":"2015-08-06T17:58:00+00:00","datePublished":"2015-08-06T17:58:00+00:00","description":"Quelques bizarreries de le semaine : Script batch : Le echo ne modifie pas le errorlevel ! Attention aux &amp; dans les paramètres ou dans les ressources VTOM. Ca peut avoir comme résultat assez drôle de n’afficher aucun log VTOM tout en ayant un retour tsend Les fichiers avec extension .i dans le répertoire de logs VTOM est normal depuis la 5.7xx ! Il semblerait que ça serve aux alarmes. fichier log sur le client VTOM à 0 ko ou pas la fin de la log. Mais, le job se statue bien. Dans mon cas, c’est un bug, le tsend du client vers le serveur de backup VTOM était bloqué (impossible de communiquer avec le backup) Quelques bouts de code de la semaine : Script PERL : charger un fichier XML et récupérer des informations #!/usr/bin/perl use XML::LibXML ; # Load DOM du fichier XML my $dom = XML::LibXML-&gt;new()-&gt;parse_file($ARGV[0]) ; # Item à récupérer my $item = $ARGV[1] ; my $logVTOM = $dom-&gt;findvalue(&#39;/runResponse/runReturn/item/name[contains(text(),\\&#39;flowResult\\&#39;)]/../value&#39;) ; my $flowResponse = $dom-&gt;findvalue(&#39;/runResponse/runReturn/item/name[contains(text(),\\&#39;flowResponse\\&#39;)]/../value&#39;) ; # On clean le flowResult pour construire un résultat XML et on charge le DOM en mémoire $logVTOM =~ s/.*(&lt;VTOM_RESULT&gt;.*)/$1/ ; $logVTOM =~ s/(.*&lt;\\/VTOM_RESULT&gt;).*/$1/ ; my $domLogVTOM = XML::LibXML-&gt;load_xml( string =&gt; $logVTOM ) ; print $domLogVTOM-&gt;findvalue(&#39;/VTOM_RESULT/VTOM_STDERR&#39;) if($item eq &quot;VTOM_STDERR&quot;); print $domLogVTOM-&gt;findvalue(&#39;/VTOM_RESULT/VTOM_STDOUT&#39;) if($item eq &quot;VTOM_STDOUT&quot;); print $domLogVTOM-&gt;findvalue(&#39;/VTOM_RESULT/VTOM_CR&#39;) if($item eq &quot;VTOM_CR&quot;); print $flowResponse if($item eq &quot;flowResponse&quot;); Script VTOM : lister les machines Windows VTOM et y associer l’utilisateur Log On “AbsyssBatchManager” vtmachine | grep -i Win | awk -F&quot;|&quot; &#39;{print $2}&#39; | sed &#39;s/[ ]//g&#39; | while read machine; do vtmachine -i $machine ; done &gt; /var/tmp/vtmachine_windows_infotag.txt egrep &quot;(Logical Name|Username)&quot; /var/tmp/vtmachine_windows_infotag.txt | awk -F&quot;|&quot; &#39;{print $3}&#39; | sed &#39;s/[ ]//g&#39; &gt; /var/tmp/liste_machine_user_windows.txt compteur=0; while read line ; do echo -en &quot;$line&quot; ; if test `expr $compteur % 2` -eq 1 ; then echo &quot;&quot; ; else echo -en &quot;;&quot; ; fi ; compteur=`expr $compteur + 1` ; done &lt; /var/tmp/liste_machine_user_windows.txt (Attention des fois le vtmachine /info ne donne pas de Username) lister les dates communes à plusieurs environnements (dangereux ! ne pas faire ça, sinon on ne sait pas quel moteur va faire basculer la date) tlist env/date | sort -u -k&quot;2,2&quot; -k&quot;1,1&quot; | awk &#39;{print $2}&#39; | uniq -c | awk &#39;$1 &gt; 1&#39; 2 date_system 2 prod_0_agp 2 prod_0_jour 2 prod_0_saveUn Petite astuce pour récupérer le dernier startup tomcat avec le log catalina.out date --date=&quot;$(grep -B 1 &quot;INFO: Server startup&quot; catalina.out | grep -v &quot;INFO: Server startup&quot; | tail -n1 | awk &#39;{$NF=&quot;&quot;;$(NF-1)=&quot;&quot; ;print}&#39;)&quot; # Si on décortique, # on grep INFO: Server startup et la ligne d&#39;avant, on affiche la ligne d&#39;avant seulement sans les deux derniers champs (pour récupérer seulement l&#39;heure de démarrage) ouvrir les ports des firewalls pour les flux VTOM, c’est sympa mais des fois, iptables bloque aussi : cp -p /etc/sysconfig/iptables /etc/sysconfig/iptables.$(date +%Y%m%d) #Editer le fichier /etc/sysconfig/iptables #Ajouter avant la ligne &quot;-A INPUT -j REJECT --reject-with icmp-host-prohibited&quot; les 2 lignes suivantes : -A INPUT -s x.x.x.x/32 -p tcp -m state --state NEW -m tcp --dport 30004 -j ACCEPT #Relancer le serice iptables : service iptables stop service iptables start","headline":"les bizarreries de la semaine","mainEntityOfPage":{"@type":"WebPage","@id":"https://virtual-thom.github.io/archives/les-bizarreries-de-la-semaine/"},"url":"https://virtual-thom.github.io/archives/les-bizarreries-de-la-semaine/"}</script>
+<!-- End Jekyll SEO tag -->
+
+  
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z8Y7902GRV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Z8Y7902GRV');
+</script>
+
+
+  <body>
+    <div class="container">
+      <header id="site-header">
+  <h1>Blog-notes VTOM, informatique, industrialisation, ordonnancement, DevOps</h1>
+  <nav>
+    <ul>
+      <li>
+        <a href="https://virtual-thom.github.io/archives" title="Home">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M18.121,9.88l-7.832-7.836c-0.155-0.158-0.428-0.155-0.584,0L1.842,9.913c-0.262,0.263-0.073,0.705,0.292,0.705h2.069v7.042c0,0.227,0.187,0.414,0.414,0.414h3.725c0.228,0,0.414-0.188,0.414-0.414v-3.313h2.483v3.313c0,0.227,0.187,0.414,0.413,0.414h3.726c0.229,0,0.414-0.188,0.414-0.414v-7.042h2.068h0.004C18.331,10.617,18.389,10.146,18.121,9.88 M14.963,17.245h-2.896v-3.313c0-0.229-0.186-0.415-0.414-0.415H8.342c-0.228,0-0.414,0.187-0.414,0.415v3.313H5.032v-6.628h9.931V17.245z M3.133,9.79l6.864-6.868l6.867,6.868H3.133z"></path>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a href="https://virtual-thom.github.io/archives/vos-commentaires-livre-d-or/" title="Commentaires - livre d'or">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M17.657,2.982H2.342c-0.234,0-0.425,0.191-0.425,0.426v10.21c0,0.234,0.191,0.426,0.425,0.426h3.404v2.553c0,0.397,0.48,0.547,0.725,0.302l2.889-2.854h8.298c0.234,0,0.426-0.191,0.426-0.426V3.408C18.083,3.174,17.892,2.982,17.657,2.982M17.232,13.192H9.185c-0.113,0-0.219,0.045-0.3,0.124l-2.289,2.262v-1.96c0-0.233-0.191-0.426-0.425-0.426H2.767V3.833h14.465V13.192z M10,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.488-0.668,1.488-1.489C11.488,7.905,10.821,7.237,10,7.237 M10,9.364c-0.352,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C10.638,9.077,10.351,9.364,10,9.364 M14.254,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489s1.489-0.668,1.489-1.489C15.743,7.905,15.075,7.237,14.254,7.237 M14.254,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.352,0,0.639,0.287,0.639,0.638C14.893,9.077,14.605,9.364,14.254,9.364 M5.746,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.489-0.668,1.489-1.489C7.234,7.905,6.566,7.237,5.746,7.237 M5.746,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C6.384,9.077,6.096,9.364,5.746,9.364"></path>
+          </svg>
+        </a>
+      </li>
+      
+      <li>
+        <a href="https://virtual-thom.github.io/about" title="Curriculum Vitae Thom">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z"></path>
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+      <div itemscope itemtype ="http://schema.org/Article" class="post">
+  
+  <header class="post-header">
+    <h1 itemprop="name about headline" class="post-title">les bizarreries de la semaine</h1>
+    <p class="post-meta">
+      <time itemprop="datePublished dateModified" datetime="2015-08-06T17:58:00+00:00">06-08-2015</time></p>
+  </header>
+
+  <article class="post-content" itemprop="articleBody">
+    <h1 class="hidden">les bizarreries de la semaine</h1>
+    <p>Quelques bizarreries de le semaine :</p>
+
+<ul>
+  <li>Script batch : Le echo ne modifie pas le errorlevel !</li>
+  <li>Attention aux &amp; dans les paramètres ou dans les ressources VTOM. Ca peut avoir comme résultat assez drôle de n’afficher aucun log VTOM tout en ayant un retour tsend</li>
+  <li>Les fichiers avec extension .i dans le répertoire de logs VTOM est normal depuis la 5.7xx ! Il semblerait que ça serve aux alarmes.</li>
+  <li>fichier log sur le client VTOM à 0 ko ou pas la fin de la log. Mais, le job se statue bien. Dans mon cas, c’est un bug, le tsend du client vers le serveur de backup VTOM était bloqué (impossible de communiquer avec le backup)</li>
+</ul>
+
+<p>Quelques bouts de code de la semaine :</p>
+<ul>
+  <li>Script PERL : charger un fichier XML et récupérer des informations</li>
+</ul>
+
+<div class="language-perl highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/perl</span>
+<span class="k">use</span> <span class="nn">XML::</span><span class="nv">LibXML</span> <span class="p">;</span>
+
+
+<span class="c1"># Load DOM du fichier XML</span>
+<span class="k">my</span> <span class="nv">$dom</span> <span class="o">=</span> <span class="nn">XML::</span><span class="nv">LibXML</span><span class="o">-&gt;</span><span class="k">new</span><span class="p">()</span><span class="o">-&gt;</span><span class="nv">parse_file</span><span class="p">(</span><span class="nv">$ARGV</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="p">;</span>
+<span class="c1"># Item à récupérer</span>
+<span class="k">my</span> <span class="nv">$item</span> <span class="o">=</span> <span class="nv">$ARGV</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">;</span>
+
+
+<span class="k">my</span> <span class="nv">$logVTOM</span> <span class="o">=</span>  <span class="nv">$dom</span><span class="o">-&gt;</span><span class="nv">findvalue</span><span class="p">('</span><span class="s1">/runResponse/runReturn/item/name[contains(text(),</span><span class="se">\'</span><span class="s1">flowResult</span><span class="se">\'</span><span class="s1">)]/../value</span><span class="p">')</span> <span class="p">;</span>
+<span class="k">my</span> <span class="nv">$flowResponse</span> <span class="o">=</span>  <span class="nv">$dom</span><span class="o">-&gt;</span><span class="nv">findvalue</span><span class="p">('</span><span class="s1">/runResponse/runReturn/item/name[contains(text(),</span><span class="se">\'</span><span class="s1">flowResponse</span><span class="se">\'</span><span class="s1">)]/../value</span><span class="p">')</span> <span class="p">;</span>
+
+<span class="c1"># On clean le flowResult pour construire un résultat XML et on charge le DOM en mémoire</span>
+<span class="nv">$logVTOM</span> <span class="o">=~</span> <span class="sr">s/.*(&lt;VTOM_RESULT&gt;.*)/$1/</span> <span class="p">;</span>
+<span class="nv">$logVTOM</span> <span class="o">=~</span> <span class="sr">s/(.*&lt;\/VTOM_RESULT&gt;).*/$1/</span> <span class="p">;</span>
+
+<span class="k">my</span> <span class="nv">$domLogVTOM</span> <span class="o">=</span> <span class="nn">XML::</span><span class="nv">LibXML</span><span class="o">-&gt;</span><span class="nv">load_xml</span><span class="p">(</span>
+	<span class="s">string</span> <span class="o">=&gt;</span> <span class="nv">$logVTOM</span>
+<span class="p">)</span> <span class="p">;</span>
+
+<span class="k">print</span> <span class="nv">$domLogVTOM</span><span class="o">-&gt;</span><span class="nv">findvalue</span><span class="p">('</span><span class="s1">/VTOM_RESULT/VTOM_STDERR</span><span class="p">')</span> <span class="k">if</span><span class="p">(</span><span class="nv">$item</span> <span class="ow">eq</span> <span class="p">"</span><span class="s2">VTOM_STDERR</span><span class="p">");</span> 
+<span class="k">print</span> <span class="nv">$domLogVTOM</span><span class="o">-&gt;</span><span class="nv">findvalue</span><span class="p">('</span><span class="s1">/VTOM_RESULT/VTOM_STDOUT</span><span class="p">')</span> <span class="k">if</span><span class="p">(</span><span class="nv">$item</span> <span class="ow">eq</span> <span class="p">"</span><span class="s2">VTOM_STDOUT</span><span class="p">");</span> 
+<span class="k">print</span> <span class="nv">$domLogVTOM</span><span class="o">-&gt;</span><span class="nv">findvalue</span><span class="p">('</span><span class="s1">/VTOM_RESULT/VTOM_CR</span><span class="p">')</span> <span class="k">if</span><span class="p">(</span><span class="nv">$item</span> <span class="ow">eq</span> <span class="p">"</span><span class="s2">VTOM_CR</span><span class="p">");</span> 
+<span class="k">print</span> <span class="nv">$flowResponse</span> <span class="k">if</span><span class="p">(</span><span class="nv">$item</span> <span class="ow">eq</span> <span class="p">"</span><span class="s2">flowResponse</span><span class="p">");</span>
+</code></pre></div></div>
+
+<ul>
+  <li>Script VTOM : lister les machines Windows VTOM et y associer l’utilisateur Log On “AbsyssBatchManager”</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vtmachine | <span class="nb">grep</span> <span class="nt">-i</span> Win | <span class="nb">awk</span> <span class="nt">-F</span><span class="s2">"|"</span> <span class="s1">'{print $2}'</span> | <span class="nb">sed</span> <span class="s1">'s/[   ]//g'</span> | <span class="k">while </span><span class="nb">read </span>machine<span class="p">;</span> <span class="k">do </span>vtmachine <span class="nt">-i</span> <span class="nv">$machine</span> <span class="p">;</span> <span class="k">done</span> <span class="o">&gt;</span> /var/tmp/vtmachine_windows_infotag.txt
+egrep <span class="s2">"(Logical Name|Username)"</span> /var/tmp/vtmachine_windows_infotag.txt | <span class="nb">awk</span> <span class="nt">-F</span><span class="s2">"|"</span> <span class="s1">'{print $3}'</span> | <span class="nb">sed</span> <span class="s1">'s/[    ]//g'</span> <span class="o">&gt;</span> /var/tmp/liste_machine_user_windows.txt
+<span class="nv">compteur</span><span class="o">=</span>0<span class="p">;</span> <span class="k">while </span><span class="nb">read </span>line <span class="p">;</span> <span class="k">do </span><span class="nb">echo</span> <span class="nt">-en</span> <span class="s2">"</span><span class="nv">$line</span><span class="s2">"</span> <span class="p">;</span> <span class="k">if </span><span class="nb">test</span> <span class="sb">`</span><span class="nb">expr</span> <span class="nv">$compteur</span> % 2<span class="sb">`</span> <span class="nt">-eq</span> 1 <span class="p">;</span> <span class="k">then </span><span class="nb">echo</span> <span class="s2">""</span> <span class="p">;</span> <span class="k">else </span><span class="nb">echo</span> <span class="nt">-en</span> <span class="s2">";"</span> <span class="p">;</span> <span class="k">fi</span> <span class="p">;</span> <span class="nv">compteur</span><span class="o">=</span><span class="sb">`</span><span class="nb">expr</span> <span class="nv">$compteur</span> + 1<span class="sb">`</span> <span class="p">;</span> <span class="k">done</span> &lt; /var/tmp/liste_machine_user_windows.txt
+</code></pre></div></div>
+
+<p>(Attention des fois le vtmachine /info ne donne pas de Username)</p>
+
+<ul>
+  <li>lister les dates communes à plusieurs environnements (dangereux ! ne pas faire ça, sinon on ne sait pas quel moteur va faire basculer la date)</li>
+</ul>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tlist <span class="nb">env</span>/date | <span class="nb">sort</span> <span class="nt">-u</span> <span class="nt">-k</span><span class="s2">"2,2"</span> <span class="nt">-k</span><span class="s2">"1,1"</span> | <span class="nb">awk</span> <span class="s1">'{print $2}'</span> | <span class="nb">uniq</span> <span class="nt">-c</span> | <span class="nb">awk</span> <span class="s1">'$1 &gt; 1'</span>
+      2 date_system
+      2 prod_0_agp
+      2 prod_0_jour
+      2 prod_0_saveUn
+</code></pre></div></div>
+
+<ul>
+  <li>Petite astuce pour récupérer le dernier startup tomcat avec le log catalina.out</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>date --date="$(grep -B 1 "INFO: Server startup" catalina.out | grep -v "INFO: Server startup" | tail -n1 | awk '{$NF="";$(NF-1)="" ;print}')"
+
+# Si on décortique, 
+# on grep INFO: Server startup et la ligne d'avant, on affiche la ligne d'avant seulement sans les deux derniers champs (pour récupérer seulement l'heure de démarrage)
+</code></pre></div></div>
+
+<ul>
+  <li>ouvrir les ports des firewalls pour les flux VTOM, c’est sympa mais des fois, iptables bloque aussi :</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cp -p /etc/sysconfig/iptables /etc/sysconfig/iptables.$(date +%Y%m%d) 
+#Editer le fichier /etc/sysconfig/iptables 
+#Ajouter avant la ligne "-A INPUT -j REJECT --reject-with icmp-host-prohibited" les 2 lignes suivantes : 
+-A INPUT -s x.x.x.x/32 -p tcp -m state --state NEW -m tcp --dport 30004 -j ACCEPT 
+
+#Relancer le serice iptables : 
+service iptables stop 
+service iptables start
+</code></pre></div></div>
+
+  </article>
+  
+<nav>
+  <ul class="pager">
+    
+     
+    <li class="previous">
+      <a href="https://virtual-thom.github.io/archives/vtaddjob-vtom-ajouter-une-ressource/"><span aria-hidden="true">&larr;</span> VTOM ajouter une ressource en mode commande</a> 
+    </li>
+    
+     
+     <li class="next">
+      <a class="next" href="https://virtual-thom.github.io/archives/sh-lister-tous-les-fichiers-sauf-les-deux-derniers/">Shell Lister tous les fichiers sauf les x derniers <span aria-hidden="true">&rarr;</span></a> 
+    </li>
+     
+    
+  </ul>
+</nav>
+
+
+  <footer class="post-footer">
+    
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>log VTOM</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>.i</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>ERRORLEVEL</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>batch</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>VTOM</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>echo</a>
+      
+    
+    <span  itemprop="author publisher" class="hidden">Virtual Thom</span>
+  </footer>
+  
+  <div id="disqus_thread" ></div>
+  <script>
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'thomas-asnar'; // required: replace example with your forum shortname
+  
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+</div>
+
+      <footer id="site-footer">
+    <div>&copy;<a href="https://github.com/virtual-thom/" title="Github Virtual-Thom">Virtual-Thom</a></div>
+    <div>
+            <a href="https://virtual-thom.github.io/archives/plan" title="Plan du site">sitemap</a> | <a href="https://virtual-thom.github.io/about" rel="publisher author" title="Curriculum vitae Thom">A propos</a>
+    </div>
+    <div>
+        <a id="goto-site-header" href="#site-header" title="Retourner au début">&uArr; Top</a>
+    </div>
+    <div id="footer-disclaimer">
+        <p>Avertissement : vous ne devez pas prendre pour argent comptant le contenu de ce site. Testez toujours la solution en environnement de test.</p>
+        <p>Malgré le sérieux que je m'efforce de mettre dans le contenu de ces billets, je ne pourrai être tenu responsable d'éventuelles erreurs que cela pourrait engendrer.</p>
+    </div>
+    <div>
+        <a class="hidden" href="https://virtual-thom.github.io/archives/sitemap.xml" title="SiteMap">sitemap</a>
+    </div>
+</footer>
+
+    </div>
+  </body>
+
+</html>

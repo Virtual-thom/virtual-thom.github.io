@@ -1,0 +1,19 @@
+---
+layout: post
+title: Ajout d'une image dans la signature d'un email 
+date: 2014-01-21 15:27
+author: Virtual Thom
+comments: true
+categories: [PHP, Zend Framework]
+---
+Pour les utilisateurs de Zend, petite astuce pour ajouter et afficher une signature dans un e-mail généré.
+<pre lang="php">$mypicture = file_get_contents('img/signature.jpg') ;
+$pictureAttachment = $mail-&gt;createAttachment($mypicture) ;
+$pictureAttachment-&gt;type = 'application/jpg' ;
+$pictureAttachment-&gt;encoding = Zend_Mime::ENCODING_BASE64;
+$pictureAttachment-&gt;filename = 'signature.jpg';
+
+$bodyhtml .= '&lt;div style="margin-top:20px ;"&gt;
+ &lt;img width=300 src="cid:signature.jpg" alt="signature.jpg" &gt;
+&lt;/div&gt;' ;</pre>
+Le client qui réceptionne l'e-mail doit être configurer en html et doit bien sûr "afficher les images" pour pouvoir apercevoir la signature. (fonctionne pour autre chose qu'une signature d'ailleurs, il suffit de placer l'img src=cid où vous voulez dans votre structure html du mail)

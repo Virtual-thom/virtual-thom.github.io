@@ -1,0 +1,134 @@
+Save 
+---
+layout: page
+title: Convertisseur Timestamp | Minuteur en ligne gratuit
+titre-court: Timer
+description: Minuteur gratuit en ligne. Convertisseur Timestamp (temps en secondes depuis 1 Janv 1970).
+---
+<style>
+  .ui-datepicker-month,.ui-datepicker-year{background:gray;}
+  h1,.footer{text-align:center;}
+  .bg-success{border-radius:10px;padding:5px;}
+  .row{margin-bottom:5px;text-align:center;}
+  .row .btn{margin:5px;}
+  #convertisseur{border-top: 5px solid aliceblue;margin-top: 20px;}
+</style>
+<div class="bg-success container-fluid">
+  
+	<div class="header">
+		<div class="row">
+			<div class="col-md-12"><h1>Minuteur</h1></div>
+		</div>
+	</div>
+	<div id="minuteur">
+
+		<div class="row">
+			<h1><span id="tth"></span></h1>
+		</div>
+		<div class="row">
+			<div class="col-md-10 col-md-offset-1">
+				<div class="progress">
+					<div id="progress-bar-minuteur" class="progress-bar progress-bar-success" role="progressbar" style="width:100%"
+						aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+					</div>
+				</div> <!-- .progress -->
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-1 col-md-offset-4">
+			   <select name="tthh" class="form-control">
+				  <option value="0">Heures</option>
+			   </select>
+			</div>
+			<div class="col-md-1">
+			   <select name="tthm" class="form-control">
+				  <option value="0">Minutes</option>
+			   </select>
+			</div>
+			<div class="col-md-1">
+			   <select name="tths" class="form-control">
+				  <option value="0">Secondes</option>
+			   </select>
+			</div>
+			<div class="col-md-1"><button id="tth-plus" class="btn"><i class="glyphicon glyphicon-plus"></i></button></div>
+			<div class="col-md-1"><button id="tth-pause" class="btn"><i class="glyphicon glyphicon-pause"></i></button></div>
+		</div> <!-- .row -->
+		<div class="row">
+			<div class="col-md-1 col-md-offset-1"><button id="tth-5" class="btn tth-btn" value="300">00:05:00</button></div>
+			<div class="col-md-1"><button id="tth-10" class="btn tth-btn" value="600">00:10:00</button></div>
+			<div class="col-md-1"><button id="tth-15" class="btn tth-btn" value="900">00:15:00</button></div>
+			<div class="col-md-1"><button id="tth-20" class="btn tth-btn" value="1200">00:20:00</button></div>
+			<div class="col-md-1"><button id="tth-25" class="btn tth-btn" value="1500">00:25:00</button></div>
+			<div class="col-md-1"><button id="tth-30" class="btn tth-btn" value="1800">00:30:00</button></div>
+			<div class="col-md-1"><button id="tth-40" class="btn tth-btn" value="2400">00:40:00</button></div>
+			<div class="col-md-1"><button id="tth-50" class="btn tth-btn" value="3000">00:50:00</button></div>
+			<div class="col-md-1"><button id="tth-60" class="btn tth-btn" value="3600">01:00:00</button></div>
+			<div class="col-md-1"><button id="tth-90" class="btn tth-btn" value="5400">01:30:00</button></div>
+		</div> <!-- .row -->
+		<audio id="alien-siren">
+			<source src="assets/sounds/alien-siren.ogg" type="audio/ogg">
+			<source src="assets/sounds/alien-siren.mp3" type="audio/mp3">
+		</audio>
+	</div> <!-- #minuteur -->
+  <div id="convertisseur">
+		<div class="row">
+			<div class="col-md-12"><h1>Convertisseur</h1></div>
+		</div>
+		<div class="row">
+			<div class="col-md-5">
+				<h1>Timestamp</h1>
+				<div class="row">
+					<div class="col-md-12"><h2><span id="now-timestamp"></span></h2></div>
+				</div>
+			</div>
+			<div class="col-md-2">
+				<h1>&lt;==&gt;</h1>
+				<div class="row">
+					<div class="col-md-12"></div>
+				</div>
+			</div>
+			<div class="col-md-5">
+				<h1>Date/Heure</h1>
+				<div class="row">
+					<div class="col-md-12"><h2><span id="now-date"></span></h2></div>	
+				</div>
+			</div>
+		</div>
+		<div id="addrow">
+		</div>
+	<div class="row">
+	    <div class="col-md-3 col-md-offset-1">
+			<div class="form-group">
+				<input class="form-control" id="htstmp" name="htstmp" type="text" value="" placeholder="timestamp" />
+			</div>
+		</div>
+		<div class="col-md-1"><button id="htstmp-plus" class="btn"><i class="glyphicon glyphicon-plus"></i></button></div>
+		<div class="col-md-2"></div>
+		<div class="col-md-1"><input class="form-control" id="hth" name="hth" type="text" value="cliquez" />mm/dd/yyyy</div>
+		<div class="col-md-1">
+		   <select name="hthh" class="form-control">
+			  <option value="0">Heures</option>
+		   </select>
+		</div>
+		<div class="col-md-1">
+		   <select name="hthm" class="form-control">
+			  <option value="0">Minutes</option>
+		   </select>
+		</div>
+		<div class="col-md-1">
+		   <select name="hths" class="form-control">
+			  <option value="0">Secondes</option>
+		   </select>
+		</div>
+		<div class="col-md-1"><button id="hth-plus" class="btn"><i class="glyphicon glyphicon-plus"></i></button></div>
+	</div> <!-- .row -->
+	<div class="row">
+	   <div class="col-md-1 col-md-offset-9"><button class="btn" id="init00">00:00:00</button></div>
+	</div>  
+	
+	</div> <!-- #convertisseur -->
+  <div class="footer">
+				   <small>** timestamp : temps écoulé en secondes depuis le 1 Janvier 1970</small>
+  </div>
+
+</div> <!-- #container -->

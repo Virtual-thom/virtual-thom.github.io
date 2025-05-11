@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="apple-touch-icon" href="https://virtual-thom.github.io/archives/apple-touch-icon.png">
+  <link rel="icon" href="https://virtual-thom.github.io/archives/favicon.ico" />
+  <!-- Remplacé par Jekyll SEO (sinon apparait en double)
+  <title>Algorithme pour résoudre un sudoku (python et javascript)</title>
+  <meta name="description" content="Voici une solution élégante (algorithme de quelques lignes) pour résoudre une grille de Sudoku en Python ou en Javascript.Download codesudoku solver pysudoku...">
+  --> 
+  
+  <link rel="canonical" href="https://virtual-thom.github.io/archives/algorithme-sudoku-resolver-python-javascript/">
+  
+  <link rel="stylesheet" media="screen" href="https://virtual-thom.github.io/archives/assets/main.css">
+  
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Algorithme pour résoudre un sudoku (python et javascript) | Virtual-Thom Blog-notes VTOM et informatique</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Algorithme pour résoudre un sudoku (python et javascript)" />
+<meta name="author" content="Virtual Thom" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Voici une solution élégante (algorithme de quelques lignes) pour résoudre une grille de Sudoku en Python ou en Javascript. Download code sudoku solver py sudoku solver js Le code en détail et console pour tester" />
+<meta property="og:description" content="Voici une solution élégante (algorithme de quelques lignes) pour résoudre une grille de Sudoku en Python ou en Javascript. Download code sudoku solver py sudoku solver js Le code en détail et console pour tester" />
+<link rel="canonical" href="https://virtual-thom.github.io/archives/algorithme-sudoku-resolver-python-javascript/" />
+<meta property="og:url" content="https://virtual-thom.github.io/archives/algorithme-sudoku-resolver-python-javascript/" />
+<meta property="og:site_name" content="Virtual-Thom Blog-notes VTOM et informatique" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-08-22T22:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Algorithme pour résoudre un sudoku (python et javascript)" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Virtual Thom"},"dateModified":"2020-08-22T22:00:00+00:00","datePublished":"2020-08-22T22:00:00+00:00","description":"Voici une solution élégante (algorithme de quelques lignes) pour résoudre une grille de Sudoku en Python ou en Javascript. Download code sudoku solver py sudoku solver js Le code en détail et console pour tester","headline":"Algorithme pour résoudre un sudoku (python et javascript)","mainEntityOfPage":{"@type":"WebPage","@id":"https://virtual-thom.github.io/archives/algorithme-sudoku-resolver-python-javascript/"},"url":"https://virtual-thom.github.io/archives/algorithme-sudoku-resolver-python-javascript/"}</script>
+<!-- End Jekyll SEO tag -->
+
+  
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z8Y7902GRV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Z8Y7902GRV');
+</script>
+
+
+  <body>
+    <div class="container">
+      <header id="site-header">
+  <h1>Blog-notes VTOM, informatique, industrialisation, ordonnancement, DevOps</h1>
+  <nav>
+    <ul>
+      <li>
+        <a href="https://virtual-thom.github.io/archives" title="Home">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M18.121,9.88l-7.832-7.836c-0.155-0.158-0.428-0.155-0.584,0L1.842,9.913c-0.262,0.263-0.073,0.705,0.292,0.705h2.069v7.042c0,0.227,0.187,0.414,0.414,0.414h3.725c0.228,0,0.414-0.188,0.414-0.414v-3.313h2.483v3.313c0,0.227,0.187,0.414,0.413,0.414h3.726c0.229,0,0.414-0.188,0.414-0.414v-7.042h2.068h0.004C18.331,10.617,18.389,10.146,18.121,9.88 M14.963,17.245h-2.896v-3.313c0-0.229-0.186-0.415-0.414-0.415H8.342c-0.228,0-0.414,0.187-0.414,0.415v3.313H5.032v-6.628h9.931V17.245z M3.133,9.79l6.864-6.868l6.867,6.868H3.133z"></path>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a href="https://virtual-thom.github.io/archives/vos-commentaires-livre-d-or/" title="Commentaires - livre d'or">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M17.657,2.982H2.342c-0.234,0-0.425,0.191-0.425,0.426v10.21c0,0.234,0.191,0.426,0.425,0.426h3.404v2.553c0,0.397,0.48,0.547,0.725,0.302l2.889-2.854h8.298c0.234,0,0.426-0.191,0.426-0.426V3.408C18.083,3.174,17.892,2.982,17.657,2.982M17.232,13.192H9.185c-0.113,0-0.219,0.045-0.3,0.124l-2.289,2.262v-1.96c0-0.233-0.191-0.426-0.425-0.426H2.767V3.833h14.465V13.192z M10,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.488-0.668,1.488-1.489C11.488,7.905,10.821,7.237,10,7.237 M10,9.364c-0.352,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C10.638,9.077,10.351,9.364,10,9.364 M14.254,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489s1.489-0.668,1.489-1.489C15.743,7.905,15.075,7.237,14.254,7.237 M14.254,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.352,0,0.639,0.287,0.639,0.638C14.893,9.077,14.605,9.364,14.254,9.364 M5.746,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.489-0.668,1.489-1.489C7.234,7.905,6.566,7.237,5.746,7.237 M5.746,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C6.384,9.077,6.096,9.364,5.746,9.364"></path>
+          </svg>
+        </a>
+      </li>
+      
+      <li>
+        <a href="https://virtual-thom.github.io/about" title="Curriculum Vitae Thom">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z"></path>
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+      <div itemscope itemtype ="http://schema.org/Article" class="post">
+  
+  <header class="post-header">
+    <h1 itemprop="name about headline" class="post-title">Algorithme pour résoudre un sudoku (python et javascript)</h1>
+    <p class="post-meta">
+      <time itemprop="datePublished dateModified" datetime="2020-08-22T22:00:00+00:00">22-08-2020</time></p>
+  </header>
+
+  <article class="post-content" itemprop="articleBody">
+    <h1 class="hidden">Algorithme pour résoudre un sudoku (python et javascript)</h1>
+    <p>Voici une solution élégante (algorithme de quelques lignes) pour résoudre une grille de Sudoku en Python ou en Javascript.</p>
+<h2 id="download-code">Download code</h2>
+<p><a href="https://virtual-thom.github.io/archives/wp-content/uploads/sudoku_solver.py">sudoku solver py</a><br />
+<a href="https://virtual-thom.github.io/archives/wp-content/uploads/sudoku_solver.js">sudoku solver js</a></p>
+
+<h2 id="le-code-en-détail-et-console-pour-tester">Le code en détail et console pour tester</h2>
+<!--more-->
+<p>Vous pouvez tester le code <a href="#jstest-ancre">à la fin de cette page</a></p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/*
+  On définit une grille de sudoku en tableau de tableau, sorte de matrice où chaque valeur de cellule est accessible par ses coordonnées grid[y][x]. 
+  Par facilité, les coordonnées commencent comme les index de tableau à 0.
+  Une cellule vide a pour valeur 0.
+  Voici un exemple pour bien comprendre :
+  x 0 1 2 | 3 4 5 | 6 7 8 
+y -----------------------
+0 | 0 0 6 | 0 3 0 | 7 0 0
+1 | 0 3 0 | 5 0 8 | 0 9 0
+2 | 8 0 0 | 4 0 7 | 0 0 6
+-------------------------
+3 | 0 9 0 | 0 0 0 | 0 3 0
+4 | 0 0 0 | 8 2 9 | 0 0 0
+5 | 0 6 0 | 0 0 0 | 0 2 0
+-------------------------
+6 | 3 0 0 | 6 0 4 | 0 0 9
+7 | 0 4 0 | 2 0 1 | 0 8 0
+8 | 0 0 1 | 0 5 0 | 2 0 0
+*/</span>
+<span class="c1">// on reporte ça en tableau de tableau donc</span>
+<span class="kd">let</span> <span class="nx">grid</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">8</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">9</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">]</span>
+
+<span class="cm">/* Fonction pour afficher la grille de façon plus sympa dans la console 
+------------
+|006|030|700
+|030|508|090
+|800|407|006
+------------
+|090|000|030
+|000|829|000
+|060|000|020
+------------
+|300|604|009
+|040|201|000
+|001|050|000
+*/</span>
+<span class="kd">function</span> <span class="nf">affiche</span><span class="p">(</span><span class="nx">grid</span><span class="p">){</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nb">Array</span><span class="p">.</span><span class="nf">isArray</span><span class="p">(</span><span class="nx">grid</span><span class="p">)){</span>
+    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nb">Array</span><span class="p">.</span><span class="nf">isArray</span><span class="p">(</span><span class="nx">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">])){</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">Ceci n'est pas une matrice</span><span class="dl">"</span><span class="p">)</span>
+      <span class="k">return</span> <span class="kc">false</span>
+    <span class="p">}</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">Ceci n'est même pas un tableau</span><span class="dl">"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">false</span>
+  <span class="p">}</span>
+  <span class="nx">grid</span><span class="p">.</span><span class="nf">forEach</span><span class="p">(</span> <span class="p">(</span><span class="nx">y</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">i</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">------------</span><span class="dl">"</span><span class="p">)</span>
+    <span class="nx">line</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="nx">y</span><span class="p">.</span><span class="nf">forEach</span><span class="p">(</span> <span class="p">(</span><span class="nx">v</span><span class="p">,</span> <span class="nx">index</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+      <span class="k">if</span><span class="p">(</span><span class="nx">index</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">line</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="dl">"</span><span class="s2">|</span><span class="dl">"</span><span class="p">)</span>
+      <span class="nx">line</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="nx">v</span><span class="p">)</span>
+    <span class="p">})</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">line</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="dl">""</span><span class="p">))</span>
+  <span class="p">})</span>
+  <span class="k">return</span> <span class="kc">true</span>
+<span class="p">}</span>
+
+<span class="c1">// est-ce que la valeur "n" est possible aux coordonnées (x,y) ? retourne true ou false</span>
+<span class="kd">function</span> <span class="nf">possible</span><span class="p">(</span><span class="nx">grid</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">n</span><span class="p">){</span>
+  <span class="c1">// On passe par trois étapes pour vérifier si la valeur "n" est possible : la ligne, la colonne, le carré</span>
+  <span class="c1">// ex. possible(grid, 1, 4, 1) la réponse est oui pour ce premier test car la valeur 1 n'apparait pas sur la ligne 1, on passe au test suivant</span>
+  <span class="c1">// possible(grid, 1, 4, 3) n'aurait pas été possible par exemple, car 3 se trouve sur la ligne 1</span>
+  <span class="c1">// 1 | 0 3 0 | 5 0 8 | 0 9 0</span>
+  <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">9</span> <span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">grid</span><span class="p">[</span><span class="nx">y</span><span class="p">][</span><span class="nx">i</span><span class="p">]</span> <span class="o">==</span> <span class="nx">n</span><span class="p">){</span>
+      <span class="k">return</span> <span class="kc">false</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="c1">// ex. possible(grid, 1, 4, 1) la réponse est oui pour ce deuxième test car la valeur 1 n'apparait pas dans la colonne 4, on passe au test suivant</span>
+  <span class="cm">/*
+    4
+    -
+    3
+    0
+    0
+    -
+    0
+    2
+    0
+    -
+    0
+    0
+    5
+   */</span>
+  <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">9</span> <span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">grid</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="nx">x</span><span class="p">]</span> <span class="o">==</span> <span class="nx">n</span><span class="p">){</span>
+      <span class="k">return</span> <span class="kc">false</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="c1">// ex. possible(grid, 1, 4, 1) la réponse est oui pour ce troisième test car la valeur 1 n'apparait pas dans le carré où se trouve (4,1)</span>
+  <span class="cm">/*
+      x 3 4 5
+    y -------
+    0 | 0 3 0
+    1 | 5 0 8
+    2 | 4 0 7
+    
+    Il y a 3 carrés par 3 dans un sudoku.
+    On cherche les coordonnées du carré où se trouve notre point (x,y).
+    On cherche le point en haut à gauche.
+    Ca sera plus facile pour itérer sur toutes les cases à partir de ce point. 
+  */</span>
+  <span class="nx">x0</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">floor</span><span class="p">(</span><span class="nx">x</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span> <span class="c1">// J'ai 3 coordonnées x possibles par carré : 0 (accepte x0, x1, x2), 3 (accepte x3, x4, x5), 6 (accepte x6, x7, x8). </span>
+  <span class="nx">y0</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nf">floor</span><span class="p">(</span><span class="nx">y</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span> <span class="c1">// Idem mais pour y et on aura bien 9 carrés possibles aux coordonnées du coin en haut à gauche ( (x0,y0) ,(x0,y3) ,(x0,y6) ,(x3,y0) ,(x3,y3) ,(x3,y6) ,(x6,y0) ,(x6,y3) ,(x6,y6) )</span>
+  <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">j</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">;</span> <span class="nx">j</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="p">;</span> <span class="nx">j</span><span class="o">++</span><span class="p">){</span>
+      <span class="k">if</span><span class="p">(</span><span class="nx">grid</span><span class="p">[</span><span class="nx">y0</span> <span class="o">+</span> <span class="nx">i</span><span class="p">][</span><span class="nx">x0</span> <span class="o">+</span> <span class="nx">j</span><span class="p">]</span> <span class="o">==</span> <span class="nx">n</span><span class="p">){</span>
+        <span class="k">return</span> <span class="kc">false</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="kc">true</span>
+<span class="p">}</span>
+<span class="kd">let</span> <span class="nx">solution</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="c1">// A ma grande surprise, voici la partie qui résout vraiment le sudoku, soit une dizaine de ligne</span>
+<span class="kd">function</span> <span class="nf">solve</span><span class="p">(</span><span class="nx">grid</span><span class="p">){</span>
+  <span class="c1">// On teste toutes les coordonnées de la matrice</span>
+  <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">y</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">;</span> <span class="nx">y</span> <span class="o">&lt;</span> <span class="mi">9</span> <span class="p">;</span> <span class="nx">y</span><span class="o">++</span><span class="p">){</span>
+    <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">x</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">;</span> <span class="nx">x</span> <span class="o">&lt;</span> <span class="mi">9</span> <span class="p">;</span> <span class="nx">x</span><span class="o">++</span><span class="p">){</span>
+      <span class="k">if</span><span class="p">(</span><span class="nx">grid</span><span class="p">[</span><span class="nx">y</span><span class="p">][</span><span class="nx">x</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span> <span class="c1">// On ne vérifie que les cellules vides (valeur == 0)</span>
+        <span class="k">for</span><span class="p">(</span><span class="kd">let</span> <span class="nx">n</span> <span class="o">=</span> <span class="mi">1</span> <span class="p">;</span> <span class="nx">n</span> <span class="o">&lt;</span> <span class="mi">10</span> <span class="p">;</span> <span class="nx">n</span><span class="o">++</span><span class="p">){</span> <span class="c1">// On teste toutes les valeurs possibles de 1 à 9</span>
+          <span class="k">if</span><span class="p">(</span><span class="nf">possible</span><span class="p">(</span><span class="nx">grid</span><span class="p">,</span> <span class="nx">y</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">n</span><span class="p">)){</span> <span class="c1">// On a vu dans la fonction précédante comment on testait si une valeur n était possible ou non aux coordonnées (x,y)</span>
+            <span class="nx">grid</span><span class="p">[</span><span class="nx">y</span><span class="p">][</span><span class="nx">x</span><span class="p">]</span> <span class="o">=</span> <span class="nx">n</span> <span class="c1">// si c'est possible, on définit cette valeur pour cette case</span>
+            <span class="nf">solve</span><span class="p">(</span><span class="nx">grid</span><span class="p">)</span> <span class="c1">// on appelle la fonction encore et encore en éliminant petit à petit les cellules vides quand n est possible. Si aucun n n'est possible, on tombera sur le return plus bas, stoppant la function solve()</span>
+            <span class="nx">grid</span><span class="p">[</span><span class="nx">y</span><span class="p">][</span><span class="nx">x</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1">// Il ne faut pas s'y méprendre, on appelle cette ligne de commande à chaque fois que solve() trouve une case vide. </span>
+            <span class="c1">// solve() du dessus va s'exécuter autant de fois que nécessaire et trouvera peut-être une solution où aucune des cellules n'est vide, et donc ne passe plus par cette itération.</span>
+            <span class="c1">// c'est vraiment important de remettre à zéro les coordonnées (x, y) pour qu'on puisse tester d'autres valeurs n à la prochaine boucle n++</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="c1">// dead end : on sort de la fonction à partir du moment où on a trouvé une cellule vide ou que c'est une voie sans issue (c'est à dire qu'aucun "n" n'est possible pour une case vide donnée).</span>
+        <span class="c1">// on n'oublie pas que la solution sera trouvée par la récursion des solve() deux lignes avant quand plus aucune cellule ne sera vide, à force de trouver des valeurs n possibles</span>
+        <span class="c1">// Il peut y avoir plusieurs solutions.</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  
+  <span class="c1">// On arrive ici seulement quand aucun case n'est vide</span>
+  <span class="nx">solution</span> <span class="o">+=</span> <span class="mi">1</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span> <span class="dl">"</span><span class="s2">Solution n°</span><span class="dl">"</span> <span class="o">+</span> <span class="nx">solution</span><span class="p">)</span>
+  <span class="nf">affiche</span><span class="p">(</span><span class="nx">grid</span><span class="p">)</span> 
+  <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">#################</span><span class="dl">"</span><span class="p">)</span>
+<span class="p">}</span>
+
+
+
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">Grille :</span><span class="dl">"</span><span class="p">)</span>
+<span class="nf">affiche</span><span class="p">(</span><span class="nx">grid</span><span class="p">)</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">""</span><span class="p">)</span>
+<span class="nf">solve</span><span class="p">(</span><span class="nx">grid</span><span class="p">)</span>
+</code></pre></div></div>
+
+<style>
+  .myButton {
+    box-shadow: 0px 10px 14px -7px #3e7327;
+    background:linear-gradient(to bottom, #77b55a 5%, #72b352 100%);
+    background-color:#77b55a;
+    border-radius:4px;
+    border:1px solid #4b8f29;
+    display:inline-block;
+    cursor:pointer;
+    color:#ffffff;
+    font-family:Arial;
+    font-size:13px;
+    font-weight:bold;
+    padding:6px 12px;
+    text-decoration:none;
+    text-shadow:0px 1px 0px #5b8a3c;
+  }
+  .myButton:hover {
+    background:linear-gradient(to bottom, #72b352 5%, #77b55a 100%);
+    background-color:#72b352;
+  }
+  .myButton:active {
+    position:relative;
+    top:1px;
+  }
+  .text-center{
+    text-align:center;
+  }
+  #jstest > div{
+    width:45%;
+    display: inline-block;
+  }
+  #jstest-code > textarea{
+    width:100%;
+    border-radius:10px;
+  }
+  #jstest-result {
+    vertical-align:top;
+    margin-left:5px;
+  }
+  #jstest-result pre{
+    height:100%;
+  }
+</style>
+
+<script>
+  var oldLog = console.log;
+  console.log = function (message) {
+      jsTestResultLog(message)
+      oldLog.apply(console, arguments);
+  };
+  function jsTestResultLog(message){
+    document.querySelector("#jstest-result pre").innerHTML += message + "\n"
+  }
+  function fnJstest(){
+    let codeToExecute = document.querySelector("#jstest-code textarea").value
+    document.querySelector("#jstest-result pre").innerHTML = ""
+    eval(codeToExecute)
+  }
+</script>
+
+<div id="jstest-ancre"></div>
+<div class="container text-center" style="margin-bottom:5px;"><button class="myButton" onclick="fnJstest()">Jouer le bout de script ci-dessous</button></div>
+<div class="container" id="jstest">
+  <div id="jstest-code">
+    <textarea rows="83">
+let grid = [
+  [0,0,6,0,3,0,7,0,0],
+  [0,3,0,5,0,8,0,9,0],
+  [8,0,0,4,0,7,0,0,6],
+  [0,9,0,0,0,0,0,3,0],
+  [0,0,0,8,2,9,0,0,0],
+  [0,6,0,0,0,0,0,2,0],
+  [3,0,0,6,0,4,0,0,9],
+  [0,4,0,2,0,1,0,8,0],
+  [0,0,1,0,5,0,2,0,0]
+]
+function affiche(grid){
+  if(!Array.isArray(grid)){
+    if(!Array.isArray(grid[0])){
+      console.log("Ceci n'est pas une matrice")
+      return false
+    }
+    console.log("Ceci n'est même pas un tableau")
+    return false
+  }
+  grid.forEach( (y, i) =&gt; {
+    if(i % 3 == 0) console.log("------------")
+    line = []
+    y.forEach( (v, index) =&gt; {
+      if(index % 3 == 0) line.push("|")
+      line.push(v)
+    })
+    console.log(line.join(""))
+  })
+  return true
+}
+
+function possible(grid, y, x, n){
+  for(let i = 0 ; i &lt; 9 ; i++){
+    if(grid[y][i] == n){
+      return false
+    }
+  }
+  for(let i = 0 ; i &lt; 9 ; i++){
+    if(grid[i][x] == n){
+      return false
+    }
+  }
+  x0 = Math.floor(x/3) * 3
+  y0 = Math.floor(y/3) * 3
+  for(let i = 0 ; i &lt; 3 ; i++){
+    for(let j = 0 ; j &lt; 3 ; j++){
+      if(grid[y0 + i][x0 + j] == n){
+        return false
+      }
+    }
+  }
+
+  return true
+}
+let solution = 0
+function solve(grid){
+  for(let y = 0 ; y &lt; 9 ; y++){
+    for(let x = 0 ; x &lt; 9 ; x++){
+      if(grid[y][x] == 0){
+        for(let n = 1 ; n &lt; 10 ; n++){
+          if(possible(grid, y, x, n)){
+            grid[y][x] = n
+            solve(grid)
+            grid[y][x] = 0
+          }
+        }
+        return
+      }
+    }
+  }
+  
+  solution += 1
+  console.log( "Solution n°" + solution)
+  affiche(grid) 
+  console.log("#################")
+}
+
+console.log("Grille :")
+affiche(grid)
+console.log("")
+solve(grid)</textarea>
+  </div>
+  <div id="jstest-result">
+    <pre>
+    </pre>
+  </div>
+</div>
+
+  </article>
+  
+<nav>
+  <ul class="pager">
+    
+     
+    <li class="previous">
+      <a href="https://virtual-thom.github.io/archives/dev-chromebook-docker-wordpress/"><span aria-hidden="true">&larr;</span> On dev un site wordpress sur chromebook (docker sur linux béta de chromebook)</a> 
+    </li>
+    
+     
+     <li class="next">
+      <a class="next" href="https://virtual-thom.github.io/archives/docker-conteneurs/">Docker introduction aux conteneurs <span aria-hidden="true">&rarr;</span></a> 
+    </li>
+     
+    
+  </ul>
+</nav>
+
+
+  <footer class="post-footer">
+    
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>javascript</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>python</a>
+      
+    
+    <span  itemprop="author publisher" class="hidden">Virtual Thom</span>
+  </footer>
+  
+  <div id="disqus_thread" ></div>
+  <script>
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'thomas-asnar'; // required: replace example with your forum shortname
+  
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+</div>
+
+      <footer id="site-footer">
+    <div>&copy;<a href="https://github.com/virtual-thom/" title="Github Virtual-Thom">Virtual-Thom</a></div>
+    <div>
+            <a href="https://virtual-thom.github.io/archives/plan" title="Plan du site">sitemap</a> | <a href="https://virtual-thom.github.io/about" rel="publisher author" title="Curriculum vitae Thom">A propos</a>
+    </div>
+    <div>
+        <a id="goto-site-header" href="#site-header" title="Retourner au début">&uArr; Top</a>
+    </div>
+    <div id="footer-disclaimer">
+        <p>Avertissement : vous ne devez pas prendre pour argent comptant le contenu de ce site. Testez toujours la solution en environnement de test.</p>
+        <p>Malgré le sérieux que je m'efforce de mettre dans le contenu de ces billets, je ne pourrai être tenu responsable d'éventuelles erreurs que cela pourrait engendrer.</p>
+    </div>
+    <div>
+        <a class="hidden" href="https://virtual-thom.github.io/archives/sitemap.xml" title="SiteMap">sitemap</a>
+    </div>
+</footer>
+
+    </div>
+  </body>
+
+</html>

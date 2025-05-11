@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="apple-touch-icon" href="https://virtual-thom.github.io/archives/apple-touch-icon.png">
+  <link rel="icon" href="https://virtual-thom.github.io/archives/favicon.ico" />
+  <!-- Remplacé par Jekyll SEO (sinon apparait en double)
+  <title>VTOM ajouter une ressource en mode commande</title>
+  <meta name="description" content="ajout/modification/suppression d’attente de ressource sur app ou jobLe vthelp vtaddjob n’est pas très intuitif.Voici un exmple pour rajouter (+) une ressourc...">
+  --> 
+  
+  <link rel="canonical" href="https://virtual-thom.github.io/archives/vtaddjob-vtom-ajouter-une-ressource/">
+  
+  <link rel="stylesheet" media="screen" href="https://virtual-thom.github.io/archives/assets/main.css">
+  
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>VTOM ajouter une ressource en mode commande | Virtual-Thom Blog-notes VTOM et informatique</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="VTOM ajouter une ressource en mode commande" />
+<meta name="author" content="Virtual Thom" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="ajout/modification/suppression d’attente de ressource sur app ou job Le vthelp vtaddjob n’est pas très intuitif. Voici un exmple pour rajouter (+) une ressource texte VTOM avec les options d’attente indéfiniment. vtaddjob /nom=env/app/job /script=&#39;monscript&#39; /res=&quot;+nom_ressource = OK [attend==oui jusqu&#39;a==Illimité]&quot; Modifier (~) une ressource de type poids en ligne de commande avec libération vtaddapp /nom=$ITEM_VTOM /Res=&quot;~${ITEM_VTOM_RES} ! 1 [attend==oui jusqu&#39;a==Illimité liberation==oui]&quot; Remplacer une ressource de type fichier par une autre (P présent) vtaddjob /nom=$ITEM_VTOM /res=&quot;-${OLD_RESS} P,+${NEW_RESS} P [attend==oui jusqu&#39;a==Illimité]&quot; exemple de changement de masse sur des jobs. Retrait d’une ressource poids et ajout d’une autre (prend 1, libère et attente illimité) : tlist jobs -f MONENV | egrep -i &quot;UNPATTERN.*I2&quot; | awk &#39;{printf&quot;vtaddjob /nom=%s/%s/%s /res=\&quot;-P_ENV_00_PARAOAG P, +P_ENV_00_PARAING ! 1 [attend==oui jusqu&#39;&quot;&#39;&quot;&#39;a==Illimite liberation==oui]\&quot;\n&quot;,$1,$2,$3}&#39; # donne vtaddjob /nom=MONENV/UNEAPP/UNPATTERNXXXI2 /res=&quot;-P_ENV_00_PARAOAG P, +P_ENV_00_PARAING ! 1 [attend==oui jusqu&#39;a==Illimite liberation==oui]&quot; (...) ajout/modification/suppression ressource vtom vtaddres - ajout ou modification d&#39;une ressource globale Usage: vtaddres /name &lt;nom_ressource&gt; [options] Exemples : vtaddres /name rgen /type gen /value jobok.bat /host localhost /user myUser /parameter 1,2 vtaddres /name rpil /type pil /value 1,2 vtaddres /name rpil /type pil /value &quot;&quot; Liste des options : Parametres Caracteristiques ------------- ----------------------------------------------------------------------------------- /help (ou -h) affiche l&#39;aide /name (ou -n) nom de la ressource /type (ou -y) type (poi|pil|tex(defaut)|num|fic|gen) /value (ou -v) script pour les ressources generiques, valeur pour les autres types /host (ou -o) machine (ressources generiques seulement) /user (ou -u) utilisateur de soumission (ressources generiques seulement) /parameter (ou -p) parametres (ressources generiques seulement) /max (ou -m) valeur maximum pour les ressources poids /att_ALL_env (ou -t) attachement a tous les environnements /det_ALL_env (ou -e) detachement de tous les environnements /att_env (ou -a) attachement aux environnements de la liste /det_env (ou -d) detachement des environnements de la liste /sepopt (ou -s) separateur utilise dans les listes Remarques : Les attachements et detachements sont possibles en meme temps. Les attachements sont effectues avant les detachements. En cas de conflit, le resultat est le detachement. Les options /att_ALL_env et /det_ALL_env s&#39;excluent mutuellement. L&#39;option /sepopt=# permet d&#39;indiquer un caractere separateur pour les listes, autre que la virgule (par defaut). Attention, cette option doit etre utilisee avant toutes celles qui contiennent des listes pour etre operationnelle. IMPORTANT : LA COMMANDE VTADDRES NE PERMET PAS LA GESTION DES RESSOURCES DE TYPE DATE. vtdelres - suppression d&#39;une ressource Usage: vtdelres /name &lt;nom_ressource&gt; Exemple : vtdelres /name res_1 Liste des options : Parametres Caracteristiques ------------- -------------------------------------------------------------------------- /help (ou -h) affiche l&#39;aide /name (ou -n) nom de la ressource /force (ou -f) supprime les references si la ressource est liee uniquement aux environnements /purge (ou -p) suppression des ressources non utilisees Remarque : Si la ressource est liee a d&#39;autres objets, elle ne pourra pas etre supprimee." />
+<meta property="og:description" content="ajout/modification/suppression d’attente de ressource sur app ou job Le vthelp vtaddjob n’est pas très intuitif. Voici un exmple pour rajouter (+) une ressource texte VTOM avec les options d’attente indéfiniment. vtaddjob /nom=env/app/job /script=&#39;monscript&#39; /res=&quot;+nom_ressource = OK [attend==oui jusqu&#39;a==Illimité]&quot; Modifier (~) une ressource de type poids en ligne de commande avec libération vtaddapp /nom=$ITEM_VTOM /Res=&quot;~${ITEM_VTOM_RES} ! 1 [attend==oui jusqu&#39;a==Illimité liberation==oui]&quot; Remplacer une ressource de type fichier par une autre (P présent) vtaddjob /nom=$ITEM_VTOM /res=&quot;-${OLD_RESS} P,+${NEW_RESS} P [attend==oui jusqu&#39;a==Illimité]&quot; exemple de changement de masse sur des jobs. Retrait d’une ressource poids et ajout d’une autre (prend 1, libère et attente illimité) : tlist jobs -f MONENV | egrep -i &quot;UNPATTERN.*I2&quot; | awk &#39;{printf&quot;vtaddjob /nom=%s/%s/%s /res=\&quot;-P_ENV_00_PARAOAG P, +P_ENV_00_PARAING ! 1 [attend==oui jusqu&#39;&quot;&#39;&quot;&#39;a==Illimite liberation==oui]\&quot;\n&quot;,$1,$2,$3}&#39; # donne vtaddjob /nom=MONENV/UNEAPP/UNPATTERNXXXI2 /res=&quot;-P_ENV_00_PARAOAG P, +P_ENV_00_PARAING ! 1 [attend==oui jusqu&#39;a==Illimite liberation==oui]&quot; (...) ajout/modification/suppression ressource vtom vtaddres - ajout ou modification d&#39;une ressource globale Usage: vtaddres /name &lt;nom_ressource&gt; [options] Exemples : vtaddres /name rgen /type gen /value jobok.bat /host localhost /user myUser /parameter 1,2 vtaddres /name rpil /type pil /value 1,2 vtaddres /name rpil /type pil /value &quot;&quot; Liste des options : Parametres Caracteristiques ------------- ----------------------------------------------------------------------------------- /help (ou -h) affiche l&#39;aide /name (ou -n) nom de la ressource /type (ou -y) type (poi|pil|tex(defaut)|num|fic|gen) /value (ou -v) script pour les ressources generiques, valeur pour les autres types /host (ou -o) machine (ressources generiques seulement) /user (ou -u) utilisateur de soumission (ressources generiques seulement) /parameter (ou -p) parametres (ressources generiques seulement) /max (ou -m) valeur maximum pour les ressources poids /att_ALL_env (ou -t) attachement a tous les environnements /det_ALL_env (ou -e) detachement de tous les environnements /att_env (ou -a) attachement aux environnements de la liste /det_env (ou -d) detachement des environnements de la liste /sepopt (ou -s) separateur utilise dans les listes Remarques : Les attachements et detachements sont possibles en meme temps. Les attachements sont effectues avant les detachements. En cas de conflit, le resultat est le detachement. Les options /att_ALL_env et /det_ALL_env s&#39;excluent mutuellement. L&#39;option /sepopt=# permet d&#39;indiquer un caractere separateur pour les listes, autre que la virgule (par defaut). Attention, cette option doit etre utilisee avant toutes celles qui contiennent des listes pour etre operationnelle. IMPORTANT : LA COMMANDE VTADDRES NE PERMET PAS LA GESTION DES RESSOURCES DE TYPE DATE. vtdelres - suppression d&#39;une ressource Usage: vtdelres /name &lt;nom_ressource&gt; Exemple : vtdelres /name res_1 Liste des options : Parametres Caracteristiques ------------- -------------------------------------------------------------------------- /help (ou -h) affiche l&#39;aide /name (ou -n) nom de la ressource /force (ou -f) supprime les references si la ressource est liee uniquement aux environnements /purge (ou -p) suppression des ressources non utilisees Remarque : Si la ressource est liee a d&#39;autres objets, elle ne pourra pas etre supprimee." />
+<link rel="canonical" href="https://virtual-thom.github.io/archives/vtaddjob-vtom-ajouter-une-ressource/" />
+<meta property="og:url" content="https://virtual-thom.github.io/archives/vtaddjob-vtom-ajouter-une-ressource/" />
+<meta property="og:site_name" content="Virtual-Thom Blog-notes VTOM et informatique" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-07-22T23:40:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="VTOM ajouter une ressource en mode commande" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Virtual Thom"},"dateModified":"2015-07-22T23:40:00+00:00","datePublished":"2015-07-22T23:40:00+00:00","description":"ajout/modification/suppression d’attente de ressource sur app ou job Le vthelp vtaddjob n’est pas très intuitif. Voici un exmple pour rajouter (+) une ressource texte VTOM avec les options d’attente indéfiniment. vtaddjob /nom=env/app/job /script=&#39;monscript&#39; /res=&quot;+nom_ressource = OK [attend==oui jusqu&#39;a==Illimité]&quot; Modifier (~) une ressource de type poids en ligne de commande avec libération vtaddapp /nom=$ITEM_VTOM /Res=&quot;~${ITEM_VTOM_RES} ! 1 [attend==oui jusqu&#39;a==Illimité liberation==oui]&quot; Remplacer une ressource de type fichier par une autre (P présent) vtaddjob /nom=$ITEM_VTOM /res=&quot;-${OLD_RESS} P,+${NEW_RESS} P [attend==oui jusqu&#39;a==Illimité]&quot; exemple de changement de masse sur des jobs. Retrait d’une ressource poids et ajout d’une autre (prend 1, libère et attente illimité) : tlist jobs -f MONENV | egrep -i &quot;UNPATTERN.*I2&quot; | awk &#39;{printf&quot;vtaddjob /nom=%s/%s/%s /res=\\&quot;-P_ENV_00_PARAOAG P, +P_ENV_00_PARAING ! 1 [attend==oui jusqu&#39;&quot;&#39;&quot;&#39;a==Illimite liberation==oui]\\&quot;\\n&quot;,$1,$2,$3}&#39; # donne vtaddjob /nom=MONENV/UNEAPP/UNPATTERNXXXI2 /res=&quot;-P_ENV_00_PARAOAG P, +P_ENV_00_PARAING ! 1 [attend==oui jusqu&#39;a==Illimite liberation==oui]&quot; (...) ajout/modification/suppression ressource vtom vtaddres - ajout ou modification d&#39;une ressource globale Usage: vtaddres /name &lt;nom_ressource&gt; [options] Exemples : vtaddres /name rgen /type gen /value jobok.bat /host localhost /user myUser /parameter 1,2 vtaddres /name rpil /type pil /value 1,2 vtaddres /name rpil /type pil /value &quot;&quot; Liste des options : Parametres Caracteristiques ------------- ----------------------------------------------------------------------------------- /help (ou -h) affiche l&#39;aide /name (ou -n) nom de la ressource /type (ou -y) type (poi|pil|tex(defaut)|num|fic|gen) /value (ou -v) script pour les ressources generiques, valeur pour les autres types /host (ou -o) machine (ressources generiques seulement) /user (ou -u) utilisateur de soumission (ressources generiques seulement) /parameter (ou -p) parametres (ressources generiques seulement) /max (ou -m) valeur maximum pour les ressources poids /att_ALL_env (ou -t) attachement a tous les environnements /det_ALL_env (ou -e) detachement de tous les environnements /att_env (ou -a) attachement aux environnements de la liste /det_env (ou -d) detachement des environnements de la liste /sepopt (ou -s) separateur utilise dans les listes Remarques : Les attachements et detachements sont possibles en meme temps. Les attachements sont effectues avant les detachements. En cas de conflit, le resultat est le detachement. Les options /att_ALL_env et /det_ALL_env s&#39;excluent mutuellement. L&#39;option /sepopt=# permet d&#39;indiquer un caractere separateur pour les listes, autre que la virgule (par defaut). Attention, cette option doit etre utilisee avant toutes celles qui contiennent des listes pour etre operationnelle. IMPORTANT : LA COMMANDE VTADDRES NE PERMET PAS LA GESTION DES RESSOURCES DE TYPE DATE. vtdelres - suppression d&#39;une ressource Usage: vtdelres /name &lt;nom_ressource&gt; Exemple : vtdelres /name res_1 Liste des options : Parametres Caracteristiques ------------- -------------------------------------------------------------------------- /help (ou -h) affiche l&#39;aide /name (ou -n) nom de la ressource /force (ou -f) supprime les references si la ressource est liee uniquement aux environnements /purge (ou -p) suppression des ressources non utilisees Remarque : Si la ressource est liee a d&#39;autres objets, elle ne pourra pas etre supprimee.","headline":"VTOM ajouter une ressource en mode commande","mainEntityOfPage":{"@type":"WebPage","@id":"https://virtual-thom.github.io/archives/vtaddjob-vtom-ajouter-une-ressource/"},"url":"https://virtual-thom.github.io/archives/vtaddjob-vtom-ajouter-une-ressource/"}</script>
+<!-- End Jekyll SEO tag -->
+
+  
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z8Y7902GRV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Z8Y7902GRV');
+</script>
+
+
+  <body>
+    <div class="container">
+      <header id="site-header">
+  <h1>Blog-notes VTOM, informatique, industrialisation, ordonnancement, DevOps</h1>
+  <nav>
+    <ul>
+      <li>
+        <a href="https://virtual-thom.github.io/archives" title="Home">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M18.121,9.88l-7.832-7.836c-0.155-0.158-0.428-0.155-0.584,0L1.842,9.913c-0.262,0.263-0.073,0.705,0.292,0.705h2.069v7.042c0,0.227,0.187,0.414,0.414,0.414h3.725c0.228,0,0.414-0.188,0.414-0.414v-3.313h2.483v3.313c0,0.227,0.187,0.414,0.413,0.414h3.726c0.229,0,0.414-0.188,0.414-0.414v-7.042h2.068h0.004C18.331,10.617,18.389,10.146,18.121,9.88 M14.963,17.245h-2.896v-3.313c0-0.229-0.186-0.415-0.414-0.415H8.342c-0.228,0-0.414,0.187-0.414,0.415v3.313H5.032v-6.628h9.931V17.245z M3.133,9.79l6.864-6.868l6.867,6.868H3.133z"></path>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a href="https://virtual-thom.github.io/archives/vos-commentaires-livre-d-or/" title="Commentaires - livre d'or">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M17.657,2.982H2.342c-0.234,0-0.425,0.191-0.425,0.426v10.21c0,0.234,0.191,0.426,0.425,0.426h3.404v2.553c0,0.397,0.48,0.547,0.725,0.302l2.889-2.854h8.298c0.234,0,0.426-0.191,0.426-0.426V3.408C18.083,3.174,17.892,2.982,17.657,2.982M17.232,13.192H9.185c-0.113,0-0.219,0.045-0.3,0.124l-2.289,2.262v-1.96c0-0.233-0.191-0.426-0.425-0.426H2.767V3.833h14.465V13.192z M10,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.488-0.668,1.488-1.489C11.488,7.905,10.821,7.237,10,7.237 M10,9.364c-0.352,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C10.638,9.077,10.351,9.364,10,9.364 M14.254,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489s1.489-0.668,1.489-1.489C15.743,7.905,15.075,7.237,14.254,7.237 M14.254,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.352,0,0.639,0.287,0.639,0.638C14.893,9.077,14.605,9.364,14.254,9.364 M5.746,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.489-0.668,1.489-1.489C7.234,7.905,6.566,7.237,5.746,7.237 M5.746,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C6.384,9.077,6.096,9.364,5.746,9.364"></path>
+          </svg>
+        </a>
+      </li>
+      
+      <li>
+        <a href="https://virtual-thom.github.io/about" title="Curriculum Vitae Thom">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z"></path>
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+      <div itemscope itemtype ="http://schema.org/Article" class="post">
+  
+  <header class="post-header">
+    <h1 itemprop="name about headline" class="post-title">VTOM ajouter une ressource en mode commande</h1>
+    <p class="post-meta">
+      <time itemprop="datePublished dateModified" datetime="2015-07-22T23:40:00+00:00">22-07-2015</time></p>
+  </header>
+
+  <article class="post-content" itemprop="articleBody">
+    <h1 class="hidden">VTOM ajouter une ressource en mode commande</h1>
+    <h2 id="ajoutmodificationsuppression-dattente-de-ressource-sur-app-ou-job">ajout/modification/suppression d’attente de ressource sur app ou job</h2>
+<p>Le vthelp vtaddjob n’est pas très intuitif.
+Voici un exmple pour rajouter (+) une ressource texte VTOM avec les options d’attente indéfiniment.</p>
+
+<p><code class="language-plaintext highlighter-rouge">vtaddjob /nom=env/app/job /script='monscript' /res="+nom_ressource = OK [attend==oui jusqu'a==Illimité]"</code></p>
+
+<ul>
+  <li>Modifier (~) une ressource de type poids en ligne de commande avec libération</li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">vtaddapp /nom=$ITEM_VTOM /Res="~${ITEM_VTOM_RES} ! 1 [attend==oui jusqu'a==Illimité liberation==oui]"</code></p>
+
+<ul>
+  <li>Remplacer une ressource de type fichier par une autre (P présent)</li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">vtaddjob /nom=$ITEM_VTOM /res="-${OLD_RESS} P,+${NEW_RESS} P [attend==oui jusqu'a==Illimité]"</code></p>
+
+<p>exemple de changement de masse sur des jobs. Retrait d’une ressource poids et ajout d’une autre (prend 1, libère et attente illimité) :</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tlist jobs -f MONENV | egrep -i "UNPATTERN.*I2" | awk '{printf"vtaddjob /nom=%s/%s/%s /res=\"-P_ENV_00_PARAOAG P, +P_ENV_00_PARAING ! 1 [attend==oui jusqu'"'"'a==Illimite liberation==oui]\"\n",$1,$2,$3}'
+# donne
+vtaddjob /nom=MONENV/UNEAPP/UNPATTERNXXXI2 /res="-P_ENV_00_PARAOAG P, +P_ENV_00_PARAING ! 1 [attend==oui jusqu'a==Illimite liberation==oui]"
+(...)
+</code></pre></div></div>
+
+<h2 id="ajoutmodificationsuppression-ressource-vtom">ajout/modification/suppression ressource vtom</h2>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vtaddres  -  ajout ou modification d'une ressource globale
+
+Usage:
+ vtaddres /name &lt;nom_ressource&gt; [options]
+
+Exemples :
+ vtaddres /name rgen /type gen /value jobok.bat /host localhost /user myUser /parameter 1,2
+ vtaddres /name rpil /type pil /value 1,2
+ vtaddres /name rpil /type pil /value ""
+
+
+Liste des options :
+
+ Parametres    Caracteristiques
+ ------------- -----------------------------------------------------------------------------------
+ /help         (ou -h) affiche l'aide
+ /name         (ou -n) nom de la ressource
+ /type         (ou -y) type (poi|pil|tex(defaut)|num|fic|gen)
+ /value        (ou -v) script pour les ressources generiques, valeur pour les autres types
+ /host         (ou -o) machine (ressources generiques seulement)
+ /user         (ou -u) utilisateur de soumission (ressources generiques seulement)
+ /parameter    (ou -p) parametres (ressources generiques seulement)
+ /max          (ou -m) valeur maximum pour les ressources poids
+ /att_ALL_env  (ou -t) attachement a tous les environnements
+ /det_ALL_env  (ou -e) detachement de tous les environnements
+ /att_env      (ou -a) attachement aux environnements de la liste
+ /det_env      (ou -d) detachement des environnements de la liste
+ /sepopt       (ou -s) separateur utilise dans les listes
+
+Remarques :
+ Les attachements et detachements sont possibles en meme temps.
+ Les attachements sont effectues avant les detachements. En cas de conflit, le resultat est le detachement.
+ Les options /att_ALL_env et /det_ALL_env s'excluent mutuellement.
+ L'option /sepopt=# permet d'indiquer un caractere separateur pour les listes, autre que la virgule (par defaut).
+ Attention, cette option doit etre utilisee avant toutes celles qui contiennent des listes pour etre operationnelle.
+
+ IMPORTANT : LA COMMANDE VTADDRES NE PERMET PAS LA GESTION DES RESSOURCES DE TYPE DATE.
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vtdelres  -  suppression d'une ressource
+
+Usage:
+ vtdelres /name &lt;nom_ressource&gt;
+
+Exemple :
+ vtdelres /name res_1
+
+Liste des options :
+
+ Parametres    Caracteristiques
+ ------------- --------------------------------------------------------------------------
+ /help         (ou -h) affiche l'aide
+ /name         (ou -n) nom de la ressource
+ /force        (ou -f) supprime les references si la ressource est liee uniquement aux
+               environnements
+ /purge        (ou -p) suppression des ressources non utilisees
+
+Remarque :
+ Si la ressource est liee a d'autres objets, elle ne pourra pas etre supprimee.
+</code></pre></div></div>
+
+  </article>
+  
+<nav>
+  <ul class="pager">
+    
+     
+    <li class="previous">
+      <a href="https://virtual-thom.github.io/archives/nas-lister-nfs-export-depuis-un-client-unix/"><span aria-hidden="true">&larr;</span> Lister les nfs export d'un NAS à partir d'un client Unix</a> 
+    </li>
+    
+     
+     <li class="next">
+      <a class="next" href="https://virtual-thom.github.io/archives/les-bizarreries-de-la-semaine/">les bizarreries de la semaine <span aria-hidden="true">&rarr;</span></a> 
+    </li>
+     
+    
+  </ul>
+</nav>
+
+
+  <footer class="post-footer">
+    
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>vtom</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>vtaddjob</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>ressource vtom</a>
+      
+    
+    <span  itemprop="author publisher" class="hidden">Virtual Thom</span>
+  </footer>
+  
+  <div id="disqus_thread" ></div>
+  <script>
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'thomas-asnar'; // required: replace example with your forum shortname
+  
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+</div>
+
+      <footer id="site-footer">
+    <div>&copy;<a href="https://github.com/virtual-thom/" title="Github Virtual-Thom">Virtual-Thom</a></div>
+    <div>
+            <a href="https://virtual-thom.github.io/archives/plan" title="Plan du site">sitemap</a> | <a href="https://virtual-thom.github.io/about" rel="publisher author" title="Curriculum vitae Thom">A propos</a>
+    </div>
+    <div>
+        <a id="goto-site-header" href="#site-header" title="Retourner au début">&uArr; Top</a>
+    </div>
+    <div id="footer-disclaimer">
+        <p>Avertissement : vous ne devez pas prendre pour argent comptant le contenu de ce site. Testez toujours la solution en environnement de test.</p>
+        <p>Malgré le sérieux que je m'efforce de mettre dans le contenu de ces billets, je ne pourrai être tenu responsable d'éventuelles erreurs que cela pourrait engendrer.</p>
+    </div>
+    <div>
+        <a class="hidden" href="https://virtual-thom.github.io/archives/sitemap.xml" title="SiteMap">sitemap</a>
+    </div>
+</footer>
+
+    </div>
+  </body>
+
+</html>

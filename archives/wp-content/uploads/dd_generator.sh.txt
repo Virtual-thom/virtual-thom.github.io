@@ -1,0 +1,442 @@
+#!/bin/sh
+
+#
+Virtual Thom
+#	SCRIPT	: dd_generator
+
+#	AUTEUR 	: Thom
+
+#	DATE	: 02.10.13
+
+# set -x # debug
+
+# set -n # verif syntax sans exec
+
+#
+
+##################################
+
+#	VARIABLES
+
+##################################
+
+datenow=$(date +"%d-%m-%y_%H.%M.%S")
+
+ibs='1024' # nombre d'octet lu d'un coup du if
+
+count='10000' # nombre de segments ibs lu (si 0 il va au bout du fichier)
+
+unit='Mo'
+
+unit_base=1024
+
+unit_mo=`expr ${unit_base} \* ${unit_base}`
+
+unit_go=`expr ${unit_mo} \* ${unit_base}`
+
+unit_to=`expr ${unit_go} \* ${unit_base}`
+
+fonc_calc_unit(){
+
+case ${unit} in
+
+	"octets")
+
+	unit_calc=1
+
+	;;
+
+	"Ko")
+
+	unit_calc=${unit_base}
+
+	;;
+
+	"Go")
+
+	unit_calc=${unit_go}
+
+	;;
+
+	"To")
+
+	unit_calc=${unit_to}
+
+	;;
+
+	"Mo" | *)
+
+	unit_calc=${unit_mo}
+
+	;;
+
+esac 
+
+}
+
+fonc_calc_unit
+
+#total_size='expr ${ibs} \* ${count} \/ ${unit_calc}' # par defaut en Mo, doit être évaluer
+
+total_size="echo 'scale=2;${ibs} * ${count} / ${unit_calc}' | bc" # par defaut en Mo, doit être évaluer
+
+total_size_msg='echo "Taille Totale (en $unit) :"'
+
+of_path='echo "${PWD}/dd_`eval \"${total_size}\"`${unit}_${datenow}.bin"' # par defaut fichier écrit dans le répertoire courant
+
+if_path='/dev/zero' # par defaut fichier lu constitué de vide 
+
+msg_retour="Tapez retour99 ou laissez vide pour ne pas changer la valeur"
+
+
+
+##################################
+
+#	FONCTIONS
+
+##################################
+
+date_heure(){
+
+        date_heure_var=`date +"%d/%m/%Y - %H:%M:%S : "`
+
+        echo "${date_heure_var}$1"
+
+}
+
+date_simple(){
+
+        date_heure_var=`date +"%d%m%Y_%H%M%S"`
+
+        echo "${date_heure_var}"
+
+}
+
+fonc_sortie(){
+
+        numero_exit=$1
+
+        message_exit=$2
+
+        date_heure "${message_exit}"
+
+        date_heure "Fin du script. Exit : ${numero_exit}"
+
+        exit ${numero_exit}
+
+}
+
+fonc_pause(){
+
+   echo -e "\nAppuyez sur Entrer pour continuer...\c"
+
+   read
+
+}
+
+fonc_trap_exit(){
+
+	echo ""
+
+	fonc_sortie "123" "Script interrompu"
+
+}
+
+trap 'fonc_trap_exit' 2
+
+fonc_menu_principal(){
+
+	clear
+
+
+
+	#TITRE 
+
+	echo -e "\n\t################\n\t# DD GENERATOR #\n\t################\n"
+
+	echo -e "\n\tdd of=`eval ${of_path}` if=${if_path} ibs=${ibs} count=${count}\n"
+
+	PS3="Selectionner une option et appuyer sur Entrer :"
+
+
+
+	select options in "Unite par defaut : $unit" "Fichier lu : $if_path" "Fichier ecrit : `eval $of_path`" "Taille segement de lecture (octet) : $ibs" "Nombre de Segment : $count" "`eval $total_size_msg` `eval \"$total_size\"`" "Creer le fichier" "Quitter"
+
+	do
+
+	case ${options}	 in 
+
+		"Unite par defaut : $unit")
+
+			menu_unit
+
+		;;
+
+		"Fichier lu : $if_path")
+
+			clear
+
+			echo -e "Veuillez entrer le chemin complet du fichier à lire : \n\t(${msg_retour})"
+
+			read read_if_path
+
+			fonc_test_retour "${read_if_path}" &&  if_path=${read_if_path}
+
+			fonc_menu_principal
+
+		;;
+
+		"Fichier ecrit : `eval $of_path`")
+
+			clear
+
+			echo -e "Veuillez entrer le chemin complet du fichier à créer : \n\t(${msg_retour})"
+
+			read read_of_path
+
+			fonc_test_retour "${read_of_path}"
+
+			if test $? -eq 0
+
+			then
+
+				of_path_tmp=${read_of_path}
+
+				of_path='echo ${of_path_tmp}'
+
+			fi
+
+			fonc_menu_principal
+
+		;;
+
+		"Taille segement de lecture (octet) : $ibs")
+
+			clear
+
+			echo -e "Veuillez entrer la taille du segment lu : \n\t(${msg_retour})"
+
+			read read_ibs 
+
+			fonc_test_retour "${read_ibs}" && ibs=${read_ibs}
+
+			fonc_menu_principal
+
+		;;
+
+		"Nombre de Segment : $count")
+
+			clear
+
+			echo -e "Veuillez entrer le nombre de segment : \n\t(${msg_retour})\n\t(tapez 0 pour copier le fichier if en totalite)"
+
+			read read_count 
+
+			fonc_test_retour "${read_count}" && count=${read_count}
+
+			fonc_menu_principal
+
+		;;
+
+		"`eval $total_size_msg` `eval \"$total_size\"`")
+
+			clear
+
+			echo -e "Veuillez entrer `eval $total_size_msg` `eval \"$total_size\"` : \n\t(${msg_retour})\n\t(tapez 0 pour copier le fichier if en totalite)"
+
+			read read_total_size 
+
+			fonc_test_retour "${read_total_size}" && fonc_calc_count	
+
+			fonc_menu_principal
+
+		;;
+
+		"Creer le fichier")
+
+			fonc_dd_generator
+
+			fonc_sortie $?  
+
+		;;
+
+		"Quitter")
+
+			fonc_sortie 0
+
+		;;
+
+		
+
+	esac
+
+	echo ""
+
+	REPLY=
+
+	clear
+
+	echo -e "\n\n\tDD GENERATOR\n\n"
+
+	done
+
+	clear
+
+}
+
+fonc_dd_generator(){
+
+    if test $count -eq 0 
+
+	then 	
+
+		echo "dd of=`eval ${of_path}` if=${if_path} ibs=${ibs}"
+
+		dd of=`eval ${of_path}` if=${if_path} ibs=${ibs} && 
+
+		echo "Le fichier `eval ${of_path}` a été créé" 
+
+	else
+
+		echo "dd of=`eval ${of_path}` if=${if_path} ibs=${ibs} count=${count}" 
+
+		dd of=`eval ${of_path}` if=${if_path} ibs=${ibs} count=${count}&& 
+
+		echo "Le fichier `eval ${of_path}` a été créé" 
+
+	fi
+
+}
+
+fonc_test_retour(){
+
+	if test "$1" == "retour99" -o -z "$1" 
+
+	then
+
+		return 250
+
+	else
+
+		return 0
+
+	fi
+
+}
+
+menu_unit(){
+
+	clear
+
+
+
+        #TITRE
+
+        echo -e "\n\n\tUnite actuelle : $unit\n\n"
+
+        PS3="Selectionner une option et appuyer sur Entrer :"
+
+
+
+        select options in "octets" "Ko" "Mo" "Go" "To" "Retour"
+
+	do
+
+		case ${options} in 
+
+			"octets")
+
+				unit='octets'
+
+				fonc_calc_unit
+
+				fonc_menu_principal
+
+			;;
+
+			"Ko")
+
+				unit='Ko'
+
+				fonc_calc_unit
+
+				fonc_menu_principal
+
+			;;
+
+			"Mo")
+
+				unit='Mo'
+
+				fonc_calc_unit
+
+				fonc_menu_principal
+
+			;;
+
+			"Go")
+
+				unit='Go'
+
+				fonc_calc_unit
+
+				fonc_menu_principal
+
+			;;
+
+			"To")
+
+				unit='To'
+
+				fonc_calc_unit
+
+				fonc_menu_principal
+
+			;;
+
+			"Retour")
+
+				fonc_menu_principal
+
+				break
+
+			;;
+
+		esac
+
+        echo ""
+
+        REPLY=
+
+        clear
+
+        echo -e "\n\n\tUnit actuelle : $unit\n\n"
+
+        done
+
+        clear
+
+
+
+}
+
+fonc_calc_count(){
+
+	count=`expr ${read_total_size} \* ${unit_calc} \/ ${ibs}`
+
+}
+
+
+
+##################################
+
+#	SCRIPT
+
+##################################
+
+fonc_menu_principal
+
+# end of script
+
+
+

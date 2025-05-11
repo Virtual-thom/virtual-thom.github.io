@@ -1,0 +1,123 @@
+---
+layout: post
+title: Redécouverte LUN sans redémarrer
+date: 2014-07-26 18:56
+author: Virtual Thom
+comments: true
+categories: [Linux, SAN, Script, shell, Stockage]
+---
+Ce script ne date pas d'hier, mais il est tellement pratique et fonctionne encore dans ma production pour redécouvrir des LUN à chaud (sans redémarrer le serveur) sous Linux (testé de RedHat 4.7 à 5.5).
+
+Je me suis largement inspiré de la documentation de RedHat <a title="lien RedHat" href="https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/Storage_Administration_Guide/scanning-storage-interconnects.html">Scanning Storage Interconnects</a> et les deux lignes qui font le boulot sont celles-ci :
+<pre lang="bash">echo "1" > /sys/class/fc_host/host/issue_lip
+echo "- - -" > /sys/class/scsi_host/hosth/scan
+</pre>
+<!--more-->
+
+Voici le reste du script, qui tient compte du logiciel / pilote de multipathing EMC² PowerPath :
+<pre lang="bash">#!/bin/sh
+#
+#	AUTEUR : SGT Virtual Thom
+#	VERSION : 1.0
+#	DATE : 10/12/2010
+#
+# set -n   # Decommenter pour debug syntax sans exécution
+#	NOTE: Ne pas oublier de recommenter !
+# set -x   # Decommenter pour debug
+#
+##########################################################
+#	VARIABLES
+##########################################################
+OK=0
+KOCRIT=1
+KOWARN=2
+CR=${OK}
+args="$*"
+date_du_jour=`date +"%d_%m_%Y"`
+tmpavant="/tmp/powermtavant"
+tmpemcavant="/tmp/emcavant"
+tmpemcapres="/tmp/emcapres"
+tmpapres="/tmp/powermtapres"
+##########################################################
+#	FONCTIONS
+##########################################################
+date_heure(){
+	date_heure_var=`date +"%d/%m/%Y - %H:%M:%S : "`
+	echo "${date_heure_var}$1"
+}
+fonc_sortie(){
+	numero_exit=$1
+	message_exit=$2
+	date_heure "${message_exit}"
+	date_heure "Fin du script. Exit : ${numero_exit}"
+	exit ${numero_exit}
+}
+usage(){
+	# exemple d'usage
+	script=${0##*/} ;
+	#script=${script%.*} ;
+	echo "" ;
+	echo "NE FONCTIONNE QUE POUR LES OS LINUX TYPE REDHAT"
+	echo "${script} - permet de decouvrir de nouvelles LUNs sans redemarrer le serveur"
+	echo ""
+	echo "Usage :" ;
+	echo " ${script}"
+	echo "    Pas de parametre." 
+	echo ""
+	echo ""
+	# echo " ${script} [options]" ;
+	# echo "" ;
+	# echo "Liste des options :" ;
+	# echo "" ;
+	# echo "Parametres    Caracteristiques                Valeurs / Formats   Valeurs par def" ;
+	# echo "------------- ------------------------------- ------------------- ---------------" ;
+	# echo " /help         (ou -h) pour afficher l'aide" ;
+	# echo " /all          (ou -a) pour tous les serveurs" ;
+	# echo " /server       (ou -s) specifie le serveur      |        localhost" ;
+}
+##########################################################
+#	SCRIPT
+##########################################################
+help=`echo $args | grep help`
+if test -n "$help"
+then
+ usage && fonc_sortie $KOWARN
+fi
+
+powermt display dev=all > $tmpavant
+
+
+for var in $(ls /sys/class/fc_host/host*/issue_lip); do echo "1" > $var ; done || CR=$KOCRIT
+for var in $(ls /sys/class/scsi_host/host*/scan) ; do echo "- - -" > $var ; done || CR=$KOCRIT
+powermt check
+powermt config
+powermt save
+
+powermt display dev=all > $tmpapres || CR=$KOCRIT
+
+
+cat $tmpavant | grep "emcpower" | cut -d"=" -f2 | sort > $tmpemcavant  || CR=$KOCRIT
+cat $tmpapres | grep "emcpower" | cut -d"=" -f2 | sort > $tmpemcapres  || CR=$KOCRIT
+while read apres
+do
+        i="false"
+        while read avant
+        do
+                if test "$avant" == "$apres"
+                then
+                        i="true"
+                        break
+                fi
+        done < $tmpemcavant 
+
+        if test "$i" != "true"
+        then
+                powermt display dev="$apres"
+        fi
+done < $tmpemcapres  || CR=$KOCRIT
+
+rm $tmpavant $tmpapres $tmpemcavant $tmpemcapres
+
+fonc_sortie "$CR"
+
+</pre>

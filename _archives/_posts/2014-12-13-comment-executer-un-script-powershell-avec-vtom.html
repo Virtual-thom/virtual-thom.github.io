@@ -1,0 +1,33 @@
+---
+layout: post
+title: Comment exécuter un script powershell avec VTOM
+date: 2014-12-13 09:07
+author: Virtual Thom
+comments: true
+categories: [Ordonnancement, powershell, powershell, Script, script, Visual TOM, VTOM, VTOM]
+---
+Nouveau job, nouveau contexte, et un nombre impressionnant de plateformes Windows. Ma balance de serveurs 80% Unix / 20% Windows vient de basculer.
+Qui dit Windows, dit scripts Powershell. 
+Mieux vaut un qui sait, que dix qui cherchent comme on dit.
+
+<h2>Installation du client VTOM en 64 bits !</h2>
+<strong>On peut aussi laisser le client VTOM 32 bits mais dans ce cas là, il faudra lancer le powerhsell x86 dans la queue(car celui par défaut dans le PATH des OS 64Bits est le powershell 64bits)</strong>
+<ul>
+	<li>Arrêter l'agent VTOM AbsyssBatchManager dans services.msc</li>
+	<li>Se déplacer dans %ABM_BIN%\..\services</li>
+        <li>Renommer bdaemon.exe en bdaemon-32.exe et bdaemon-64.exe en bdaemon.exe</li>
+	<li>Relancer l'agent VTOM AbsyssBatchManager dans services.msc</li>
+ </ul>
+ 
+<p>on peut vérifier si le bdaemon.exe est en 32 ou 64 Bits dans le Gestionnaire des Tâches Windows. Ca sera préciser (x32)</p>
+
+<h2>Une queue particulière pour lancer les scripts Powershell</h2>
+Je passe les mises en formes et fioritures habituelles <a href="/ecrire-sa-queue-batch-vtom-cygwin-php-perl/" title="Ecrire sa queue batch vtom">(voir mon article sur les queues d'exécution VTOM)</a>.
+La commande principale pour lancer des scripts powershell est la suivante (même si on peut adapter, voir get-help about_Powershell.exe).
+<strong>Noubliez pas de mettre le full path du powershell x86 si vous avez un client VTOM 32 bits</strong>
+<pre lang="powershell">PowerShell.exe -ExecutionPolicy Unrestricted -NonInteractive -File &lt;FilePath&gt; [&lt;Args&gt;]</pre>
+Attention, si vous avez des problèmes de sécurité (« Impossible de charger le fichier c:\script.ps1 car l’exécution de scripts est désactivée sur ce système. Pour plus d’information, consultez…. »), regardez de ce côté : get-help about_Execution_Policies ou about_Signing). L'idée, c'est que la stratégie de sécurité est généralement restreinte pour ne pouvoir lancer aucun script powershell.
+<pre lang="powershell">get-executionpolicy
+Restricted
+set-executionpolicy Unrestricted
+</pre>

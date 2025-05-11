@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="apple-touch-icon" href="https://virtual-thom.github.io/archives/apple-touch-icon.png">
+  <link rel="icon" href="https://virtual-thom.github.io/archives/favicon.ico" />
+  <!-- Remplacé par Jekyll SEO (sinon apparait en double)
+  <title>Extraction des crontabs de tous les utilisateurs en local ou à distance</title>
+  <meta name="description" content="Le principe est d’exécuter  crontab -l -u user (linux) ou crontab -l user (solaris) pour tous les utilisateurs et pour tous les serveurs distants passés en p...">
+  --> 
+  
+  <link rel="canonical" href="https://virtual-thom.github.io/archives/extraire-crontab-serveurs-distants/">
+  
+  <link rel="stylesheet" media="screen" href="https://virtual-thom.github.io/archives/assets/main.css">
+  
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Extraction des crontabs de tous les utilisateurs en local ou à distance | Virtual-Thom Blog-notes VTOM et informatique</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Extraction des crontabs de tous les utilisateurs en local ou à distance" />
+<meta name="author" content="Virtual Thom" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Le principe est d’exécuter crontab -l -u user (linux) ou crontab -l user (solaris) pour tous les utilisateurs et pour tous les serveurs distants passés en paramètre dans un fichier. Voici comment récupérer facilement la liste de vos clients : vtmachine | awk -F&quot;|&quot; &#39;$7 ~ /Win/ {print $3}&#39; | sed &#39;s/^[ \t]*\|[ \t]*$//g&#39; &gt; /var/tmp/liste_client_windows.txt vtmachine | awk -F&quot;|&quot; &#39;$7 ~ /Sol|Lin/ {print $3}&#39; | sed &#39;s/^[ \t]*\|[ \t]*$//g&#39; &gt; /var/tmp/liste_client_unix.txt Script shell à télécharger : Extract_Crontab.sh # Script qui pousse un sous-script permettant d&#39;afficher la crontab de tous les utilisateurs # et l&#39;exécute sur des serveurs distants # ou en local si aucun paramètre # A lancer en root # Le premier paramètre doit être le chemin complet d&#39;un fichier listant des serveurs linux ou Solaris # Le serveur sur lequel est exécuté le script doit pouvoir communiquer en ssh avec les serveurs distants FIC_LISTE_SERVEURS=$1 # On set le code retour à 0 CR=0 # Sous-script à exécuter sur les serveurs distants FIC_SUBSCRIPT=/var/tmp/`basename $0`_${RANDOM}_`date +&quot;%d%m%Y&quot;`.sh # fichier de sortie des crontabs -l des utilisateurs # format hostname;user;ligne crontab (commentaires et lignes vides non prises en compte) FIC_SORTIE_EXT_CRONTAB=/var/tmp/`basename $0`_${RANDOM}_`date +&quot;%d%m%Y&quot;`.csv &gt; ${FIC_SORTIE_EXT_CRONTAB} # Ecriture du sous-script # si le crontab -l -u user ne fonctionne pas sur votre machine distante, on peut imaginer créer # une couche d&#39;abstraction pour la commande crontab selon l&#39;OS echo &quot;awk -F\&quot;:\&quot; &#39;\$NF !~ /(nologin|sync|shutdown|halt|false)/ {print \$1}&#39; /etc/passwd | while read user ;do \ export user; \ FIC_TEMP=/var/tmp/\${RANDOM}_crontab-l; \ crontab -l -u \${user} &gt; \$FIC_TEMP 2&gt; /dev/null ; \ if test \$? -ne 0 ; then \ crontab -l \${user} &gt; \$FIC_TEMP 2&gt; /dev/null ; \ if test \$? -ne 0 ; then \ rm -f \$FIC_TEMP; \ continue ; \ fi ; \ fi ; \ while read line ; do \ if test -z \&quot;\$line\&quot; ; then \ continue ; \ fi ; \ echo \&quot;\$line\&quot; | grep \&quot;^#\&quot; &gt; /dev/null 2&gt;&amp;1 ;\ if test \$? -eq 0 ; then \ continue ; \ fi ; \ printf \&quot;%s;%s;%s;\\\n\&quot; \&quot;\`uname -n\`\&quot; \&quot;\${user}\&quot; \&quot;\${line}\&quot; ; \ done &lt; \${FIC_TEMP}; \ rm -f \$FIC_TEMP; done&quot; &gt; ${FIC_SUBSCRIPT} # Si la liste des serveurs distants est vide, on exécute le sous-script en local if test -z &quot;${FIC_LISTE_SERVEURS}&quot;;then chmod +x ${FIC_SUBSCRIPT} ${FIC_SUBSCRIPT} &gt;&gt; ${FIC_SORTIE_EXT_CRONTAB} else NB_SERVEURS=`cat ${FIC_LISTE_SERVEURS} | wc -l` BOUCLE_COURRANTE=0 while read SERVEUR_DISTANT do BOUCLE_COURRANTE=`expr ${BOUCLE_COURRANTE} + 1` echo &quot;INFO -- ${SERVEUR_DISTANT} : ${BOUCLE_COURRANTE}/${NB_SERVEURS}&quot; # on continue dans la boucle si le ping ne fonctionne pas ping -c 1 ${SERVEUR_DISTANT} &gt; /dev/null 2&gt;&amp;1 if [ $? -ne 0 ];then echo &quot;ERROR -- PING serveur ${SERVEUR_DISTANT}&quot; CR=10 continue fi # ssh -n dans une boucle while sinon on sort de la boucle à la première occurence # on continue si le ssh/scp ne fonctionne pas scp ${FIC_SUBSCRIPT} ${SERVEUR_DISTANT}:/var/tmp/ &gt; /dev/null ssh -n ${SERVEUR_DISTANT} &quot;chmod 777 /var/tmp/`basename ${FIC_SUBSCRIPT}`&quot; if [ $? -ne 0 ];then echo &quot;ERROR -- SSH serveur ${SERVEUR_DISTANT}&quot; CR=11 continue fi ssh -n ${SERVEUR_DISTANT} &quot;/var/tmp/`basename ${FIC_SUBSCRIPT}`&quot; &gt;&gt; ${FIC_SORTIE_EXT_CRONTAB} done &lt; ${FIC_LISTE_SERVEURS} fi exit $CR Pour déployer facilement un script depuis le serveur VTOM vers tous les clients, on peut aussi utiliser le vtcopy vtmachine | grep -i running | awk -F&quot;|&quot; &#39;BEGIN{printf &quot;tremote /machine=&quot;}{gsub(/[ ]/, &quot;&quot;, $2); printf &quot;%s,&quot;,$2;}END{printf &quot; vtcopy -i monfic_source -o mon_rep_dest\n&quot;}&#39; Version tâches planifiées Windows (filtre des tâches microsoft) schtasks /query : @echo off set USER=administrateur set PASSWD=motdepasse for /F %i in (c:\temp\liste_client_windows.txt) do ( schtasks /Query /FO CSV /V /S %i /U %USER% /P %PASSWD% | findstr /V &quot;\Microsoft&quot; | findstr /V &#39;&quot;HostName&quot;,&quot;TaskName&quot;,&quot;Next Run Time&quot;,&quot;Status&quot;,&quot;Logon Mode&quot;,&quot;Last Run Time&quot;,&quot;Last Result&quot;,&quot;Author&quot;,&quot;Task To Run&quot;,&quot;Start In&quot;,&quot;Comment&quot;&#39; ) &gt;&gt; c:\temp\taches_planifiees_windows.csv @echo on" />
+<meta property="og:description" content="Le principe est d’exécuter crontab -l -u user (linux) ou crontab -l user (solaris) pour tous les utilisateurs et pour tous les serveurs distants passés en paramètre dans un fichier. Voici comment récupérer facilement la liste de vos clients : vtmachine | awk -F&quot;|&quot; &#39;$7 ~ /Win/ {print $3}&#39; | sed &#39;s/^[ \t]*\|[ \t]*$//g&#39; &gt; /var/tmp/liste_client_windows.txt vtmachine | awk -F&quot;|&quot; &#39;$7 ~ /Sol|Lin/ {print $3}&#39; | sed &#39;s/^[ \t]*\|[ \t]*$//g&#39; &gt; /var/tmp/liste_client_unix.txt Script shell à télécharger : Extract_Crontab.sh # Script qui pousse un sous-script permettant d&#39;afficher la crontab de tous les utilisateurs # et l&#39;exécute sur des serveurs distants # ou en local si aucun paramètre # A lancer en root # Le premier paramètre doit être le chemin complet d&#39;un fichier listant des serveurs linux ou Solaris # Le serveur sur lequel est exécuté le script doit pouvoir communiquer en ssh avec les serveurs distants FIC_LISTE_SERVEURS=$1 # On set le code retour à 0 CR=0 # Sous-script à exécuter sur les serveurs distants FIC_SUBSCRIPT=/var/tmp/`basename $0`_${RANDOM}_`date +&quot;%d%m%Y&quot;`.sh # fichier de sortie des crontabs -l des utilisateurs # format hostname;user;ligne crontab (commentaires et lignes vides non prises en compte) FIC_SORTIE_EXT_CRONTAB=/var/tmp/`basename $0`_${RANDOM}_`date +&quot;%d%m%Y&quot;`.csv &gt; ${FIC_SORTIE_EXT_CRONTAB} # Ecriture du sous-script # si le crontab -l -u user ne fonctionne pas sur votre machine distante, on peut imaginer créer # une couche d&#39;abstraction pour la commande crontab selon l&#39;OS echo &quot;awk -F\&quot;:\&quot; &#39;\$NF !~ /(nologin|sync|shutdown|halt|false)/ {print \$1}&#39; /etc/passwd | while read user ;do \ export user; \ FIC_TEMP=/var/tmp/\${RANDOM}_crontab-l; \ crontab -l -u \${user} &gt; \$FIC_TEMP 2&gt; /dev/null ; \ if test \$? -ne 0 ; then \ crontab -l \${user} &gt; \$FIC_TEMP 2&gt; /dev/null ; \ if test \$? -ne 0 ; then \ rm -f \$FIC_TEMP; \ continue ; \ fi ; \ fi ; \ while read line ; do \ if test -z \&quot;\$line\&quot; ; then \ continue ; \ fi ; \ echo \&quot;\$line\&quot; | grep \&quot;^#\&quot; &gt; /dev/null 2&gt;&amp;1 ;\ if test \$? -eq 0 ; then \ continue ; \ fi ; \ printf \&quot;%s;%s;%s;\\\n\&quot; \&quot;\`uname -n\`\&quot; \&quot;\${user}\&quot; \&quot;\${line}\&quot; ; \ done &lt; \${FIC_TEMP}; \ rm -f \$FIC_TEMP; done&quot; &gt; ${FIC_SUBSCRIPT} # Si la liste des serveurs distants est vide, on exécute le sous-script en local if test -z &quot;${FIC_LISTE_SERVEURS}&quot;;then chmod +x ${FIC_SUBSCRIPT} ${FIC_SUBSCRIPT} &gt;&gt; ${FIC_SORTIE_EXT_CRONTAB} else NB_SERVEURS=`cat ${FIC_LISTE_SERVEURS} | wc -l` BOUCLE_COURRANTE=0 while read SERVEUR_DISTANT do BOUCLE_COURRANTE=`expr ${BOUCLE_COURRANTE} + 1` echo &quot;INFO -- ${SERVEUR_DISTANT} : ${BOUCLE_COURRANTE}/${NB_SERVEURS}&quot; # on continue dans la boucle si le ping ne fonctionne pas ping -c 1 ${SERVEUR_DISTANT} &gt; /dev/null 2&gt;&amp;1 if [ $? -ne 0 ];then echo &quot;ERROR -- PING serveur ${SERVEUR_DISTANT}&quot; CR=10 continue fi # ssh -n dans une boucle while sinon on sort de la boucle à la première occurence # on continue si le ssh/scp ne fonctionne pas scp ${FIC_SUBSCRIPT} ${SERVEUR_DISTANT}:/var/tmp/ &gt; /dev/null ssh -n ${SERVEUR_DISTANT} &quot;chmod 777 /var/tmp/`basename ${FIC_SUBSCRIPT}`&quot; if [ $? -ne 0 ];then echo &quot;ERROR -- SSH serveur ${SERVEUR_DISTANT}&quot; CR=11 continue fi ssh -n ${SERVEUR_DISTANT} &quot;/var/tmp/`basename ${FIC_SUBSCRIPT}`&quot; &gt;&gt; ${FIC_SORTIE_EXT_CRONTAB} done &lt; ${FIC_LISTE_SERVEURS} fi exit $CR Pour déployer facilement un script depuis le serveur VTOM vers tous les clients, on peut aussi utiliser le vtcopy vtmachine | grep -i running | awk -F&quot;|&quot; &#39;BEGIN{printf &quot;tremote /machine=&quot;}{gsub(/[ ]/, &quot;&quot;, $2); printf &quot;%s,&quot;,$2;}END{printf &quot; vtcopy -i monfic_source -o mon_rep_dest\n&quot;}&#39; Version tâches planifiées Windows (filtre des tâches microsoft) schtasks /query : @echo off set USER=administrateur set PASSWD=motdepasse for /F %i in (c:\temp\liste_client_windows.txt) do ( schtasks /Query /FO CSV /V /S %i /U %USER% /P %PASSWD% | findstr /V &quot;\Microsoft&quot; | findstr /V &#39;&quot;HostName&quot;,&quot;TaskName&quot;,&quot;Next Run Time&quot;,&quot;Status&quot;,&quot;Logon Mode&quot;,&quot;Last Run Time&quot;,&quot;Last Result&quot;,&quot;Author&quot;,&quot;Task To Run&quot;,&quot;Start In&quot;,&quot;Comment&quot;&#39; ) &gt;&gt; c:\temp\taches_planifiees_windows.csv @echo on" />
+<link rel="canonical" href="https://virtual-thom.github.io/archives/extraire-crontab-serveurs-distants/" />
+<meta property="og:url" content="https://virtual-thom.github.io/archives/extraire-crontab-serveurs-distants/" />
+<meta property="og:site_name" content="Virtual-Thom Blog-notes VTOM et informatique" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2015-04-05T10:58:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Extraction des crontabs de tous les utilisateurs en local ou à distance" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Virtual Thom"},"dateModified":"2015-04-05T10:58:00+00:00","datePublished":"2015-04-05T10:58:00+00:00","description":"Le principe est d’exécuter crontab -l -u user (linux) ou crontab -l user (solaris) pour tous les utilisateurs et pour tous les serveurs distants passés en paramètre dans un fichier. Voici comment récupérer facilement la liste de vos clients : vtmachine | awk -F&quot;|&quot; &#39;$7 ~ /Win/ {print $3}&#39; | sed &#39;s/^[ \\t]*\\|[ \\t]*$//g&#39; &gt; /var/tmp/liste_client_windows.txt vtmachine | awk -F&quot;|&quot; &#39;$7 ~ /Sol|Lin/ {print $3}&#39; | sed &#39;s/^[ \\t]*\\|[ \\t]*$//g&#39; &gt; /var/tmp/liste_client_unix.txt Script shell à télécharger : Extract_Crontab.sh # Script qui pousse un sous-script permettant d&#39;afficher la crontab de tous les utilisateurs # et l&#39;exécute sur des serveurs distants # ou en local si aucun paramètre # A lancer en root # Le premier paramètre doit être le chemin complet d&#39;un fichier listant des serveurs linux ou Solaris # Le serveur sur lequel est exécuté le script doit pouvoir communiquer en ssh avec les serveurs distants FIC_LISTE_SERVEURS=$1 # On set le code retour à 0 CR=0 # Sous-script à exécuter sur les serveurs distants FIC_SUBSCRIPT=/var/tmp/`basename $0`_${RANDOM}_`date +&quot;%d%m%Y&quot;`.sh # fichier de sortie des crontabs -l des utilisateurs # format hostname;user;ligne crontab (commentaires et lignes vides non prises en compte) FIC_SORTIE_EXT_CRONTAB=/var/tmp/`basename $0`_${RANDOM}_`date +&quot;%d%m%Y&quot;`.csv &gt; ${FIC_SORTIE_EXT_CRONTAB} # Ecriture du sous-script # si le crontab -l -u user ne fonctionne pas sur votre machine distante, on peut imaginer créer # une couche d&#39;abstraction pour la commande crontab selon l&#39;OS echo &quot;awk -F\\&quot;:\\&quot; &#39;\\$NF !~ /(nologin|sync|shutdown|halt|false)/ {print \\$1}&#39; /etc/passwd | while read user ;do \\ export user; \\ FIC_TEMP=/var/tmp/\\${RANDOM}_crontab-l; \\ crontab -l -u \\${user} &gt; \\$FIC_TEMP 2&gt; /dev/null ; \\ if test \\$? -ne 0 ; then \\ crontab -l \\${user} &gt; \\$FIC_TEMP 2&gt; /dev/null ; \\ if test \\$? -ne 0 ; then \\ rm -f \\$FIC_TEMP; \\ continue ; \\ fi ; \\ fi ; \\ while read line ; do \\ if test -z \\&quot;\\$line\\&quot; ; then \\ continue ; \\ fi ; \\ echo \\&quot;\\$line\\&quot; | grep \\&quot;^#\\&quot; &gt; /dev/null 2&gt;&amp;1 ;\\ if test \\$? -eq 0 ; then \\ continue ; \\ fi ; \\ printf \\&quot;%s;%s;%s;\\\\\\n\\&quot; \\&quot;\\`uname -n\\`\\&quot; \\&quot;\\${user}\\&quot; \\&quot;\\${line}\\&quot; ; \\ done &lt; \\${FIC_TEMP}; \\ rm -f \\$FIC_TEMP; done&quot; &gt; ${FIC_SUBSCRIPT} # Si la liste des serveurs distants est vide, on exécute le sous-script en local if test -z &quot;${FIC_LISTE_SERVEURS}&quot;;then chmod +x ${FIC_SUBSCRIPT} ${FIC_SUBSCRIPT} &gt;&gt; ${FIC_SORTIE_EXT_CRONTAB} else NB_SERVEURS=`cat ${FIC_LISTE_SERVEURS} | wc -l` BOUCLE_COURRANTE=0 while read SERVEUR_DISTANT do BOUCLE_COURRANTE=`expr ${BOUCLE_COURRANTE} + 1` echo &quot;INFO -- ${SERVEUR_DISTANT} : ${BOUCLE_COURRANTE}/${NB_SERVEURS}&quot; # on continue dans la boucle si le ping ne fonctionne pas ping -c 1 ${SERVEUR_DISTANT} &gt; /dev/null 2&gt;&amp;1 if [ $? -ne 0 ];then echo &quot;ERROR -- PING serveur ${SERVEUR_DISTANT}&quot; CR=10 continue fi # ssh -n dans une boucle while sinon on sort de la boucle à la première occurence # on continue si le ssh/scp ne fonctionne pas scp ${FIC_SUBSCRIPT} ${SERVEUR_DISTANT}:/var/tmp/ &gt; /dev/null ssh -n ${SERVEUR_DISTANT} &quot;chmod 777 /var/tmp/`basename ${FIC_SUBSCRIPT}`&quot; if [ $? -ne 0 ];then echo &quot;ERROR -- SSH serveur ${SERVEUR_DISTANT}&quot; CR=11 continue fi ssh -n ${SERVEUR_DISTANT} &quot;/var/tmp/`basename ${FIC_SUBSCRIPT}`&quot; &gt;&gt; ${FIC_SORTIE_EXT_CRONTAB} done &lt; ${FIC_LISTE_SERVEURS} fi exit $CR Pour déployer facilement un script depuis le serveur VTOM vers tous les clients, on peut aussi utiliser le vtcopy vtmachine | grep -i running | awk -F&quot;|&quot; &#39;BEGIN{printf &quot;tremote /machine=&quot;}{gsub(/[ ]/, &quot;&quot;, $2); printf &quot;%s,&quot;,$2;}END{printf &quot; vtcopy -i monfic_source -o mon_rep_dest\\n&quot;}&#39; Version tâches planifiées Windows (filtre des tâches microsoft) schtasks /query : @echo off set USER=administrateur set PASSWD=motdepasse for /F %i in (c:\\temp\\liste_client_windows.txt) do ( schtasks /Query /FO CSV /V /S %i /U %USER% /P %PASSWD% | findstr /V &quot;\\Microsoft&quot; | findstr /V &#39;&quot;HostName&quot;,&quot;TaskName&quot;,&quot;Next Run Time&quot;,&quot;Status&quot;,&quot;Logon Mode&quot;,&quot;Last Run Time&quot;,&quot;Last Result&quot;,&quot;Author&quot;,&quot;Task To Run&quot;,&quot;Start In&quot;,&quot;Comment&quot;&#39; ) &gt;&gt; c:\\temp\\taches_planifiees_windows.csv @echo on","headline":"Extraction des crontabs de tous les utilisateurs en local ou à distance","mainEntityOfPage":{"@type":"WebPage","@id":"https://virtual-thom.github.io/archives/extraire-crontab-serveurs-distants/"},"url":"https://virtual-thom.github.io/archives/extraire-crontab-serveurs-distants/"}</script>
+<!-- End Jekyll SEO tag -->
+
+  
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z8Y7902GRV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Z8Y7902GRV');
+</script>
+
+
+  <body>
+    <div class="container">
+      <header id="site-header">
+  <h1>Blog-notes VTOM, informatique, industrialisation, ordonnancement, DevOps</h1>
+  <nav>
+    <ul>
+      <li>
+        <a href="https://virtual-thom.github.io/archives" title="Home">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M18.121,9.88l-7.832-7.836c-0.155-0.158-0.428-0.155-0.584,0L1.842,9.913c-0.262,0.263-0.073,0.705,0.292,0.705h2.069v7.042c0,0.227,0.187,0.414,0.414,0.414h3.725c0.228,0,0.414-0.188,0.414-0.414v-3.313h2.483v3.313c0,0.227,0.187,0.414,0.413,0.414h3.726c0.229,0,0.414-0.188,0.414-0.414v-7.042h2.068h0.004C18.331,10.617,18.389,10.146,18.121,9.88 M14.963,17.245h-2.896v-3.313c0-0.229-0.186-0.415-0.414-0.415H8.342c-0.228,0-0.414,0.187-0.414,0.415v3.313H5.032v-6.628h9.931V17.245z M3.133,9.79l6.864-6.868l6.867,6.868H3.133z"></path>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a href="https://virtual-thom.github.io/archives/vos-commentaires-livre-d-or/" title="Commentaires - livre d'or">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M17.657,2.982H2.342c-0.234,0-0.425,0.191-0.425,0.426v10.21c0,0.234,0.191,0.426,0.425,0.426h3.404v2.553c0,0.397,0.48,0.547,0.725,0.302l2.889-2.854h8.298c0.234,0,0.426-0.191,0.426-0.426V3.408C18.083,3.174,17.892,2.982,17.657,2.982M17.232,13.192H9.185c-0.113,0-0.219,0.045-0.3,0.124l-2.289,2.262v-1.96c0-0.233-0.191-0.426-0.425-0.426H2.767V3.833h14.465V13.192z M10,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.488-0.668,1.488-1.489C11.488,7.905,10.821,7.237,10,7.237 M10,9.364c-0.352,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C10.638,9.077,10.351,9.364,10,9.364 M14.254,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489s1.489-0.668,1.489-1.489C15.743,7.905,15.075,7.237,14.254,7.237 M14.254,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.352,0,0.639,0.287,0.639,0.638C14.893,9.077,14.605,9.364,14.254,9.364 M5.746,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.489-0.668,1.489-1.489C7.234,7.905,6.566,7.237,5.746,7.237 M5.746,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C6.384,9.077,6.096,9.364,5.746,9.364"></path>
+          </svg>
+        </a>
+      </li>
+      
+      <li>
+        <a href="https://virtual-thom.github.io/about" title="Curriculum Vitae Thom">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z"></path>
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+      <div itemscope itemtype ="http://schema.org/Article" class="post">
+  
+  <header class="post-header">
+    <h1 itemprop="name about headline" class="post-title">Extraction des crontabs de tous les utilisateurs en local ou à distance</h1>
+    <p class="post-meta">
+      <time itemprop="datePublished dateModified" datetime="2015-04-05T10:58:00+00:00">05-04-2015</time></p>
+  </header>
+
+  <article class="post-content" itemprop="articleBody">
+    <h1 class="hidden">Extraction des crontabs de tous les utilisateurs en local ou à distance</h1>
+    <p>Le principe est d’exécuter  <code class="language-plaintext highlighter-rouge">crontab -l -u user</code> (linux) ou <code class="language-plaintext highlighter-rouge">crontab -l user</code> (solaris) pour tous les utilisateurs et pour tous les serveurs distants passés en paramètre dans un fichier.</p>
+
+<p>Voici comment récupérer facilement la liste de vos clients :</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vtmachine | <span class="nb">awk</span>  <span class="nt">-F</span><span class="s2">"|"</span> <span class="s1">'$7 ~ /Win/ {print $3}'</span> | <span class="nb">sed</span> <span class="s1">'s/^[ \t]*\|[ \t]*$//g'</span> <span class="o">&gt;</span> /var/tmp/liste_client_windows.txt
+vtmachine | <span class="nb">awk</span>  <span class="nt">-F</span><span class="s2">"|"</span> <span class="s1">'$7 ~ /Sol|Lin/ {print $3}'</span> | <span class="nb">sed</span> <span class="s1">'s/^[ \t]*\|[ \t]*$//g'</span> <span class="o">&gt;</span> /var/tmp/liste_client_unix.txt
+</code></pre></div></div>
+
+<p>Script shell à télécharger : <a href="https://virtual-thom.github.io/archives/scripts/Extract_Crontab.sh">Extract_Crontab.sh</a></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Script qui pousse un sous-script permettant d'afficher la crontab de tous les utilisateurs</span>
+<span class="c"># et l'exécute sur des serveurs distants </span>
+<span class="c"># ou en local si aucun paramètre</span>
+<span class="c"># A lancer en root</span>
+
+<span class="c"># Le premier paramètre doit être le chemin complet d'un fichier listant des serveurs linux ou Solaris</span>
+<span class="c"># Le serveur sur lequel est exécuté le script doit pouvoir communiquer en ssh avec les serveurs distants</span>
+<span class="nv">FIC_LISTE_SERVEURS</span><span class="o">=</span><span class="nv">$1</span>
+
+<span class="c"># On set le code retour à 0</span>
+<span class="nv">CR</span><span class="o">=</span>0
+
+<span class="c"># Sous-script à exécuter sur les serveurs distants</span>
+<span class="nv">FIC_SUBSCRIPT</span><span class="o">=</span>/var/tmp/<span class="sb">`</span><span class="nb">basename</span> <span class="nv">$0</span><span class="sb">`</span>_<span class="k">${</span><span class="nv">RANDOM</span><span class="k">}</span>_<span class="sb">`</span><span class="nb">date</span> +<span class="s2">"%d%m%Y"</span><span class="sb">`</span>.sh
+
+<span class="c"># fichier de sortie des crontabs -l des utilisateurs </span>
+<span class="c"># format hostname;user;ligne crontab (commentaires et lignes vides non prises en compte)</span>
+<span class="nv">FIC_SORTIE_EXT_CRONTAB</span><span class="o">=</span>/var/tmp/<span class="sb">`</span><span class="nb">basename</span> <span class="nv">$0</span><span class="sb">`</span>_<span class="k">${</span><span class="nv">RANDOM</span><span class="k">}</span>_<span class="sb">`</span><span class="nb">date</span> +<span class="s2">"%d%m%Y"</span><span class="sb">`</span>.csv
+<span class="o">&gt;</span> <span class="k">${</span><span class="nv">FIC_SORTIE_EXT_CRONTAB</span><span class="k">}</span>
+
+<span class="c"># Ecriture du sous-script</span>
+<span class="c"># si le crontab -l -u user ne fonctionne pas sur votre machine distante, on peut imaginer créer</span>
+<span class="c"># une couche d'abstraction pour la commande crontab selon l'OS</span>
+<span class="nb">echo</span> <span class="s2">"awk -F</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2"> '</span><span class="se">\$</span><span class="s2">NF !~ /(nologin|sync|shutdown|halt|false)/ {print </span><span class="se">\$</span><span class="s2">1}' /etc/passwd | while read user ;do </span><span class="se">\</span><span class="s2">
+export user; </span><span class="se">\</span><span class="s2">
+FIC_TEMP=/var/tmp/</span><span class="se">\$</span><span class="s2">{RANDOM}_crontab-l; </span><span class="se">\</span><span class="s2">
+crontab -l -u </span><span class="se">\$</span><span class="s2">{user} &gt; </span><span class="se">\$</span><span class="s2">FIC_TEMP 2&gt; /dev/null ; </span><span class="se">\</span><span class="s2">
+if test </span><span class="se">\$</span><span class="s2">? -ne 0 ; then </span><span class="se">\</span><span class="s2">
+ crontab -l </span><span class="se">\$</span><span class="s2">{user} &gt; </span><span class="se">\$</span><span class="s2">FIC_TEMP 2&gt; /dev/null ; </span><span class="se">\</span><span class="s2">
+ if test </span><span class="se">\$</span><span class="s2">? -ne 0 ; then </span><span class="se">\</span><span class="s2">
+  rm -f </span><span class="se">\$</span><span class="s2">FIC_TEMP; </span><span class="se">\</span><span class="s2">
+  continue ; </span><span class="se">\</span><span class="s2">
+ fi ; </span><span class="se">\</span><span class="s2">
+fi ; </span><span class="se">\</span><span class="s2">
+while read line ; do </span><span class="se">\</span><span class="s2">
+ if test -z </span><span class="se">\"\$</span><span class="s2">line</span><span class="se">\"</span><span class="s2"> ; then </span><span class="se">\</span><span class="s2">
+  continue ; </span><span class="se">\</span><span class="s2">
+ fi ; </span><span class="se">\</span><span class="s2">
+ echo </span><span class="se">\"\$</span><span class="s2">line</span><span class="se">\"</span><span class="s2"> | grep </span><span class="se">\"</span><span class="s2">^#</span><span class="se">\"</span><span class="s2"> &gt; /dev/null 2&gt;&amp;1 ;</span><span class="se">\</span><span class="s2">
+ if test </span><span class="se">\$</span><span class="s2">? -eq 0 ; then </span><span class="se">\</span><span class="s2">
+  continue ; </span><span class="se">\</span><span class="s2">
+ fi ; </span><span class="se">\</span><span class="s2">
+ printf </span><span class="se">\"</span><span class="s2">%s;%s;%s;</span><span class="se">\\\n\"</span><span class="s2"> </span><span class="se">\"\`</span><span class="s2">uname -n</span><span class="se">\`\"</span><span class="s2"> </span><span class="se">\"\$</span><span class="s2">{user}</span><span class="se">\"</span><span class="s2"> </span><span class="se">\"\$</span><span class="s2">{line}</span><span class="se">\"</span><span class="s2"> ; </span><span class="se">\</span><span class="s2">
+done &lt; </span><span class="se">\$</span><span class="s2">{FIC_TEMP}; </span><span class="se">\</span><span class="s2">
+rm -f </span><span class="se">\$</span><span class="s2">FIC_TEMP; 
+done"</span> <span class="o">&gt;</span> <span class="k">${</span><span class="nv">FIC_SUBSCRIPT</span><span class="k">}</span>
+
+
+<span class="c"># Si la liste des serveurs distants est vide, on exécute le sous-script en local</span>
+<span class="k">if </span><span class="nb">test</span> <span class="nt">-z</span> <span class="s2">"</span><span class="k">${</span><span class="nv">FIC_LISTE_SERVEURS</span><span class="k">}</span><span class="s2">"</span><span class="p">;</span><span class="k">then
+  </span><span class="nb">chmod</span> +x <span class="k">${</span><span class="nv">FIC_SUBSCRIPT</span><span class="k">}</span>
+  <span class="k">${</span><span class="nv">FIC_SUBSCRIPT</span><span class="k">}</span> <span class="o">&gt;&gt;</span>  <span class="k">${</span><span class="nv">FIC_SORTIE_EXT_CRONTAB</span><span class="k">}</span>
+<span class="k">else
+  </span><span class="nv">NB_SERVEURS</span><span class="o">=</span><span class="sb">`</span><span class="nb">cat</span> <span class="k">${</span><span class="nv">FIC_LISTE_SERVEURS</span><span class="k">}</span> | <span class="nb">wc</span> <span class="nt">-l</span><span class="sb">`</span>
+  <span class="nv">BOUCLE_COURRANTE</span><span class="o">=</span>0
+
+  
+  <span class="k">while </span><span class="nb">read </span>SERVEUR_DISTANT
+  <span class="k">do 
+    </span><span class="nv">BOUCLE_COURRANTE</span><span class="o">=</span><span class="sb">`</span><span class="nb">expr</span> <span class="k">${</span><span class="nv">BOUCLE_COURRANTE</span><span class="k">}</span> + 1<span class="sb">`</span>
+    <span class="nb">echo</span> <span class="s2">"INFO -- </span><span class="k">${</span><span class="nv">SERVEUR_DISTANT</span><span class="k">}</span><span class="s2"> : </span><span class="k">${</span><span class="nv">BOUCLE_COURRANTE</span><span class="k">}</span><span class="s2">/</span><span class="k">${</span><span class="nv">NB_SERVEURS</span><span class="k">}</span><span class="s2">"</span>
+    
+    <span class="c"># on continue dans la boucle si le ping ne fonctionne pas</span>
+    ping <span class="nt">-c</span> 1 <span class="k">${</span><span class="nv">SERVEUR_DISTANT</span><span class="k">}</span> <span class="o">&gt;</span> /dev/null  2&gt;&amp;1
+    <span class="k">if</span> <span class="o">[</span> <span class="nv">$?</span> <span class="nt">-ne</span> 0 <span class="o">]</span><span class="p">;</span><span class="k">then
+      </span><span class="nb">echo</span> <span class="s2">"ERROR -- PING serveur </span><span class="k">${</span><span class="nv">SERVEUR_DISTANT</span><span class="k">}</span><span class="s2">"</span>
+      <span class="nv">CR</span><span class="o">=</span>10
+      <span class="k">continue
+    fi</span>
+    
+    <span class="c"># ssh -n dans une boucle while sinon on sort de la boucle à la première occurence</span>
+    <span class="c"># on continue si le ssh/scp ne fonctionne pas</span>
+    scp <span class="k">${</span><span class="nv">FIC_SUBSCRIPT</span><span class="k">}</span>  <span class="k">${</span><span class="nv">SERVEUR_DISTANT</span><span class="k">}</span>:/var/tmp/ <span class="o">&gt;</span> /dev/null
+    ssh <span class="nt">-n</span> <span class="k">${</span><span class="nv">SERVEUR_DISTANT</span><span class="k">}</span> <span class="s2">"chmod 777 /var/tmp/</span><span class="sb">`</span><span class="nb">basename</span> <span class="k">${</span><span class="nv">FIC_SUBSCRIPT</span><span class="k">}</span><span class="sb">`</span><span class="s2">"</span>
+    <span class="k">if</span> <span class="o">[</span> <span class="nv">$?</span> <span class="nt">-ne</span> 0 <span class="o">]</span><span class="p">;</span><span class="k">then
+      </span><span class="nb">echo</span> <span class="s2">"ERROR -- SSH serveur </span><span class="k">${</span><span class="nv">SERVEUR_DISTANT</span><span class="k">}</span><span class="s2">"</span>
+      <span class="nv">CR</span><span class="o">=</span>11
+      <span class="k">continue
+    fi
+
+    </span>ssh <span class="nt">-n</span> <span class="k">${</span><span class="nv">SERVEUR_DISTANT</span><span class="k">}</span> <span class="s2">"/var/tmp/</span><span class="sb">`</span><span class="nb">basename</span> <span class="k">${</span><span class="nv">FIC_SUBSCRIPT</span><span class="k">}</span><span class="sb">`</span><span class="s2">"</span> <span class="o">&gt;&gt;</span> <span class="k">${</span><span class="nv">FIC_SORTIE_EXT_CRONTAB</span><span class="k">}</span>
+
+  <span class="k">done</span> &lt; <span class="k">${</span><span class="nv">FIC_LISTE_SERVEURS</span><span class="k">}</span>
+<span class="k">fi
+
+</span><span class="nb">exit</span> <span class="nv">$CR</span>
+</code></pre></div></div>
+
+<p>Pour déployer facilement un script depuis le serveur VTOM vers tous les clients, on peut aussi utiliser le <code class="language-plaintext highlighter-rouge">vtcopy</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vtmachine | grep -i running | awk -F"|" 'BEGIN{printf "tremote /machine="}{gsub(/[ 	]/, "", $2); printf "%s,",$2;}END{printf " vtcopy -i monfic_source -o mon_rep_dest\n"}'
+</code></pre></div></div>
+
+<p>Version tâches planifiées Windows (filtre des tâches microsoft) schtasks /query :</p>
+
+<div class="language-batch highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@echo <span class="na">off</span>
+<span class="kd">set</span> <span class="kd">USER</span><span class="o">=</span><span class="kd">administrateur</span>
+<span class="kd">set</span> <span class="kd">PASSWD</span><span class="o">=</span><span class="kd">motdepasse</span>
+<span class="k">for</span> <span class="na">/F </span><span class="vm">%i</span> <span class="k">in</span> <span class="o">(</span><span class="kd">c</span>:\temp\liste_client_windows.txt<span class="o">)</span> <span class="k">do</span> <span class="o">(</span>
+<span class="nb">schtasks</span> <span class="na">/Query /FO </span><span class="kd">CSV</span> <span class="na">/V /S </span><span class="vm">%i</span> <span class="na">/U </span><span class="nv">%USER%</span> <span class="na">/P </span><span class="nv">%PASSWD%</span> <span class="o">|</span> <span class="nb">findstr</span> <span class="na">/V </span><span class="s2">"\Microsoft"</span> <span class="o">|</span> <span class="nb">findstr</span> <span class="na">/V </span><span class="s1">'"HostName","TaskName","Next Run Time","Status","Logon Mode","Last Run Time","Last Result","Author","Task To Run","Start In","Comment"'</span> 
+<span class="o">)</span> <span class="o">&gt;&gt;</span> <span class="kd">c</span>:\temp\taches_planifiees_windows.csv
+@echo <span class="na">on</span>
+</code></pre></div></div>
+
+  </article>
+  
+<nav>
+  <ul class="pager">
+    
+     
+    <li class="previous">
+      <a href="https://virtual-thom.github.io/archives/vtom-compter-nombre-traitements-par-machine/"><span aria-hidden="true">&larr;</span> Compter le nombre de traitements VTOM par client</a> 
+    </li>
+    
+     
+     <li class="next">
+      <a class="next" href="https://virtual-thom.github.io/archives/sendmail-vtom/">sendmail pour vtom <span aria-hidden="true">&rarr;</span></a> 
+    </li>
+     
+    
+  </ul>
+</nav>
+
+
+  <footer class="post-footer">
+    
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>crontab</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>crontab -l</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>sh</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>script</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>extraire crontab à distance</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>tâches planifiees</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>schtasks /query</a>
+      
+    
+    <span  itemprop="author publisher" class="hidden">Virtual Thom</span>
+  </footer>
+  
+  <div id="disqus_thread" ></div>
+  <script>
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'thomas-asnar'; // required: replace example with your forum shortname
+  
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+</div>
+
+      <footer id="site-footer">
+    <div>&copy;<a href="https://github.com/virtual-thom/" title="Github Virtual-Thom">Virtual-Thom</a></div>
+    <div>
+            <a href="https://virtual-thom.github.io/archives/plan" title="Plan du site">sitemap</a> | <a href="https://virtual-thom.github.io/about" rel="publisher author" title="Curriculum vitae Thom">A propos</a>
+    </div>
+    <div>
+        <a id="goto-site-header" href="#site-header" title="Retourner au début">&uArr; Top</a>
+    </div>
+    <div id="footer-disclaimer">
+        <p>Avertissement : vous ne devez pas prendre pour argent comptant le contenu de ce site. Testez toujours la solution en environnement de test.</p>
+        <p>Malgré le sérieux que je m'efforce de mettre dans le contenu de ces billets, je ne pourrai être tenu responsable d'éventuelles erreurs que cela pourrait engendrer.</p>
+    </div>
+    <div>
+        <a class="hidden" href="https://virtual-thom.github.io/archives/sitemap.xml" title="SiteMap">sitemap</a>
+    </div>
+</footer>
+
+    </div>
+  </body>
+
+</html>

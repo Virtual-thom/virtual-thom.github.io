@@ -1,0 +1,59 @@
+---
+layout: post
+title: Lister tous les LUNs par Pool et par projet en script aksh - ZFS Storage 7310 (Oracle Unified Storage Systems)
+date: 2014-08-28 13:00
+author: Virtual Thom
+comments: true
+categories: [list LUN, Script, script .aksh, ssh, Stockage, SUN, SUN Storage ZFS 7310, ZFS 7310]
+---
+Cet article a pour objectif de lister tous les LUNs par pool et par projet en mode automatique par script, sur les baies de stockage ZFS 7310 (Oracle Unified Storage Systems).
+
+Les explications, c'est pas votre point fort ? Rendez-vous directement au script <a href="#scriptaksh">ici</a>
+<h2>Qu'est ce qu'aksh ?</h2>
+C'est le shell par défaut quand vous vous connectez sur les baies de stockage ZFS 7310 (et plus globalement pour les Oracle Unified Storage Systems).
+En général, ce shell, aux commandes bien particulières, est destiné à l'exploitation des baies, en plus de la GUI par navigateur web.
+On n'y reste, généralement, pas bien longtemps avant de taper la commande " confirm shell " pour passer en root sur la baie (avec un shell tout ce qu'il y a de plus classique).
+
+<h3>Scripter en aksh</h3>
+Depuis le shell aksh, vous pouvez taper un certain nombre de commandes comme :
+<ul>
+<li>ls : pour l'état des objets courants du chemin où vous vous trouvez</li>
+<li>cd : pour se déplacer</li>
+<li>select xxxx : pour sélectionner un pool, un projet, un LUN etc. et se positionner sur l'objet</li>
+<li>get attribut : pour récupérer la valeur d'un attribut de l'objet où vous vous trouvez</li>
+<li>la liste n'est pas exhaustive mais ça suffit en général, vous trouverez la documentation en bas de page</li>
+</ul>
+Pour scripter, il suffira d'encapsuler ces commandes avec run('commande') soit :
+<ul>
+<li>dans un shell aksh en tapant " script " (pour terminer saisissez "." et ENTRéE</li>
+<li>dans un fichier xxxx.aksh. Vous pourrez lancer  le script en ssh depuis un autre serveur : ssh root@ip_tete_baie script < votrescript.aksh<ul><li>pour rajouter une clé ssh entre un serveur et la tête de baie, rien de plus simple, "confirm shell; cd ~/.ssh; vi authorized_keys;" et vous rajouter la clé publique de votre serveur (attention la clé saute sur un changement de firmware, j'en ai fait les frais récemment)</li></ul></li>
+</ul>
+Pour le reste, ça ressemble comme deux gouttes d'eau à du javascript. Pour ceux qui sont habitués, ça va être très facile de comprendre mon script pour lister les LUNs. 
+
+<h3 id="scriptaksh">Script aksh pour lister les LUNs</h3>
+<pre class="hightlight"><code class="language-javascript" data-lang="javascript">
+run('cd /'); // certain d'être dans le répertoire racine
+run('shares'); // déplace dans shares
+var projects = list(); // liste de tous les projets 
+var pool = run('get pool').split(/\s+/)[3]; // récupération du nom du pool
+
+for (var i = 0; i < projects.length; i++) { // pour chaque pool
+  run('select ' + projects[i]);             // sélection du pool
+  var luns = list() ;                       // liste des LUNs du pool
+  for (var j = 0;j < luns.length ; j++){    // pour chaque LUNs
+     run('select ' + luns[j]) ;             // sélection du LUN
+     var initiatorgroup = run('get initiatorgroup').split(/\s+/)[3];  // récupération de l'initiator group
+     var targetgroup = run('get targetgroup').split(/\s+/)[3];  // récupération du target group
+     var space_total = run('get space_total').split(/\s+/)[3];  // récupération de la taille du LUN
+     printf('%s;%s;%s;%s;%s\n',projects[i],luns[j],initiatorgroup,targetgroup,space_total) ; // affichage, ici en csv
+     run('cd ..') ;  // on remonte d'un cran pour sortir du select LUN
+   }
+   run('cd ..'); // remonte d'un cran pour sortir du select Pool
+}
+run('cd ..'); 
+</code>
+</pre>
+
+Voilà, rien de compliqué. Quand vous voulez adapter, connectez-vous en aksh sur la tête de baie et vérifier les attributs en faisant un " ls ". 
+
+<a href="http://www.oracle.com/technetwork/documentation/old-unified-ss-1882427.html" title="Documentation Oracle">Documentations offcielles ORACLE</a>

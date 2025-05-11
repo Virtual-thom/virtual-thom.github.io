@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="apple-touch-icon" href="https://virtual-thom.github.io/archives/apple-touch-icon.png">
+  <link rel="icon" href="https://virtual-thom.github.io/archives/favicon.ico" />
+  <!-- Remplacé par Jekyll SEO (sinon apparait en double)
+  <title>Indicateurs état capacitaire des baies de stockage (Naviseccli, XML et XSLT embarquée)</title>
+  <meta name="description" content="But :Donner à la direction informatique une visualisation globale des indicateurs de l’état capacitaire (espace utilisé, disponible et total) des baies de st...">
+  --> 
+  
+  <link rel="canonical" href="https://virtual-thom.github.io/archives/indicateurs-etat-capacitaire-des-baies-de-stockage-naviseccli-xml-xslt-embarquee/">
+  
+  <link rel="stylesheet" media="screen" href="https://virtual-thom.github.io/archives/assets/main.css">
+  
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Indicateurs état capacitaire des baies de stockage (Naviseccli, XML et XSLT embarquée) | Virtual-Thom Blog-notes VTOM et informatique</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Indicateurs état capacitaire des baies de stockage (Naviseccli, XML et XSLT embarquée)" />
+<meta name="author" content="Virtual Thom" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="But : Donner à la direction informatique une visualisation globale des indicateurs de l’état capacitaire (espace utilisé, disponible et total) des baies de stockage. L’outil doit fournir une aide décisionnelle qui permettra, par exemple, la commande de nouveaux disques, la prise en compte de nouveaux systèmes d’informations en étant sûr de pouvoir l’héberger. Voici un rendu du fichier XML basique. Les explications, ça n’est pas votre tasse de thé ? On en vient directement au fait ici. Comment ? Les besoins : Une visualisation d&#39;ensemble des KPI (indicateurs clefs de performances) : l&#39;état capacitaire de toutes les baies de stockage (espace utilisé, disponible et total). Si possible en pourcentage, en Giga Octet et en camembert. Une mise à jour régulière des données, sur demande ou temps réel selon les besoins. J&#39;estime qu&#39;une mise à jour quotidienne, et à la demande suffisent aux besoins. Un accès web. Un compte rendu journalier par e-mail. Un état imprimable. (Je pense que je vais améliorer cet aspect) Les méthodes : Pour les requêtes aux baies de stockage EMC, j&#39;utilise : naviseccli. Le programme permet de récupérer toutes les informations qu&#39;on souhaite. Afin de produire un seul document, qui va servir à la fois, pour une page web, à la fois, pour le compte-rendu journalier par e-mail, j&#39;utilise le format XML. Le fichier XML ne fait rien en lui-même. Il n&#39;est donc pas exploitable sans la transformation XSL pour un rendu HTML. Pour stocker les données, j&#39;utilise le format XML. Pour mettre en forme, j&#39;utilise le langage de transformation XSLT avec un rendu HTML5. Pour la mise à jour des données, j&#39;utilise l&#39;ordonnanceur VTOM. Il lance le script de mise à jour 3 fois par jour, et dispose d&#39;un traitement à la demande au besoin. Une fois par jour, le matin, VTOM envoie le fichier XML par e-mail. Dans ce genre de cas, il faut éviter les tableaux excels car, ils ne sont pas mis à jour automatiquement (on peut presque dire, jamais à jour par conséquent). De même, il est quasiment exclus de donner un accès direct au logiciel d’administration, à notre DSI. Pourquoi, me diriez-vous ? Navisphere, par exemple, dispose de toutes les informations, même sous forme graphique. A cela, je répondrais : trop compliqué, trop de cliques à effectuer, trop de chargement, pas de visualisation d’ensemble. La direction a autre chose à faire que de naviguer dans les menus complexes que nous, administrateurs chevronnés, connaissons par coeur. naviseccli Je vous conseille d’authentifier votre utilisateur afin d’effectuer des requêtes sans mot de passe. naviseccli -h IParray -AddUserSecurity -user username -password mypass -scope 0 Toutes mes baies EMC sont configurées en Storage Pool. J’effectue une requête pour obtenir l’espace utilisable total utilisateur, l’espace disponible et le nom. J’en déduirai l’espace utilisé. naviseccli -h $iparray storagepool -list -userCap -availableCap &gt; ${tmpfile}_$iparray Contenu du fichier : Pool Name: Pool Bronze Pool ID: 1 User Capacity (Blocks): 21107025920 User Capacity (GBs): 10064.614 Available Capacity (Blocks): 21107025920 Available Capacity (GBs): 10064.614 Pool Name: Pool Gold 1 Pool ID: 2 User Capacity (Blocks): 29173164800 User Capacity (GBs): 13910.849 Available Capacity (Blocks): 11354673920 Available Capacity (GBs): 5414.330 ... ... Petit problème, l’espace du Storage Pool NAS est utilisé à 100%, ou peu s’en faut. L’information n’est pas fausse en soit. En effet, le datamover prend bien tout l’espace du Storage Pool pour constituer son propre pool de stockage, afin de créer les filesystems. Pour pallier à ce problème, j’utilise des requêtes directement sur la control station du NAS. # il m&#39;a fallu positionner les variables d&#39;environnement afin d&#39;exécuter les commandes ssh nasadmin@$ipnas &#39;. .bash_profile ; nas_pool -size &quot;Pool NAS&quot;&#39; &gt; pool_nas_size_$ipnas &lt;/pre&gt; Toujours pour éviter de mettre les mots de passe, j&#39;effectue la mise en place de clés ssh entre mon serveur et la control station. &lt;pre lang=&quot;bash&quot;&gt; # connexion en ssh sur la control station en nasadmin # ssh nasadmin@ipcontrolstation # aller dans le répertoire /home/nasadmin/.ssh ou le créer s&#39;il n&#39;existe pas avec ssh-keygen test -d ~/.ssh || ssh-keygen cd ~/.ssh # éditer le fichier authorized_keys pour ajouter la clé de votre serveur # attention le fichier authorized_keys doit avoir les droits 600 vi authorized_keys # coller la clé ~/.ssh/id_rsa.pub de votre serveur distant (si c&#39;est une clé rsa) dans le fichier authorized_keys # sauvegarder Comment traiter les informations de naviseccli et du NAS ? J’ai toutes mes informations. Maintenant, je les traite avec un script shell et les mets en forme en XML. Le fichier XML aura la feuille de style XSLT embarquée, avec un rendu HTML. Entête XML pour le script. (J’utilise Chart.js pour les camemberts en canvas) Script qui génère le fichier XML. Rendu fichier XML. #!/bin/bash # AUTEUR : SCH Virtual Thom # VERSION : 1.0 # DATE : 10/08/2014 # # set -n # Decommenter pour debug syntax sans exéon # NOTE: Ne pas oublier de recommenter ! # set -x # Decommenter pour debug # ########################################################## # VARIABLES ########################################################## OK=0 KOCRIT=1 KOWARN=2 CR=${OK} date_du_jour=`date +&quot;%d_%m_%Y&quot;` # Le nom des arrays doit pouvoir être résolu (/etc/hosts ou dns) ou mettre l&#39;adresse IP iparrays=&quot;VNX5700 VNX5300 CX4-960&quot; tmpfile=&quot;${date_du_jour}_`uuidgen`_etat-capacitaire-shemc.xml&quot; ftp_ip=ftp.adresse.intradef.gouv.fr ftp_user=xxxx ftp_mdp=xxxx rep_script=&#39;/SANSCRIPTS/etat-capacitaire&#39; # pour naviseccli export PATH=$PATH:/opt/Navisphere/bin ########################################################## # FONCTIONS ########################################################## date_heure(){ date_heure_var=`date +&quot;%d/%m/%Y - %H:%M:%S : &quot;` echo &quot;${date_heure_var}$1&quot; } fonc_sortie(){ numero_exit=$1 message_exit=$2 date_heure &quot;${message_exit}&quot; date_heure &quot;Fin du script. Exit : ${numero_exit}&quot; exit ${numero_exit} } usage(){ # exemple d&#39;usage script=${0##*/} ; #script=${script%.*} ; echo &quot;&quot; ; echo &quot;Genere un fichier xml de l&#39;etat capacitaire SHEM-C&quot; echo &quot;Usage :&quot; ; echo &quot; ${script}&quot; echo &quot; Pas de parametre.&quot; echo &quot;&quot; exit ${KOWARN}; } ########################################################## # SCRIPT ########################################################## date_heure &#39;Début du script&#39; cat ${rep_script}/etat-capacitaire-en-tete-xml.txt &gt; ${rep_script}/$tmpfile echo &quot;&lt;!-- cette partie est mise à jour par naviseccli --&gt; &lt;data:data&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # Requete sur les baies de stockage en naviseccli (les clés doivent être mise en place) # naviseccli -h ipbaie -addusersecurity -scope 0 -password password -user userName for iparray in $(echo $iparrays) do # un seul naviseccli pour toues les storages d&#39;une baie (ça fait moins de requêtes) naviseccli -h $iparray storagepool -list -userCap -availableCap &gt; ${rep_script}/${tmpfile}_$iparray # Le nom et les ip des array sont identiques ici mais on peut mettre autre chose # si le résultat contient des lignes, on traite if test $(cat ${rep_script}/${tmpfile}_$iparray | wc -l) -gt 1 then # si les baies sont aussi des têtes NAS, je récupère l&#39;état du &quot;Pool NAS&quot; (il s&#39;appelle comme ça chez moi) if test &quot;$iparray&quot; = &quot;VNX5700&quot; then namearray=&quot;VNX5700&quot; # le nom du NAS doit pouvoir être résolu (/etc/hosts ou dns) ou mettre l&#39;adresse IP ipnas=&quot;NAS5700&quot; ssh nasadmin@$ipnas &#39;. .bash_profile ; nas_pool -size &quot;Pool NAS&quot;&#39; &gt; ${rep_script}/pool_nas_size_$ipnas else if test &quot;$iparray&quot; = &quot;VNX5300&quot; then namearray=&quot;VNX5300&quot; # le nom du NAS doit pouvoir être résolu (/etc/hosts ou dns) ou mettre l&#39;adresse IP ipnas=&quot;NAS5300&quot; ssh nasadmin@$ipnas &#39;. .bash_profile ; nas_pool -size &quot;Pool NAS&quot;&#39; &gt; ${rep_script}/pool_nas_size_$ipnas else if test &quot;$iparray&quot; = &quot;CX4-960&quot; then namearray=&quot;CX4-960&quot; else # par défaut on met l&#39;IP ou le nom dns en tant que nom de baie namearray=$iparray fi fi fi echo &quot;&lt;array name=&#39;$namearray&#39;&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # line de la sortie naviseccli &lt; ${rep_script}/${tmpfile}_$iparray # Ne pas oublier que l&#39;entrée ssh dans un boucle while remplace l&#39;entrée standard # solution ssh -n while read line do if test -n &quot;$(echo $line | grep &#39;Pool Name&#39;)&quot; then if test -n &quot;$(echo $line | grep &#39;NAS&#39;)&quot; then NAS=1 else NAS=0 fi echo &quot;&lt;storagepool&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile echo &quot;&lt;name&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # awk -F: &#39;$1 ~ /Pool Name/ {print $2}&#39; =&gt; délimiteur &quot;:&quot;, 1er champ contient &quot;Pool Name&quot; # affiche le deuxième champs echo $line | awk -F: &#39;$1 ~ /Pool Name/ {print $2}&#39; | sed &#39;s/^ //g&#39; &gt;&gt; ${rep_script}/$tmpfile echo &quot;&lt;/name&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # FIN name else if test -n &quot;$(echo $line | grep &#39;User Capacity (GBs)&#39;)&quot; then echo &quot;&lt;usercap&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile if test &quot;$NAS&quot; = &quot;1&quot; then usercap=`cat ${rep_script}/pool_nas_size_${ipnas} | awk -F&quot;=&quot; &#39;$1 ~ /total_mb/ {print $2}&#39; | sed &#39;s/^ //g&#39;` if test &quot;$usercap&quot; != &quot;0&quot; then usercap=`expr $usercap \/ 1024` else usercap=`cat ${rep_script}/pool_nas_size_${ipnas} | awk -F&quot;=&quot; &#39;$1 ~ /potential_mb/ {print $2}&#39; | sed &#39;s/^ //g&#39;` usercap=`expr $usercap \/ 1024` fi echo $usercap &gt;&gt; ${rep_script}/$tmpfile # si Pool différent du NAS else echo $line | awk -F: &#39;$1 ~ /User Capacity \(GBs\)/ {print $2}&#39; | sed &#39;s/^ //g&#39; &gt;&gt; ${rep_script}/$tmpfile fi echo &quot;&lt;/usercap&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # FIN usercap else if test -n &quot;$(echo $line | grep &#39;Available Capacity (GBs)&#39;)&quot; then echo &quot;&lt;availablecap&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile if test &quot;$NAS&quot; = &quot;1&quot; then availablecap=`cat ${rep_script}/pool_nas_size_${ipnas} | awk -F&quot;=&quot; &#39;$1 ~ /avail_mb/ {print $2}&#39; | sed &#39;s/^ //g&#39;` if test &quot;$availablecap&quot; != &quot;0&quot; then availablecap=`expr $availablecap \/ 1024` else availablecap=`cat ${rep_script}/pool_nas_size_${ipnas} | awk -F&quot;=&quot; &#39;$1 ~ /potential_mb/ {print $2}&#39; | sed &#39;s/^ //g&#39;` availablecap=`expr $availablecap \/ 1024` fi echo $availablecap &gt;&gt; ${rep_script}/$tmpfile # si pas pool NAS else echo $line | awk -F: &#39;$1 ~ /Available Capacity \(GBs\)/ {print $2}&#39; | sed &#39;s/^ //g&#39; &gt;&gt; $tmpfile fi echo &quot;&lt;/availablecap&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # FIN availablecap else # Je prends les lignes vides comme séparateur des pools if test -z &quot;$line&quot; then echo &quot;&lt;/storagepool&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile fi fi fi fi done &lt; ${rep_script}/${tmpfile}_$iparray echo &quot;&lt;/array&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile fi done echo &quot;&lt;/data:data&gt; &lt;!-- fin des datas --&gt; &lt;/xsl:stylesheet&gt; &lt;!-- fin du fichier xml --&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile date_heure &quot;Transfert FTP&quot; # Transfert FTP sur le site de la SHEM ftp -v -n -i &gt; /dev/null &lt;&lt; EOF open ${ftp_ip} user ${ftp_user} ${ftp_mdp} binary put ${rep_script}/$tmpfile index.xml EOF # TODO : prévoir d&#39;envoyer un e-mail en compte rendu avec le xml attaché # Nettoyage des fichiers temporaires for iparray in $(echo $iparrays) do rm -f ${rep_script}/${tmpfile}_$iparray done rm -f ${rep_script}/pool_nas_size* rm -f ${rep_script}/$tmpfile date_heure &#39;Fin du script&#39; Vous avez remarqué que je dis souvent que la feuille XSLT est embarquée dans le fichier XML. En réalité, c’est plutôt la data XML qui est embarquée dans la transformation XSLT. En fait, la feuille de transformation XSLT est un fichier XML en elle-même. Il suffit de lui insérer des datas et de définir un certain nombre de paramètres : &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt; &lt;!-- Comme tout fichier XML --&gt; &lt;?xml-stylesheet href=&quot;#stylesheet&quot; type=&quot;text/xsl&quot;?&gt; &lt;!-- D&#39;habitude on met l&#39;url du fichier XML à transformer ici --&gt; &lt;!-- là, on fait référence à l&#39;ID stylesheet, interne à ce fichier --&gt; &lt;!-- Pour ça, il faut définir la structure du document DTD (Document Type Definition) --&gt; &lt;!DOCTYPE xsl:stylesheet [ &lt;!ATTLIST xsl:stylesheet id ID #REQUIRED&gt; ]&gt; &lt;!-- balises de transformation xsl --&gt; &lt;xsl:stylesheet version=&quot;2.0&quot; id=&quot;stylesheet&quot; xmlns:data=&quot;localhost&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;&gt; &lt;!-- pour un rendu HTML --&gt; &lt;xsl:output method=&quot;html&quot; indent=&quot;yes&quot; encoding=&quot;UTF-8&quot; /&gt; &lt;!-- definition du template principal avec le rendu html --&gt; &lt;xsl:template match=&quot;/&quot;&gt; &lt;html&gt; &lt;body&gt;... &lt;!-- Les appels de template se feront &lt;xsl:apply-templates select=&quot;/xsl:stylesheet/data:data/xxx&quot; /&gt; --&gt; &lt;/body&gt; &lt;/html&gt; &lt;/xsl:template&gt; &lt;data:data&gt; &lt;!-- c&#39;est ici que j&#39;insère de la data --&gt; &lt;/data:data&gt; &lt;!-- fin des datas --&gt; &lt;/xsl:stylesheet&gt; &lt;!-- fin du fichier xml --&gt; Petite aparté : Il faut savoir que vous pouvez sortir les informations en XML avec naviseccli. C’est possible mais, le format est tellement peu pratique et peu lisible (car non-imbriqué) que je ne l’utilise pas. Si vous voulez absolument avoir une sortie en XML il faut rajouter -Xml à naviseccli. naviseccli -Xml -h x.x.x.x storagepool -list -userCap -availableCap &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt; &lt;CIM CIMVERSION=&quot;2.0&quot; DTDVERSION=&quot;2.0&quot;&gt;&lt;MESSAGE ID=&quot;877&quot; PROTOCOLVERSION=&quot;1.0&quot;&gt;&lt;SIMPLERSP&gt;&lt;METHODRESPONSE NAME=&quot;ExecuteClientRequest&quot;&gt;&lt;RETURNVALUE TYPE=&quot;Navi_Error&quot;&gt; &lt;VALUE.NAMEDINSTANCE&gt; &lt;INSTANCENAME CLASSNAME=&quot;Navi_Error&quot;&gt; &lt;/INSTANCENAME&gt; &lt;INSTANCE CLASSNAME=&quot;Navi_Error&quot;&gt; &lt;PROPERTY NAME=&quot;errorCode&quot; TYPE=&quot;uint32&quot;&gt;&lt;VALUE&gt;0&lt;/VALUE&gt; &lt;/PROPERTY&gt; &lt;PROPERTY NAME=&quot;success&quot; TYPE=&quot;boolean&quot;&gt;&lt;VALUE&gt;true&lt;/VALUE&gt; &lt;/PROPERTY&gt; &lt;PROPERTY NAME=&quot;where&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;ProvisionProvider&lt;/VALUE&gt; &lt;/PROPERTY&gt; &lt;PROPERTY NAME=&quot;why&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;&lt;/VALUE&gt; &lt;/PROPERTY&gt; &lt;/INSTANCE&gt; &lt;/VALUE.NAMEDINSTANCE&gt; &lt;/RETURNVALUE&gt;&lt;PARAMVALUE NAME=&quot;Pool Name&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;Pool&amp;#32;Bronze&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;Pool ID&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;1&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;User Capacity (Blocks)&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;21107025920&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;User Capacity (GBs)&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;10064.614&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;Available Capacity (Blocks)&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;21107025920&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;Available Capacity (GBs)&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;10064.614&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;&amp;#32;&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; ... ... &lt;/METHODRESPONSE&gt;&lt;/SIMPLERSP&gt;&lt;/MESSAGE&gt;&lt;/CIM&gt;" />
+<meta property="og:description" content="But : Donner à la direction informatique une visualisation globale des indicateurs de l’état capacitaire (espace utilisé, disponible et total) des baies de stockage. L’outil doit fournir une aide décisionnelle qui permettra, par exemple, la commande de nouveaux disques, la prise en compte de nouveaux systèmes d’informations en étant sûr de pouvoir l’héberger. Voici un rendu du fichier XML basique. Les explications, ça n’est pas votre tasse de thé ? On en vient directement au fait ici. Comment ? Les besoins : Une visualisation d&#39;ensemble des KPI (indicateurs clefs de performances) : l&#39;état capacitaire de toutes les baies de stockage (espace utilisé, disponible et total). Si possible en pourcentage, en Giga Octet et en camembert. Une mise à jour régulière des données, sur demande ou temps réel selon les besoins. J&#39;estime qu&#39;une mise à jour quotidienne, et à la demande suffisent aux besoins. Un accès web. Un compte rendu journalier par e-mail. Un état imprimable. (Je pense que je vais améliorer cet aspect) Les méthodes : Pour les requêtes aux baies de stockage EMC, j&#39;utilise : naviseccli. Le programme permet de récupérer toutes les informations qu&#39;on souhaite. Afin de produire un seul document, qui va servir à la fois, pour une page web, à la fois, pour le compte-rendu journalier par e-mail, j&#39;utilise le format XML. Le fichier XML ne fait rien en lui-même. Il n&#39;est donc pas exploitable sans la transformation XSL pour un rendu HTML. Pour stocker les données, j&#39;utilise le format XML. Pour mettre en forme, j&#39;utilise le langage de transformation XSLT avec un rendu HTML5. Pour la mise à jour des données, j&#39;utilise l&#39;ordonnanceur VTOM. Il lance le script de mise à jour 3 fois par jour, et dispose d&#39;un traitement à la demande au besoin. Une fois par jour, le matin, VTOM envoie le fichier XML par e-mail. Dans ce genre de cas, il faut éviter les tableaux excels car, ils ne sont pas mis à jour automatiquement (on peut presque dire, jamais à jour par conséquent). De même, il est quasiment exclus de donner un accès direct au logiciel d’administration, à notre DSI. Pourquoi, me diriez-vous ? Navisphere, par exemple, dispose de toutes les informations, même sous forme graphique. A cela, je répondrais : trop compliqué, trop de cliques à effectuer, trop de chargement, pas de visualisation d’ensemble. La direction a autre chose à faire que de naviguer dans les menus complexes que nous, administrateurs chevronnés, connaissons par coeur. naviseccli Je vous conseille d’authentifier votre utilisateur afin d’effectuer des requêtes sans mot de passe. naviseccli -h IParray -AddUserSecurity -user username -password mypass -scope 0 Toutes mes baies EMC sont configurées en Storage Pool. J’effectue une requête pour obtenir l’espace utilisable total utilisateur, l’espace disponible et le nom. J’en déduirai l’espace utilisé. naviseccli -h $iparray storagepool -list -userCap -availableCap &gt; ${tmpfile}_$iparray Contenu du fichier : Pool Name: Pool Bronze Pool ID: 1 User Capacity (Blocks): 21107025920 User Capacity (GBs): 10064.614 Available Capacity (Blocks): 21107025920 Available Capacity (GBs): 10064.614 Pool Name: Pool Gold 1 Pool ID: 2 User Capacity (Blocks): 29173164800 User Capacity (GBs): 13910.849 Available Capacity (Blocks): 11354673920 Available Capacity (GBs): 5414.330 ... ... Petit problème, l’espace du Storage Pool NAS est utilisé à 100%, ou peu s’en faut. L’information n’est pas fausse en soit. En effet, le datamover prend bien tout l’espace du Storage Pool pour constituer son propre pool de stockage, afin de créer les filesystems. Pour pallier à ce problème, j’utilise des requêtes directement sur la control station du NAS. # il m&#39;a fallu positionner les variables d&#39;environnement afin d&#39;exécuter les commandes ssh nasadmin@$ipnas &#39;. .bash_profile ; nas_pool -size &quot;Pool NAS&quot;&#39; &gt; pool_nas_size_$ipnas &lt;/pre&gt; Toujours pour éviter de mettre les mots de passe, j&#39;effectue la mise en place de clés ssh entre mon serveur et la control station. &lt;pre lang=&quot;bash&quot;&gt; # connexion en ssh sur la control station en nasadmin # ssh nasadmin@ipcontrolstation # aller dans le répertoire /home/nasadmin/.ssh ou le créer s&#39;il n&#39;existe pas avec ssh-keygen test -d ~/.ssh || ssh-keygen cd ~/.ssh # éditer le fichier authorized_keys pour ajouter la clé de votre serveur # attention le fichier authorized_keys doit avoir les droits 600 vi authorized_keys # coller la clé ~/.ssh/id_rsa.pub de votre serveur distant (si c&#39;est une clé rsa) dans le fichier authorized_keys # sauvegarder Comment traiter les informations de naviseccli et du NAS ? J’ai toutes mes informations. Maintenant, je les traite avec un script shell et les mets en forme en XML. Le fichier XML aura la feuille de style XSLT embarquée, avec un rendu HTML. Entête XML pour le script. (J’utilise Chart.js pour les camemberts en canvas) Script qui génère le fichier XML. Rendu fichier XML. #!/bin/bash # AUTEUR : SCH Virtual Thom # VERSION : 1.0 # DATE : 10/08/2014 # # set -n # Decommenter pour debug syntax sans exéon # NOTE: Ne pas oublier de recommenter ! # set -x # Decommenter pour debug # ########################################################## # VARIABLES ########################################################## OK=0 KOCRIT=1 KOWARN=2 CR=${OK} date_du_jour=`date +&quot;%d_%m_%Y&quot;` # Le nom des arrays doit pouvoir être résolu (/etc/hosts ou dns) ou mettre l&#39;adresse IP iparrays=&quot;VNX5700 VNX5300 CX4-960&quot; tmpfile=&quot;${date_du_jour}_`uuidgen`_etat-capacitaire-shemc.xml&quot; ftp_ip=ftp.adresse.intradef.gouv.fr ftp_user=xxxx ftp_mdp=xxxx rep_script=&#39;/SANSCRIPTS/etat-capacitaire&#39; # pour naviseccli export PATH=$PATH:/opt/Navisphere/bin ########################################################## # FONCTIONS ########################################################## date_heure(){ date_heure_var=`date +&quot;%d/%m/%Y - %H:%M:%S : &quot;` echo &quot;${date_heure_var}$1&quot; } fonc_sortie(){ numero_exit=$1 message_exit=$2 date_heure &quot;${message_exit}&quot; date_heure &quot;Fin du script. Exit : ${numero_exit}&quot; exit ${numero_exit} } usage(){ # exemple d&#39;usage script=${0##*/} ; #script=${script%.*} ; echo &quot;&quot; ; echo &quot;Genere un fichier xml de l&#39;etat capacitaire SHEM-C&quot; echo &quot;Usage :&quot; ; echo &quot; ${script}&quot; echo &quot; Pas de parametre.&quot; echo &quot;&quot; exit ${KOWARN}; } ########################################################## # SCRIPT ########################################################## date_heure &#39;Début du script&#39; cat ${rep_script}/etat-capacitaire-en-tete-xml.txt &gt; ${rep_script}/$tmpfile echo &quot;&lt;!-- cette partie est mise à jour par naviseccli --&gt; &lt;data:data&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # Requete sur les baies de stockage en naviseccli (les clés doivent être mise en place) # naviseccli -h ipbaie -addusersecurity -scope 0 -password password -user userName for iparray in $(echo $iparrays) do # un seul naviseccli pour toues les storages d&#39;une baie (ça fait moins de requêtes) naviseccli -h $iparray storagepool -list -userCap -availableCap &gt; ${rep_script}/${tmpfile}_$iparray # Le nom et les ip des array sont identiques ici mais on peut mettre autre chose # si le résultat contient des lignes, on traite if test $(cat ${rep_script}/${tmpfile}_$iparray | wc -l) -gt 1 then # si les baies sont aussi des têtes NAS, je récupère l&#39;état du &quot;Pool NAS&quot; (il s&#39;appelle comme ça chez moi) if test &quot;$iparray&quot; = &quot;VNX5700&quot; then namearray=&quot;VNX5700&quot; # le nom du NAS doit pouvoir être résolu (/etc/hosts ou dns) ou mettre l&#39;adresse IP ipnas=&quot;NAS5700&quot; ssh nasadmin@$ipnas &#39;. .bash_profile ; nas_pool -size &quot;Pool NAS&quot;&#39; &gt; ${rep_script}/pool_nas_size_$ipnas else if test &quot;$iparray&quot; = &quot;VNX5300&quot; then namearray=&quot;VNX5300&quot; # le nom du NAS doit pouvoir être résolu (/etc/hosts ou dns) ou mettre l&#39;adresse IP ipnas=&quot;NAS5300&quot; ssh nasadmin@$ipnas &#39;. .bash_profile ; nas_pool -size &quot;Pool NAS&quot;&#39; &gt; ${rep_script}/pool_nas_size_$ipnas else if test &quot;$iparray&quot; = &quot;CX4-960&quot; then namearray=&quot;CX4-960&quot; else # par défaut on met l&#39;IP ou le nom dns en tant que nom de baie namearray=$iparray fi fi fi echo &quot;&lt;array name=&#39;$namearray&#39;&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # line de la sortie naviseccli &lt; ${rep_script}/${tmpfile}_$iparray # Ne pas oublier que l&#39;entrée ssh dans un boucle while remplace l&#39;entrée standard # solution ssh -n while read line do if test -n &quot;$(echo $line | grep &#39;Pool Name&#39;)&quot; then if test -n &quot;$(echo $line | grep &#39;NAS&#39;)&quot; then NAS=1 else NAS=0 fi echo &quot;&lt;storagepool&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile echo &quot;&lt;name&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # awk -F: &#39;$1 ~ /Pool Name/ {print $2}&#39; =&gt; délimiteur &quot;:&quot;, 1er champ contient &quot;Pool Name&quot; # affiche le deuxième champs echo $line | awk -F: &#39;$1 ~ /Pool Name/ {print $2}&#39; | sed &#39;s/^ //g&#39; &gt;&gt; ${rep_script}/$tmpfile echo &quot;&lt;/name&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # FIN name else if test -n &quot;$(echo $line | grep &#39;User Capacity (GBs)&#39;)&quot; then echo &quot;&lt;usercap&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile if test &quot;$NAS&quot; = &quot;1&quot; then usercap=`cat ${rep_script}/pool_nas_size_${ipnas} | awk -F&quot;=&quot; &#39;$1 ~ /total_mb/ {print $2}&#39; | sed &#39;s/^ //g&#39;` if test &quot;$usercap&quot; != &quot;0&quot; then usercap=`expr $usercap \/ 1024` else usercap=`cat ${rep_script}/pool_nas_size_${ipnas} | awk -F&quot;=&quot; &#39;$1 ~ /potential_mb/ {print $2}&#39; | sed &#39;s/^ //g&#39;` usercap=`expr $usercap \/ 1024` fi echo $usercap &gt;&gt; ${rep_script}/$tmpfile # si Pool différent du NAS else echo $line | awk -F: &#39;$1 ~ /User Capacity \(GBs\)/ {print $2}&#39; | sed &#39;s/^ //g&#39; &gt;&gt; ${rep_script}/$tmpfile fi echo &quot;&lt;/usercap&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # FIN usercap else if test -n &quot;$(echo $line | grep &#39;Available Capacity (GBs)&#39;)&quot; then echo &quot;&lt;availablecap&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile if test &quot;$NAS&quot; = &quot;1&quot; then availablecap=`cat ${rep_script}/pool_nas_size_${ipnas} | awk -F&quot;=&quot; &#39;$1 ~ /avail_mb/ {print $2}&#39; | sed &#39;s/^ //g&#39;` if test &quot;$availablecap&quot; != &quot;0&quot; then availablecap=`expr $availablecap \/ 1024` else availablecap=`cat ${rep_script}/pool_nas_size_${ipnas} | awk -F&quot;=&quot; &#39;$1 ~ /potential_mb/ {print $2}&#39; | sed &#39;s/^ //g&#39;` availablecap=`expr $availablecap \/ 1024` fi echo $availablecap &gt;&gt; ${rep_script}/$tmpfile # si pas pool NAS else echo $line | awk -F: &#39;$1 ~ /Available Capacity \(GBs\)/ {print $2}&#39; | sed &#39;s/^ //g&#39; &gt;&gt; $tmpfile fi echo &quot;&lt;/availablecap&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # FIN availablecap else # Je prends les lignes vides comme séparateur des pools if test -z &quot;$line&quot; then echo &quot;&lt;/storagepool&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile fi fi fi fi done &lt; ${rep_script}/${tmpfile}_$iparray echo &quot;&lt;/array&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile fi done echo &quot;&lt;/data:data&gt; &lt;!-- fin des datas --&gt; &lt;/xsl:stylesheet&gt; &lt;!-- fin du fichier xml --&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile date_heure &quot;Transfert FTP&quot; # Transfert FTP sur le site de la SHEM ftp -v -n -i &gt; /dev/null &lt;&lt; EOF open ${ftp_ip} user ${ftp_user} ${ftp_mdp} binary put ${rep_script}/$tmpfile index.xml EOF # TODO : prévoir d&#39;envoyer un e-mail en compte rendu avec le xml attaché # Nettoyage des fichiers temporaires for iparray in $(echo $iparrays) do rm -f ${rep_script}/${tmpfile}_$iparray done rm -f ${rep_script}/pool_nas_size* rm -f ${rep_script}/$tmpfile date_heure &#39;Fin du script&#39; Vous avez remarqué que je dis souvent que la feuille XSLT est embarquée dans le fichier XML. En réalité, c’est plutôt la data XML qui est embarquée dans la transformation XSLT. En fait, la feuille de transformation XSLT est un fichier XML en elle-même. Il suffit de lui insérer des datas et de définir un certain nombre de paramètres : &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt; &lt;!-- Comme tout fichier XML --&gt; &lt;?xml-stylesheet href=&quot;#stylesheet&quot; type=&quot;text/xsl&quot;?&gt; &lt;!-- D&#39;habitude on met l&#39;url du fichier XML à transformer ici --&gt; &lt;!-- là, on fait référence à l&#39;ID stylesheet, interne à ce fichier --&gt; &lt;!-- Pour ça, il faut définir la structure du document DTD (Document Type Definition) --&gt; &lt;!DOCTYPE xsl:stylesheet [ &lt;!ATTLIST xsl:stylesheet id ID #REQUIRED&gt; ]&gt; &lt;!-- balises de transformation xsl --&gt; &lt;xsl:stylesheet version=&quot;2.0&quot; id=&quot;stylesheet&quot; xmlns:data=&quot;localhost&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;&gt; &lt;!-- pour un rendu HTML --&gt; &lt;xsl:output method=&quot;html&quot; indent=&quot;yes&quot; encoding=&quot;UTF-8&quot; /&gt; &lt;!-- definition du template principal avec le rendu html --&gt; &lt;xsl:template match=&quot;/&quot;&gt; &lt;html&gt; &lt;body&gt;... &lt;!-- Les appels de template se feront &lt;xsl:apply-templates select=&quot;/xsl:stylesheet/data:data/xxx&quot; /&gt; --&gt; &lt;/body&gt; &lt;/html&gt; &lt;/xsl:template&gt; &lt;data:data&gt; &lt;!-- c&#39;est ici que j&#39;insère de la data --&gt; &lt;/data:data&gt; &lt;!-- fin des datas --&gt; &lt;/xsl:stylesheet&gt; &lt;!-- fin du fichier xml --&gt; Petite aparté : Il faut savoir que vous pouvez sortir les informations en XML avec naviseccli. C’est possible mais, le format est tellement peu pratique et peu lisible (car non-imbriqué) que je ne l’utilise pas. Si vous voulez absolument avoir une sortie en XML il faut rajouter -Xml à naviseccli. naviseccli -Xml -h x.x.x.x storagepool -list -userCap -availableCap &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt; &lt;CIM CIMVERSION=&quot;2.0&quot; DTDVERSION=&quot;2.0&quot;&gt;&lt;MESSAGE ID=&quot;877&quot; PROTOCOLVERSION=&quot;1.0&quot;&gt;&lt;SIMPLERSP&gt;&lt;METHODRESPONSE NAME=&quot;ExecuteClientRequest&quot;&gt;&lt;RETURNVALUE TYPE=&quot;Navi_Error&quot;&gt; &lt;VALUE.NAMEDINSTANCE&gt; &lt;INSTANCENAME CLASSNAME=&quot;Navi_Error&quot;&gt; &lt;/INSTANCENAME&gt; &lt;INSTANCE CLASSNAME=&quot;Navi_Error&quot;&gt; &lt;PROPERTY NAME=&quot;errorCode&quot; TYPE=&quot;uint32&quot;&gt;&lt;VALUE&gt;0&lt;/VALUE&gt; &lt;/PROPERTY&gt; &lt;PROPERTY NAME=&quot;success&quot; TYPE=&quot;boolean&quot;&gt;&lt;VALUE&gt;true&lt;/VALUE&gt; &lt;/PROPERTY&gt; &lt;PROPERTY NAME=&quot;where&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;ProvisionProvider&lt;/VALUE&gt; &lt;/PROPERTY&gt; &lt;PROPERTY NAME=&quot;why&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;&lt;/VALUE&gt; &lt;/PROPERTY&gt; &lt;/INSTANCE&gt; &lt;/VALUE.NAMEDINSTANCE&gt; &lt;/RETURNVALUE&gt;&lt;PARAMVALUE NAME=&quot;Pool Name&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;Pool&amp;#32;Bronze&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;Pool ID&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;1&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;User Capacity (Blocks)&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;21107025920&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;User Capacity (GBs)&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;10064.614&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;Available Capacity (Blocks)&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;21107025920&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;Available Capacity (GBs)&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;10064.614&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;&amp;#32;&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; ... ... &lt;/METHODRESPONSE&gt;&lt;/SIMPLERSP&gt;&lt;/MESSAGE&gt;&lt;/CIM&gt;" />
+<link rel="canonical" href="https://virtual-thom.github.io/archives/indicateurs-etat-capacitaire-des-baies-de-stockage-naviseccli-xml-xslt-embarquee/" />
+<meta property="og:url" content="https://virtual-thom.github.io/archives/indicateurs-etat-capacitaire-des-baies-de-stockage-naviseccli-xml-xslt-embarquee/" />
+<meta property="og:site_name" content="Virtual-Thom Blog-notes VTOM et informatique" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2014-08-21T22:57:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Indicateurs état capacitaire des baies de stockage (Naviseccli, XML et XSLT embarquée)" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Virtual Thom"},"dateModified":"2014-08-21T22:57:00+00:00","datePublished":"2014-08-21T22:57:00+00:00","description":"But : Donner à la direction informatique une visualisation globale des indicateurs de l’état capacitaire (espace utilisé, disponible et total) des baies de stockage. L’outil doit fournir une aide décisionnelle qui permettra, par exemple, la commande de nouveaux disques, la prise en compte de nouveaux systèmes d’informations en étant sûr de pouvoir l’héberger. Voici un rendu du fichier XML basique. Les explications, ça n’est pas votre tasse de thé ? On en vient directement au fait ici. Comment ? Les besoins : Une visualisation d&#39;ensemble des KPI (indicateurs clefs de performances) : l&#39;état capacitaire de toutes les baies de stockage (espace utilisé, disponible et total). Si possible en pourcentage, en Giga Octet et en camembert. Une mise à jour régulière des données, sur demande ou temps réel selon les besoins. J&#39;estime qu&#39;une mise à jour quotidienne, et à la demande suffisent aux besoins. Un accès web. Un compte rendu journalier par e-mail. Un état imprimable. (Je pense que je vais améliorer cet aspect) Les méthodes : Pour les requêtes aux baies de stockage EMC, j&#39;utilise : naviseccli. Le programme permet de récupérer toutes les informations qu&#39;on souhaite. Afin de produire un seul document, qui va servir à la fois, pour une page web, à la fois, pour le compte-rendu journalier par e-mail, j&#39;utilise le format XML. Le fichier XML ne fait rien en lui-même. Il n&#39;est donc pas exploitable sans la transformation XSL pour un rendu HTML. Pour stocker les données, j&#39;utilise le format XML. Pour mettre en forme, j&#39;utilise le langage de transformation XSLT avec un rendu HTML5. Pour la mise à jour des données, j&#39;utilise l&#39;ordonnanceur VTOM. Il lance le script de mise à jour 3 fois par jour, et dispose d&#39;un traitement à la demande au besoin. Une fois par jour, le matin, VTOM envoie le fichier XML par e-mail. Dans ce genre de cas, il faut éviter les tableaux excels car, ils ne sont pas mis à jour automatiquement (on peut presque dire, jamais à jour par conséquent). De même, il est quasiment exclus de donner un accès direct au logiciel d’administration, à notre DSI. Pourquoi, me diriez-vous ? Navisphere, par exemple, dispose de toutes les informations, même sous forme graphique. A cela, je répondrais : trop compliqué, trop de cliques à effectuer, trop de chargement, pas de visualisation d’ensemble. La direction a autre chose à faire que de naviguer dans les menus complexes que nous, administrateurs chevronnés, connaissons par coeur. naviseccli Je vous conseille d’authentifier votre utilisateur afin d’effectuer des requêtes sans mot de passe. naviseccli -h IParray -AddUserSecurity -user username -password mypass -scope 0 Toutes mes baies EMC sont configurées en Storage Pool. J’effectue une requête pour obtenir l’espace utilisable total utilisateur, l’espace disponible et le nom. J’en déduirai l’espace utilisé. naviseccli -h $iparray storagepool -list -userCap -availableCap &gt; ${tmpfile}_$iparray Contenu du fichier : Pool Name: Pool Bronze Pool ID: 1 User Capacity (Blocks): 21107025920 User Capacity (GBs): 10064.614 Available Capacity (Blocks): 21107025920 Available Capacity (GBs): 10064.614 Pool Name: Pool Gold 1 Pool ID: 2 User Capacity (Blocks): 29173164800 User Capacity (GBs): 13910.849 Available Capacity (Blocks): 11354673920 Available Capacity (GBs): 5414.330 ... ... Petit problème, l’espace du Storage Pool NAS est utilisé à 100%, ou peu s’en faut. L’information n’est pas fausse en soit. En effet, le datamover prend bien tout l’espace du Storage Pool pour constituer son propre pool de stockage, afin de créer les filesystems. Pour pallier à ce problème, j’utilise des requêtes directement sur la control station du NAS. # il m&#39;a fallu positionner les variables d&#39;environnement afin d&#39;exécuter les commandes ssh nasadmin@$ipnas &#39;. .bash_profile ; nas_pool -size &quot;Pool NAS&quot;&#39; &gt; pool_nas_size_$ipnas &lt;/pre&gt; Toujours pour éviter de mettre les mots de passe, j&#39;effectue la mise en place de clés ssh entre mon serveur et la control station. &lt;pre lang=&quot;bash&quot;&gt; # connexion en ssh sur la control station en nasadmin # ssh nasadmin@ipcontrolstation # aller dans le répertoire /home/nasadmin/.ssh ou le créer s&#39;il n&#39;existe pas avec ssh-keygen test -d ~/.ssh || ssh-keygen cd ~/.ssh # éditer le fichier authorized_keys pour ajouter la clé de votre serveur # attention le fichier authorized_keys doit avoir les droits 600 vi authorized_keys # coller la clé ~/.ssh/id_rsa.pub de votre serveur distant (si c&#39;est une clé rsa) dans le fichier authorized_keys # sauvegarder Comment traiter les informations de naviseccli et du NAS ? J’ai toutes mes informations. Maintenant, je les traite avec un script shell et les mets en forme en XML. Le fichier XML aura la feuille de style XSLT embarquée, avec un rendu HTML. Entête XML pour le script. (J’utilise Chart.js pour les camemberts en canvas) Script qui génère le fichier XML. Rendu fichier XML. #!/bin/bash # AUTEUR : SCH Virtual Thom # VERSION : 1.0 # DATE : 10/08/2014 # # set -n # Decommenter pour debug syntax sans exéon # NOTE: Ne pas oublier de recommenter ! # set -x # Decommenter pour debug # ########################################################## # VARIABLES ########################################################## OK=0 KOCRIT=1 KOWARN=2 CR=${OK} date_du_jour=`date +&quot;%d_%m_%Y&quot;` # Le nom des arrays doit pouvoir être résolu (/etc/hosts ou dns) ou mettre l&#39;adresse IP iparrays=&quot;VNX5700 VNX5300 CX4-960&quot; tmpfile=&quot;${date_du_jour}_`uuidgen`_etat-capacitaire-shemc.xml&quot; ftp_ip=ftp.adresse.intradef.gouv.fr ftp_user=xxxx ftp_mdp=xxxx rep_script=&#39;/SANSCRIPTS/etat-capacitaire&#39; # pour naviseccli export PATH=$PATH:/opt/Navisphere/bin ########################################################## # FONCTIONS ########################################################## date_heure(){ date_heure_var=`date +&quot;%d/%m/%Y - %H:%M:%S : &quot;` echo &quot;${date_heure_var}$1&quot; } fonc_sortie(){ numero_exit=$1 message_exit=$2 date_heure &quot;${message_exit}&quot; date_heure &quot;Fin du script. Exit : ${numero_exit}&quot; exit ${numero_exit} } usage(){ # exemple d&#39;usage script=${0##*/} ; #script=${script%.*} ; echo &quot;&quot; ; echo &quot;Genere un fichier xml de l&#39;etat capacitaire SHEM-C&quot; echo &quot;Usage :&quot; ; echo &quot; ${script}&quot; echo &quot; Pas de parametre.&quot; echo &quot;&quot; exit ${KOWARN}; } ########################################################## # SCRIPT ########################################################## date_heure &#39;Début du script&#39; cat ${rep_script}/etat-capacitaire-en-tete-xml.txt &gt; ${rep_script}/$tmpfile echo &quot;&lt;!-- cette partie est mise à jour par naviseccli --&gt; &lt;data:data&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # Requete sur les baies de stockage en naviseccli (les clés doivent être mise en place) # naviseccli -h ipbaie -addusersecurity -scope 0 -password password -user userName for iparray in $(echo $iparrays) do # un seul naviseccli pour toues les storages d&#39;une baie (ça fait moins de requêtes) naviseccli -h $iparray storagepool -list -userCap -availableCap &gt; ${rep_script}/${tmpfile}_$iparray # Le nom et les ip des array sont identiques ici mais on peut mettre autre chose # si le résultat contient des lignes, on traite if test $(cat ${rep_script}/${tmpfile}_$iparray | wc -l) -gt 1 then # si les baies sont aussi des têtes NAS, je récupère l&#39;état du &quot;Pool NAS&quot; (il s&#39;appelle comme ça chez moi) if test &quot;$iparray&quot; = &quot;VNX5700&quot; then namearray=&quot;VNX5700&quot; # le nom du NAS doit pouvoir être résolu (/etc/hosts ou dns) ou mettre l&#39;adresse IP ipnas=&quot;NAS5700&quot; ssh nasadmin@$ipnas &#39;. .bash_profile ; nas_pool -size &quot;Pool NAS&quot;&#39; &gt; ${rep_script}/pool_nas_size_$ipnas else if test &quot;$iparray&quot; = &quot;VNX5300&quot; then namearray=&quot;VNX5300&quot; # le nom du NAS doit pouvoir être résolu (/etc/hosts ou dns) ou mettre l&#39;adresse IP ipnas=&quot;NAS5300&quot; ssh nasadmin@$ipnas &#39;. .bash_profile ; nas_pool -size &quot;Pool NAS&quot;&#39; &gt; ${rep_script}/pool_nas_size_$ipnas else if test &quot;$iparray&quot; = &quot;CX4-960&quot; then namearray=&quot;CX4-960&quot; else # par défaut on met l&#39;IP ou le nom dns en tant que nom de baie namearray=$iparray fi fi fi echo &quot;&lt;array name=&#39;$namearray&#39;&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # line de la sortie naviseccli &lt; ${rep_script}/${tmpfile}_$iparray # Ne pas oublier que l&#39;entrée ssh dans un boucle while remplace l&#39;entrée standard # solution ssh -n while read line do if test -n &quot;$(echo $line | grep &#39;Pool Name&#39;)&quot; then if test -n &quot;$(echo $line | grep &#39;NAS&#39;)&quot; then NAS=1 else NAS=0 fi echo &quot;&lt;storagepool&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile echo &quot;&lt;name&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # awk -F: &#39;$1 ~ /Pool Name/ {print $2}&#39; =&gt; délimiteur &quot;:&quot;, 1er champ contient &quot;Pool Name&quot; # affiche le deuxième champs echo $line | awk -F: &#39;$1 ~ /Pool Name/ {print $2}&#39; | sed &#39;s/^ //g&#39; &gt;&gt; ${rep_script}/$tmpfile echo &quot;&lt;/name&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # FIN name else if test -n &quot;$(echo $line | grep &#39;User Capacity (GBs)&#39;)&quot; then echo &quot;&lt;usercap&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile if test &quot;$NAS&quot; = &quot;1&quot; then usercap=`cat ${rep_script}/pool_nas_size_${ipnas} | awk -F&quot;=&quot; &#39;$1 ~ /total_mb/ {print $2}&#39; | sed &#39;s/^ //g&#39;` if test &quot;$usercap&quot; != &quot;0&quot; then usercap=`expr $usercap \\/ 1024` else usercap=`cat ${rep_script}/pool_nas_size_${ipnas} | awk -F&quot;=&quot; &#39;$1 ~ /potential_mb/ {print $2}&#39; | sed &#39;s/^ //g&#39;` usercap=`expr $usercap \\/ 1024` fi echo $usercap &gt;&gt; ${rep_script}/$tmpfile # si Pool différent du NAS else echo $line | awk -F: &#39;$1 ~ /User Capacity \\(GBs\\)/ {print $2}&#39; | sed &#39;s/^ //g&#39; &gt;&gt; ${rep_script}/$tmpfile fi echo &quot;&lt;/usercap&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # FIN usercap else if test -n &quot;$(echo $line | grep &#39;Available Capacity (GBs)&#39;)&quot; then echo &quot;&lt;availablecap&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile if test &quot;$NAS&quot; = &quot;1&quot; then availablecap=`cat ${rep_script}/pool_nas_size_${ipnas} | awk -F&quot;=&quot; &#39;$1 ~ /avail_mb/ {print $2}&#39; | sed &#39;s/^ //g&#39;` if test &quot;$availablecap&quot; != &quot;0&quot; then availablecap=`expr $availablecap \\/ 1024` else availablecap=`cat ${rep_script}/pool_nas_size_${ipnas} | awk -F&quot;=&quot; &#39;$1 ~ /potential_mb/ {print $2}&#39; | sed &#39;s/^ //g&#39;` availablecap=`expr $availablecap \\/ 1024` fi echo $availablecap &gt;&gt; ${rep_script}/$tmpfile # si pas pool NAS else echo $line | awk -F: &#39;$1 ~ /Available Capacity \\(GBs\\)/ {print $2}&#39; | sed &#39;s/^ //g&#39; &gt;&gt; $tmpfile fi echo &quot;&lt;/availablecap&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile # FIN availablecap else # Je prends les lignes vides comme séparateur des pools if test -z &quot;$line&quot; then echo &quot;&lt;/storagepool&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile fi fi fi fi done &lt; ${rep_script}/${tmpfile}_$iparray echo &quot;&lt;/array&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile fi done echo &quot;&lt;/data:data&gt; &lt;!-- fin des datas --&gt; &lt;/xsl:stylesheet&gt; &lt;!-- fin du fichier xml --&gt;&quot; &gt;&gt; ${rep_script}/$tmpfile date_heure &quot;Transfert FTP&quot; # Transfert FTP sur le site de la SHEM ftp -v -n -i &gt; /dev/null &lt;&lt; EOF open ${ftp_ip} user ${ftp_user} ${ftp_mdp} binary put ${rep_script}/$tmpfile index.xml EOF # TODO : prévoir d&#39;envoyer un e-mail en compte rendu avec le xml attaché # Nettoyage des fichiers temporaires for iparray in $(echo $iparrays) do rm -f ${rep_script}/${tmpfile}_$iparray done rm -f ${rep_script}/pool_nas_size* rm -f ${rep_script}/$tmpfile date_heure &#39;Fin du script&#39; Vous avez remarqué que je dis souvent que la feuille XSLT est embarquée dans le fichier XML. En réalité, c’est plutôt la data XML qui est embarquée dans la transformation XSLT. En fait, la feuille de transformation XSLT est un fichier XML en elle-même. Il suffit de lui insérer des datas et de définir un certain nombre de paramètres : &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt; &lt;!-- Comme tout fichier XML --&gt; &lt;?xml-stylesheet href=&quot;#stylesheet&quot; type=&quot;text/xsl&quot;?&gt; &lt;!-- D&#39;habitude on met l&#39;url du fichier XML à transformer ici --&gt; &lt;!-- là, on fait référence à l&#39;ID stylesheet, interne à ce fichier --&gt; &lt;!-- Pour ça, il faut définir la structure du document DTD (Document Type Definition) --&gt; &lt;!DOCTYPE xsl:stylesheet [ &lt;!ATTLIST xsl:stylesheet id ID #REQUIRED&gt; ]&gt; &lt;!-- balises de transformation xsl --&gt; &lt;xsl:stylesheet version=&quot;2.0&quot; id=&quot;stylesheet&quot; xmlns:data=&quot;localhost&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;&gt; &lt;!-- pour un rendu HTML --&gt; &lt;xsl:output method=&quot;html&quot; indent=&quot;yes&quot; encoding=&quot;UTF-8&quot; /&gt; &lt;!-- definition du template principal avec le rendu html --&gt; &lt;xsl:template match=&quot;/&quot;&gt; &lt;html&gt; &lt;body&gt;... &lt;!-- Les appels de template se feront &lt;xsl:apply-templates select=&quot;/xsl:stylesheet/data:data/xxx&quot; /&gt; --&gt; &lt;/body&gt; &lt;/html&gt; &lt;/xsl:template&gt; &lt;data:data&gt; &lt;!-- c&#39;est ici que j&#39;insère de la data --&gt; &lt;/data:data&gt; &lt;!-- fin des datas --&gt; &lt;/xsl:stylesheet&gt; &lt;!-- fin du fichier xml --&gt; Petite aparté : Il faut savoir que vous pouvez sortir les informations en XML avec naviseccli. C’est possible mais, le format est tellement peu pratique et peu lisible (car non-imbriqué) que je ne l’utilise pas. Si vous voulez absolument avoir une sortie en XML il faut rajouter -Xml à naviseccli. naviseccli -Xml -h x.x.x.x storagepool -list -userCap -availableCap &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt; &lt;CIM CIMVERSION=&quot;2.0&quot; DTDVERSION=&quot;2.0&quot;&gt;&lt;MESSAGE ID=&quot;877&quot; PROTOCOLVERSION=&quot;1.0&quot;&gt;&lt;SIMPLERSP&gt;&lt;METHODRESPONSE NAME=&quot;ExecuteClientRequest&quot;&gt;&lt;RETURNVALUE TYPE=&quot;Navi_Error&quot;&gt; &lt;VALUE.NAMEDINSTANCE&gt; &lt;INSTANCENAME CLASSNAME=&quot;Navi_Error&quot;&gt; &lt;/INSTANCENAME&gt; &lt;INSTANCE CLASSNAME=&quot;Navi_Error&quot;&gt; &lt;PROPERTY NAME=&quot;errorCode&quot; TYPE=&quot;uint32&quot;&gt;&lt;VALUE&gt;0&lt;/VALUE&gt; &lt;/PROPERTY&gt; &lt;PROPERTY NAME=&quot;success&quot; TYPE=&quot;boolean&quot;&gt;&lt;VALUE&gt;true&lt;/VALUE&gt; &lt;/PROPERTY&gt; &lt;PROPERTY NAME=&quot;where&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;ProvisionProvider&lt;/VALUE&gt; &lt;/PROPERTY&gt; &lt;PROPERTY NAME=&quot;why&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;&lt;/VALUE&gt; &lt;/PROPERTY&gt; &lt;/INSTANCE&gt; &lt;/VALUE.NAMEDINSTANCE&gt; &lt;/RETURNVALUE&gt;&lt;PARAMVALUE NAME=&quot;Pool Name&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;Pool&amp;#32;Bronze&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;Pool ID&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;1&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;User Capacity (Blocks)&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;21107025920&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;User Capacity (GBs)&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;10064.614&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;Available Capacity (Blocks)&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;21107025920&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;Available Capacity (GBs)&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;10064.614&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; &lt;PARAMVALUE NAME=&quot;&quot; TYPE=&quot;string&quot;&gt;&lt;VALUE&gt;&amp;#32;&lt;/VALUE&gt; &lt;/PARAMVALUE&gt; ... ... &lt;/METHODRESPONSE&gt;&lt;/SIMPLERSP&gt;&lt;/MESSAGE&gt;&lt;/CIM&gt;","headline":"Indicateurs état capacitaire des baies de stockage (Naviseccli, XML et XSLT embarquée)","mainEntityOfPage":{"@type":"WebPage","@id":"https://virtual-thom.github.io/archives/indicateurs-etat-capacitaire-des-baies-de-stockage-naviseccli-xml-xslt-embarquee/"},"url":"https://virtual-thom.github.io/archives/indicateurs-etat-capacitaire-des-baies-de-stockage-naviseccli-xml-xslt-embarquee/"}</script>
+<!-- End Jekyll SEO tag -->
+
+  
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z8Y7902GRV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Z8Y7902GRV');
+</script>
+
+
+  <body>
+    <div class="container">
+      <header id="site-header">
+  <h1>Blog-notes VTOM, informatique, industrialisation, ordonnancement, DevOps</h1>
+  <nav>
+    <ul>
+      <li>
+        <a href="https://virtual-thom.github.io/archives" title="Home">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M18.121,9.88l-7.832-7.836c-0.155-0.158-0.428-0.155-0.584,0L1.842,9.913c-0.262,0.263-0.073,0.705,0.292,0.705h2.069v7.042c0,0.227,0.187,0.414,0.414,0.414h3.725c0.228,0,0.414-0.188,0.414-0.414v-3.313h2.483v3.313c0,0.227,0.187,0.414,0.413,0.414h3.726c0.229,0,0.414-0.188,0.414-0.414v-7.042h2.068h0.004C18.331,10.617,18.389,10.146,18.121,9.88 M14.963,17.245h-2.896v-3.313c0-0.229-0.186-0.415-0.414-0.415H8.342c-0.228,0-0.414,0.187-0.414,0.415v3.313H5.032v-6.628h9.931V17.245z M3.133,9.79l6.864-6.868l6.867,6.868H3.133z"></path>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a href="https://virtual-thom.github.io/archives/vos-commentaires-livre-d-or/" title="Commentaires - livre d'or">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M17.657,2.982H2.342c-0.234,0-0.425,0.191-0.425,0.426v10.21c0,0.234,0.191,0.426,0.425,0.426h3.404v2.553c0,0.397,0.48,0.547,0.725,0.302l2.889-2.854h8.298c0.234,0,0.426-0.191,0.426-0.426V3.408C18.083,3.174,17.892,2.982,17.657,2.982M17.232,13.192H9.185c-0.113,0-0.219,0.045-0.3,0.124l-2.289,2.262v-1.96c0-0.233-0.191-0.426-0.425-0.426H2.767V3.833h14.465V13.192z M10,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.488-0.668,1.488-1.489C11.488,7.905,10.821,7.237,10,7.237 M10,9.364c-0.352,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C10.638,9.077,10.351,9.364,10,9.364 M14.254,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489s1.489-0.668,1.489-1.489C15.743,7.905,15.075,7.237,14.254,7.237 M14.254,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.352,0,0.639,0.287,0.639,0.638C14.893,9.077,14.605,9.364,14.254,9.364 M5.746,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.489-0.668,1.489-1.489C7.234,7.905,6.566,7.237,5.746,7.237 M5.746,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C6.384,9.077,6.096,9.364,5.746,9.364"></path>
+          </svg>
+        </a>
+      </li>
+      
+      <li>
+        <a href="https://virtual-thom.github.io/about" title="Curriculum Vitae Thom">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z"></path>
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+      <div itemscope itemtype ="http://schema.org/Article" class="post">
+  
+  <header class="post-header">
+    <h1 itemprop="name about headline" class="post-title">Indicateurs état capacitaire des baies de stockage (Naviseccli, XML et XSLT embarquée)</h1>
+    <p class="post-meta">
+      <time itemprop="datePublished dateModified" datetime="2014-08-21T22:57:00+00:00">21-08-2014</time></p>
+  </header>
+
+  <article class="post-content" itemprop="articleBody">
+    <h1 class="hidden">Indicateurs état capacitaire des baies de stockage (Naviseccli, XML et XSLT embarquée)</h1>
+    <h2 id="but-">But :</h2>
+
+<p>Donner à la direction informatique une visualisation globale des indicateurs de l’état capacitaire (espace utilisé, disponible et total) des baies de stockage. L’outil doit fournir une aide décisionnelle qui permettra, par exemple, la commande de nouveaux disques, la prise en compte de nouveaux systèmes d’informations en étant sûr de pouvoir l’héberger.</p>
+
+<p>Voici un <a href="https://virtual-thom.github.io/archives/wp-content/uploads/etat-capacitaire.xml">rendu du fichier XML</a> basique.</p>
+
+<p>Les explications, ça n’est pas votre tasse de thé ? On en vient directement au fait <a href="#demo-script" title="La démonstration par l'exemple">ici</a>.</p>
+
+<h2 id="comment-">Comment ?</h2>
+
+<h3 id="les-besoins-">Les besoins :</h3>
+<ul>
+<li>Une visualisation d'ensemble des KPI (indicateurs clefs de performances) : l'état capacitaire de toutes les baies de  stockage (espace utilisé, disponible et total). Si possible en pourcentage, en Giga Octet et en camembert.</li>
+<li>Une mise à jour régulière des données, sur demande ou temps réel selon les besoins. J'estime qu'une mise à jour quotidienne, et à la demande suffisent aux besoins.</li>
+<li>Un accès web.</li>
+<li>Un compte rendu journalier par e-mail.</li>
+<li>Un état imprimable. (Je pense que je vais améliorer cet aspect)</li>
+</ul>
+
+<h3 id="les-méthodes-">Les méthodes :</h3>
+<ul>
+<li>Pour les requêtes aux baies de stockage EMC, j'utilise : naviseccli. Le programme permet de récupérer toutes les informations qu'on souhaite.</li>
+<li>
+Afin de produire un seul document, qui va servir à la fois, pour une page web, à la fois, pour le compte-rendu journalier par e-mail, j'utilise le format XML. Le fichier XML ne fait rien en lui-même. Il n'est donc pas exploitable sans la transformation XSL pour un rendu HTML.
+<ul>
+<li>Pour stocker les données, j'utilise le format XML.</li>
+<li>Pour mettre en forme, j'utilise le langage de transformation XSLT avec un rendu HTML5.</li>  
+<li>Pour la mise à jour des données, j'utilise l'ordonnanceur VTOM. Il lance le script de mise à jour 3 fois par jour, et dispose d'un traitement à la demande au besoin. Une fois par jour, le matin, VTOM envoie le fichier XML par e-mail.</li>
+</ul>
+</li>
+</ul>
+
+<p>Dans ce genre de cas, il faut éviter les tableaux excels car, ils ne sont pas mis à jour automatiquement (on peut presque dire, jamais à jour par conséquent).
+De même, il est quasiment exclus de donner un accès direct au logiciel d’administration, à notre DSI.</p>
+
+<p>Pourquoi, me diriez-vous ? Navisphere, par exemple, dispose de toutes les informations, même sous forme graphique. 
+A cela, je répondrais : trop compliqué, trop de cliques à effectuer, trop de chargement, pas de visualisation d’ensemble. La direction a autre chose à faire que de naviguer dans les menus complexes que nous, administrateurs chevronnés, connaissons par coeur.</p>
+
+<h2 id="naviseccli">naviseccli</h2>
+
+<p>Je vous conseille d’authentifier votre utilisateur afin d’effectuer des requêtes sans mot de passe.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>naviseccli -h IParray -AddUserSecurity -user username -password mypass -scope 0
+</code></pre></div></div>
+
+<p>Toutes mes baies EMC sont configurées en Storage Pool. J’effectue une requête pour obtenir l’espace utilisable total utilisateur, l’espace disponible et le nom. J’en déduirai l’espace utilisé.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>naviseccli -h $iparray storagepool -list -userCap -availableCap &gt; ${tmpfile}_$iparray
+
+Contenu du fichier :
+Pool Name:  Pool Bronze
+Pool ID:  1
+User Capacity (Blocks):  21107025920
+User Capacity (GBs):  10064.614
+Available Capacity (Blocks):  21107025920
+Available Capacity (GBs):  10064.614
+ 
+Pool Name:  Pool Gold 1
+Pool ID:  2
+User Capacity (Blocks):  29173164800
+User Capacity (GBs):  13910.849
+Available Capacity (Blocks):  11354673920
+Available Capacity (GBs):  5414.330
+ 
+...
+...
+
+</code></pre></div></div>
+
+<p>Petit problème, l’espace du Storage Pool NAS est utilisé à 100%, ou peu s’en faut. L’information n’est pas fausse en soit. En effet, le datamover prend bien tout l’espace du Storage Pool pour constituer son propre pool de stockage, afin de créer les filesystems.
+Pour pallier à ce problème, j’utilise des requêtes directement sur la control station du NAS.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># il m'a fallu positionner les variables d'environnement afin d'exécuter les commandes
+ssh nasadmin@$ipnas '. .bash_profile ; nas_pool -size "Pool NAS"' &gt; pool_nas_size_$ipnas
+&lt;/pre&gt;
+Toujours pour éviter de mettre les mots de passe, j'effectue la mise en place de clés ssh entre mon serveur et la control station.
+&lt;pre lang="bash"&gt;
+# connexion en ssh sur la control station en nasadmin
+# ssh nasadmin@ipcontrolstation
+# aller dans le répertoire /home/nasadmin/.ssh ou le créer s'il n'existe pas avec ssh-keygen
+test -d ~/.ssh || ssh-keygen
+cd ~/.ssh
+# éditer le fichier authorized_keys pour ajouter la clé de votre serveur
+# attention le fichier authorized_keys doit avoir les droits 600
+vi authorized_keys
+# coller la clé ~/.ssh/id_rsa.pub de votre serveur distant (si c'est une clé rsa) dans le fichier authorized_keys
+# sauvegarder
+</code></pre></div></div>
+
+<h2 id="comment-traiter-les-informations-de-naviseccli-et-du-nas-">Comment traiter les informations de naviseccli et du NAS ?</h2>
+<p>J’ai toutes mes informations. Maintenant, je les traite avec un script shell et les mets en forme en XML.
+Le fichier XML aura la feuille de style XSLT embarquée, avec un rendu HTML.</p>
+
+<p><a href="https://virtual-thom.github.io/archives/wp-content/uploads/etat-capacitaire-en-tete-xml.txt" title="entete xml">Entête XML pour le script.</a> (J’utilise <a href="http://www.chartjs.org/" title="Chart.js">Chart.js</a> pour les camemberts en canvas)
+<a href="https://virtual-thom.github.io/archives/wp-content/uploads/etat-capacitaire-shemc.sh.txt" title="script genere xml">Script qui génère le fichier XML.</a></p>
+
+<p><a href="https://virtual-thom.github.io/archives/wp-content/uploads/etat-capacitaire.xml">Rendu fichier XML.</a></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#!/bin/bash
+#	AUTEUR : SCH Virtual Thom
+#	VERSION : 1.0
+#	DATE : 10/08/2014
+#
+# set -n   # Decommenter pour debug syntax sans exéon
+#	NOTE: Ne pas oublier de recommenter !
+# set -x   # Decommenter pour debug
+#
+##########################################################
+#	VARIABLES
+##########################################################
+OK=0
+KOCRIT=1
+KOWARN=2
+CR=${OK}
+date_du_jour=`date +"%d_%m_%Y"`
+# Le nom des arrays doit pouvoir être résolu (/etc/hosts ou dns)  ou mettre l'adresse IP
+iparrays="VNX5700 VNX5300 CX4-960"
+tmpfile="${date_du_jour}_`uuidgen`_etat-capacitaire-shemc.xml"
+ftp_ip=ftp.adresse.intradef.gouv.fr
+ftp_user=xxxx
+ftp_mdp=xxxx
+rep_script='/SANSCRIPTS/etat-capacitaire'
+# pour naviseccli
+export PATH=$PATH:/opt/Navisphere/bin
+
+##########################################################
+#	FONCTIONS
+##########################################################
+date_heure(){
+	date_heure_var=`date +"%d/%m/%Y - %H:%M:%S : "`
+	echo "${date_heure_var}$1"
+}
+fonc_sortie(){
+	numero_exit=$1
+	message_exit=$2
+	date_heure "${message_exit}"
+	date_heure "Fin du script. Exit : ${numero_exit}"
+	exit ${numero_exit}
+}
+usage(){
+	# exemple d'usage
+	script=${0##*/} ;
+	#script=${script%.*} ;
+	echo "" ;
+	echo "Genere un fichier xml de l'etat capacitaire SHEM-C"
+	echo "Usage :" ;
+	echo " ${script}"
+	echo "    Pas de parametre."
+	echo ""
+	exit ${KOWARN};
+}
+##########################################################
+#	SCRIPT
+##########################################################
+date_heure 'Début du script'
+
+cat ${rep_script}/etat-capacitaire-en-tete-xml.txt &gt; ${rep_script}/$tmpfile
+
+echo "&lt;!-- cette partie est mise à jour par naviseccli --&gt;
+&lt;data:data&gt;" &gt;&gt; ${rep_script}/$tmpfile
+
+# Requete sur les baies de stockage en naviseccli (les clés doivent être mise en place)
+# naviseccli -h ipbaie -addusersecurity -scope 0 -password password -user userName
+for iparray in $(echo $iparrays)
+do
+	# un seul naviseccli pour toues les storages d'une baie (ça fait moins de requêtes)
+	naviseccli -h $iparray storagepool -list  -userCap -availableCap &gt; ${rep_script}/${tmpfile}_$iparray
+
+	# Le nom et les ip des array sont identiques ici mais on peut mettre autre chose
+	# si le résultat contient des lignes, on traite
+	if test $(cat  ${rep_script}/${tmpfile}_$iparray | wc -l) -gt 1
+	then
+		# si les baies sont aussi des têtes NAS, je récupère l'état du "Pool NAS" (il s'appelle comme ça chez moi)
+		if test "$iparray" = "VNX5700"
+		then
+			namearray="VNX5700"
+			# le nom du NAS doit pouvoir être résolu (/etc/hosts ou dns) ou mettre l'adresse IP
+			ipnas="NAS5700"
+			ssh nasadmin@$ipnas '. .bash_profile ; nas_pool -size "Pool NAS"' &gt; ${rep_script}/pool_nas_size_$ipnas
+		else
+			if test "$iparray" = "VNX5300"
+			then
+				namearray="VNX5300"
+				# le nom du NAS doit pouvoir être résolu (/etc/hosts ou dns) ou mettre l'adresse IP
+				ipnas="NAS5300"
+				ssh nasadmin@$ipnas '. .bash_profile ; nas_pool -size "Pool NAS"' &gt; ${rep_script}/pool_nas_size_$ipnas
+			else
+				if test  "$iparray" = "CX4-960"
+				then
+					 	namearray="CX4-960"
+				else
+						# par défaut on met l'IP ou le nom dns en tant que nom de baie
+						namearray=$iparray
+				fi
+			fi
+		fi
+
+		echo "&lt;array name='$namearray'&gt;" &gt;&gt; ${rep_script}/$tmpfile
+
+		# line de la sortie naviseccli &lt; ${rep_script}/${tmpfile}_$iparray
+		# Ne pas oublier que l'entrée ssh dans un boucle while remplace l'entrée standard
+		# solution ssh -n
+		while read line
+		do
+			if test -n "$(echo $line | grep 'Pool Name')"
+			then
+				if test -n  "$(echo $line | grep 'NAS')"
+				then
+					NAS=1
+				else
+					NAS=0
+				fi
+				echo "&lt;storagepool&gt;" &gt;&gt; ${rep_script}/$tmpfile
+				echo "&lt;name&gt;" &gt;&gt; ${rep_script}/$tmpfile
+				# awk -F: '$1 ~ /Pool Name/ {print $2}' =&gt; délimiteur ":", 1er champ contient "Pool Name"
+				# affiche le deuxième champs
+				echo $line | awk -F: '$1 ~ /Pool Name/ {print $2}' | sed 's/^ //g' &gt;&gt; ${rep_script}/$tmpfile
+				echo "&lt;/name&gt;" &gt;&gt; ${rep_script}/$tmpfile
+			# FIN name
+			else
+				if test -n  "$(echo $line | grep 'User Capacity (GBs)')"
+				then
+					echo "&lt;usercap&gt;" &gt;&gt; ${rep_script}/$tmpfile
+
+					if test "$NAS" = "1"
+					then
+						usercap=`cat ${rep_script}/pool_nas_size_${ipnas} | awk -F"=" '$1 ~ /total_mb/ {print $2}' | sed 's/^ //g'`
+						if test "$usercap" != "0"
+						then
+							usercap=`expr $usercap \/ 1024`
+						else
+							usercap=`cat ${rep_script}/pool_nas_size_${ipnas} | awk -F"=" '$1 ~ /potential_mb/ {print $2}' | sed 's/^ //g'`
+							usercap=`expr $usercap \/ 1024`
+						fi
+						echo $usercap &gt;&gt; ${rep_script}/$tmpfile
+
+					# si Pool différent du NAS
+					else
+						echo $line | awk -F: '$1 ~ /User Capacity \(GBs\)/ {print $2}' | sed 's/^ //g' &gt;&gt; ${rep_script}/$tmpfile
+					fi
+
+					echo "&lt;/usercap&gt;" &gt;&gt; ${rep_script}/$tmpfile
+				# FIN usercap
+				else
+					if test -n  "$(echo $line | grep 'Available Capacity (GBs)')"
+					then
+						echo "&lt;availablecap&gt;" &gt;&gt; ${rep_script}/$tmpfile
+
+						if test "$NAS" = "1"
+						then
+							availablecap=`cat ${rep_script}/pool_nas_size_${ipnas} | awk -F"=" '$1 ~ /avail_mb/ {print $2}' | sed 's/^ //g'`
+							if test "$availablecap" != "0"
+							then
+								availablecap=`expr $availablecap \/ 1024`
+							else
+								availablecap=`cat ${rep_script}/pool_nas_size_${ipnas} | awk -F"=" '$1 ~ /potential_mb/ {print $2}' | sed 's/^ //g'`
+								availablecap=`expr $availablecap \/ 1024`
+							fi
+							echo $availablecap &gt;&gt; ${rep_script}/$tmpfile
+
+						# si pas pool NAS
+						else
+							echo $line | awk -F: '$1 ~ /Available Capacity \(GBs\)/ {print $2}' | sed 's/^ //g' &gt;&gt; $tmpfile
+						fi
+
+						echo "&lt;/availablecap&gt;" &gt;&gt; ${rep_script}/$tmpfile
+					# FIN availablecap
+					else
+						# Je prends les lignes vides comme séparateur des pools
+						if test -z "$line"
+						then
+							echo "&lt;/storagepool&gt;" &gt;&gt; ${rep_script}/$tmpfile
+						fi
+
+					fi
+				fi
+			fi
+
+		done &lt; ${rep_script}/${tmpfile}_$iparray
+
+		echo "&lt;/array&gt;" &gt;&gt; ${rep_script}/$tmpfile
+	fi
+done
+
+
+echo "&lt;/data:data&gt; &lt;!-- fin des datas --&gt;
+&lt;/xsl:stylesheet&gt; &lt;!-- fin du fichier xml --&gt;" &gt;&gt; ${rep_script}/$tmpfile
+
+date_heure "Transfert FTP"
+# Transfert FTP sur le site de la SHEM
+ftp -v -n -i &gt; /dev/null &lt;&lt; EOF
+open ${ftp_ip}
+user ${ftp_user} ${ftp_mdp}
+binary
+put ${rep_script}/$tmpfile index.xml
+EOF
+
+# TODO : prévoir d'envoyer un e-mail en compte rendu avec le xml attaché
+
+# Nettoyage des fichiers temporaires
+for iparray in $(echo $iparrays)
+do
+	rm -f ${rep_script}/${tmpfile}_$iparray
+done
+rm -f ${rep_script}/pool_nas_size*
+rm -f ${rep_script}/$tmpfile
+date_heure 'Fin du script'
+</code></pre></div></div>
+
+<p>Vous avez remarqué que je dis souvent que la feuille XSLT est embarquée dans le fichier XML. En réalité, c’est plutôt la data XML qui est embarquée dans la transformation XSLT. En fait, la feuille de transformation XSLT est un fichier XML en elle-même. Il suffit de lui insérer des datas et de définir un certain nombre de paramètres :</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span> <span class="c">&lt;!-- Comme tout fichier XML --&gt;</span>
+<span class="cp">&lt;?xml-stylesheet href="#stylesheet" type="text/xsl"?&gt;</span> <span class="c">&lt;!-- D'habitude on met l'url du fichier XML à transformer ici --&gt;</span>
+<span class="c">&lt;!-- là, on fait référence à l'ID stylesheet, interne à ce fichier --&gt;</span>
+
+<span class="c">&lt;!--  Pour ça, il faut définir la structure du document DTD (Document Type Definition)  --&gt;</span>
+<span class="cp">&lt;!DOCTYPE xsl:stylesheet [
+&lt;!ATTLIST xsl:stylesheet
+id	ID	#REQUIRED&gt;</span>
+]&gt;
+ 
+<span class="c">&lt;!-- balises de transformation xsl --&gt;</span>
+<span class="nt">&lt;xsl:stylesheet</span> <span class="na">version=</span><span class="s">"2.0"</span> <span class="na">id=</span><span class="s">"stylesheet"</span>  <span class="na">xmlns:data=</span><span class="s">"localhost"</span> 
+<span class="na">xmlns:xsl=</span><span class="s">"http://www.w3.org/1999/XSL/Transform"</span><span class="nt">&gt;</span>
+
+<span class="c">&lt;!-- pour un rendu HTML --&gt;</span>
+<span class="nt">&lt;xsl:output</span> <span class="na">method=</span><span class="s">"html"</span> <span class="na">indent=</span><span class="s">"yes"</span> <span class="na">encoding=</span><span class="s">"UTF-8"</span> <span class="nt">/&gt;</span>
+
+<span class="c">&lt;!-- definition du template principal avec le rendu html --&gt;</span>
+<span class="nt">&lt;xsl:template</span> <span class="na">match=</span><span class="s">"/"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;body&gt;</span>...
+<span class="c">&lt;!-- Les appels de template se feront &lt;xsl:apply-templates select="/xsl:stylesheet/data:data/xxx" /&gt; --&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+<span class="nt">&lt;/xsl:template&gt;</span>
+
+<span class="nt">&lt;data:data&gt;</span>
+<span class="c">&lt;!-- c'est ici que j'insère de la data --&gt;</span>
+<span class="nt">&lt;/data:data&gt;</span> <span class="c">&lt;!-- fin des datas --&gt;</span>
+
+<span class="nt">&lt;/xsl:stylesheet&gt;</span> <span class="c">&lt;!-- fin du fichier xml --&gt;</span>
+</code></pre></div></div>
+
+<p>Petite aparté :
+Il faut savoir que vous pouvez sortir les informations en XML avec naviseccli. C’est possible mais, le format est tellement peu pratique et peu lisible (car non-imbriqué) que je ne l’utilise pas. Si vous voulez absolument avoir une sortie en XML il faut rajouter -Xml à naviseccli.</p>
+
+<p><code class="language-plaintext highlighter-rouge">naviseccli -Xml -h x.x.x.x storagepool -list  -userCap -availableCap</code></p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="utf-8" ?&gt;</span>
+<span class="nt">&lt;CIM</span> <span class="na">CIMVERSION=</span><span class="s">"2.0"</span> <span class="na">DTDVERSION=</span><span class="s">"2.0"</span><span class="nt">&gt;&lt;MESSAGE</span> <span class="na">ID=</span><span class="s">"877"</span> <span class="na">PROTOCOLVERSION=</span><span class="s">"1.0"</span><span class="nt">&gt;&lt;SIMPLERSP&gt;&lt;METHODRESPONSE</span> <span class="na">NAME=</span><span class="s">"ExecuteClientRequest"</span><span class="nt">&gt;&lt;RETURNVALUE</span> <span class="na">TYPE=</span><span class="s">"Navi_Error"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;VALUE.NAMEDINSTANCE&gt;</span>
+<span class="nt">&lt;INSTANCENAME</span> <span class="na">CLASSNAME=</span><span class="s">"Navi_Error"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/INSTANCENAME&gt;</span>
+<span class="nt">&lt;INSTANCE</span> <span class="na">CLASSNAME=</span><span class="s">"Navi_Error"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;PROPERTY</span> <span class="na">NAME=</span><span class="s">"errorCode"</span> <span class="na">TYPE=</span><span class="s">"uint32"</span><span class="nt">&gt;&lt;VALUE&gt;</span>0<span class="nt">&lt;/VALUE&gt;</span>
+<span class="nt">&lt;/PROPERTY&gt;</span>
+<span class="nt">&lt;PROPERTY</span> <span class="na">NAME=</span><span class="s">"success"</span> <span class="na">TYPE=</span><span class="s">"boolean"</span><span class="nt">&gt;&lt;VALUE&gt;</span>true<span class="nt">&lt;/VALUE&gt;</span>
+<span class="nt">&lt;/PROPERTY&gt;</span>
+<span class="nt">&lt;PROPERTY</span> <span class="na">NAME=</span><span class="s">"where"</span> <span class="na">TYPE=</span><span class="s">"string"</span><span class="nt">&gt;&lt;VALUE&gt;</span>ProvisionProvider<span class="nt">&lt;/VALUE&gt;</span>
+<span class="nt">&lt;/PROPERTY&gt;</span>
+<span class="nt">&lt;PROPERTY</span> <span class="na">NAME=</span><span class="s">"why"</span> <span class="na">TYPE=</span><span class="s">"string"</span><span class="nt">&gt;&lt;VALUE&gt;&lt;/VALUE&gt;</span>
+<span class="nt">&lt;/PROPERTY&gt;</span>
+<span class="nt">&lt;/INSTANCE&gt;</span>
+<span class="nt">&lt;/VALUE.NAMEDINSTANCE&gt;</span>
+<span class="nt">&lt;/RETURNVALUE&gt;&lt;PARAMVALUE</span> <span class="na">NAME=</span><span class="s">"Pool Name"</span> <span class="na">TYPE=</span><span class="s">"string"</span><span class="nt">&gt;&lt;VALUE&gt;</span>Pool<span class="ni">&amp;#32;</span>Bronze<span class="nt">&lt;/VALUE&gt;</span>
+<span class="nt">&lt;/PARAMVALUE&gt;</span>
+<span class="nt">&lt;PARAMVALUE</span> <span class="na">NAME=</span><span class="s">"Pool ID"</span> <span class="na">TYPE=</span><span class="s">"string"</span><span class="nt">&gt;&lt;VALUE&gt;</span>1<span class="nt">&lt;/VALUE&gt;</span>
+<span class="nt">&lt;/PARAMVALUE&gt;</span>
+<span class="nt">&lt;PARAMVALUE</span> <span class="na">NAME=</span><span class="s">"User Capacity (Blocks)"</span> <span class="na">TYPE=</span><span class="s">"string"</span><span class="nt">&gt;&lt;VALUE&gt;</span>21107025920<span class="nt">&lt;/VALUE&gt;</span>
+<span class="nt">&lt;/PARAMVALUE&gt;</span>
+<span class="nt">&lt;PARAMVALUE</span> <span class="na">NAME=</span><span class="s">"User Capacity (GBs)"</span> <span class="na">TYPE=</span><span class="s">"string"</span><span class="nt">&gt;&lt;VALUE&gt;</span>10064.614<span class="nt">&lt;/VALUE&gt;</span>
+<span class="nt">&lt;/PARAMVALUE&gt;</span>
+<span class="nt">&lt;PARAMVALUE</span> <span class="na">NAME=</span><span class="s">"Available Capacity (Blocks)"</span> <span class="na">TYPE=</span><span class="s">"string"</span><span class="nt">&gt;&lt;VALUE&gt;</span>21107025920<span class="nt">&lt;/VALUE&gt;</span>
+<span class="nt">&lt;/PARAMVALUE&gt;</span>
+<span class="nt">&lt;PARAMVALUE</span> <span class="na">NAME=</span><span class="s">"Available Capacity (GBs)"</span> <span class="na">TYPE=</span><span class="s">"string"</span><span class="nt">&gt;&lt;VALUE&gt;</span>10064.614<span class="nt">&lt;/VALUE&gt;</span>
+<span class="nt">&lt;/PARAMVALUE&gt;</span>
+<span class="nt">&lt;PARAMVALUE</span> <span class="na">NAME=</span><span class="s">""</span> <span class="na">TYPE=</span><span class="s">"string"</span><span class="nt">&gt;&lt;VALUE&gt;</span><span class="ni">&amp;#32;</span><span class="nt">&lt;/VALUE&gt;</span>
+<span class="nt">&lt;/PARAMVALUE&gt;</span>
+...
+...
+<span class="nt">&lt;/METHODRESPONSE&gt;&lt;/SIMPLERSP&gt;&lt;/MESSAGE&gt;&lt;/CIM&gt;</span>
+</code></pre></div></div>
+
+  </article>
+  
+<nav>
+  <ul class="pager">
+    
+     
+    <li class="previous">
+      <a href="https://virtual-thom.github.io/archives/api-vplex-restful/"><span aria-hidden="true">&larr;</span> VPLEX Element Manager API, ou API VPLEX RESTful</a> 
+    </li>
+    
+     
+     <li class="next">
+      <a class="next" href="https://virtual-thom.github.io/archives/deployer-application-sails-js-framework-node-js-openshift-gratuit/">Déployer une application Sails JS (framework Node.js) sur Openshift - gratuit <span aria-hidden="true">&rarr;</span></a> 
+    </li>
+     
+    
+  </ul>
+</nav>
+
+
+  <footer class="post-footer">
+    
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>HTML</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>naviseccli</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>SAN</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>Script</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>shell</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>Stockage</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>VTOM</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>xml</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>XML</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>xsl</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>XSL</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>xslt</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>XSLT</a>
+      
+    
+    <span  itemprop="author publisher" class="hidden">Virtual Thom</span>
+  </footer>
+  
+  <div id="disqus_thread" ></div>
+  <script>
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'thomas-asnar'; // required: replace example with your forum shortname
+  
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+</div>
+
+      <footer id="site-footer">
+    <div>&copy;<a href="https://github.com/virtual-thom/" title="Github Virtual-Thom">Virtual-Thom</a></div>
+    <div>
+            <a href="https://virtual-thom.github.io/archives/plan" title="Plan du site">sitemap</a> | <a href="https://virtual-thom.github.io/about" rel="publisher author" title="Curriculum vitae Thom">A propos</a>
+    </div>
+    <div>
+        <a id="goto-site-header" href="#site-header" title="Retourner au début">&uArr; Top</a>
+    </div>
+    <div id="footer-disclaimer">
+        <p>Avertissement : vous ne devez pas prendre pour argent comptant le contenu de ce site. Testez toujours la solution en environnement de test.</p>
+        <p>Malgré le sérieux que je m'efforce de mettre dans le contenu de ces billets, je ne pourrai être tenu responsable d'éventuelles erreurs que cela pourrait engendrer.</p>
+    </div>
+    <div>
+        <a class="hidden" href="https://virtual-thom.github.io/archives/sitemap.xml" title="SiteMap">sitemap</a>
+    </div>
+</footer>
+
+    </div>
+  </body>
+
+</html>

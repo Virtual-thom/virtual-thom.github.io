@@ -1,0 +1,75 @@
+@echo off
+rem inclut le répertoire binaire PHP dans le path
+set PATH=E:\PHP5;%PATH%
+set PATH_PHP=e:\PHP5
+set PHP=php.exe
+echo.
+rem Layout du log
+echo _________________________________________
+echo.
+echo Contexte Visual TOM du traitement
+echo Machine.............: %COMPUTERNAME%
+echo Machine VTOM........: %TOM_HOST%
+echo Utilisateur.........: %TOM_USER%
+echo Script..............: %TOM_SCRIPT%
+rem petite boucle pour récupérer les paramètres
+:argloop
+shift
+if "%0"=="" goto argend
+set arg=%arg% %0
+goto argloop
+:argend
+echo Parametres..........: %arg%
+echo Serveur Visual TOM..: %TOM_REMOTE_SERVER%
+echo Traitement..........: %TOM_JOB%
+echo Application.........: %TOM_APPLICATION%
+echo Environnement.......: %TOM_ENVIRONMENT%
+echo Job ID..............: %TOM_JOB_ID%
+echo Mode Execution......: %TOM_JOB_EXEC%
+echo Date d'exploitation.: %TOM_DATE%
+echo Valeur de la date...: %TOM_DATE_VALUE%
+echo Log des erreurs.....: %TOM_LOG_PATH_E%
+echo Log des sorties.....: %TOM_LOG_PATH_O%
+echo Action sur les logs.: (%TOM_LOG_ACTION%)
+echo Directory des logs..: %TOM_LOG_DIR%
+echo.
+echo _________________________________________
+echo Debut de l'execution du traitement %TOM_ENVIRONMENT% / %TOM_APPLICATION% / %TOM_JOB%
+date /T
+rem troncature de caractères %nomdelavariable:~+ou-début,nombredecaractères% 
+echo %time:~+0,8%
+echo.
+rem exécution du script et récupération du code retour
+%PATH_PHP%\%PHP% %TOM_SCRIPT% %arg%
+set TOM_STATUS=%ERRORLEVEL%
+echo.
+date /T
+echo %time:~+0,8%
+echo Fin du traitement
+echo _________________________________________
+echo Determination du Status de terminaison
+echo.
+rem c'est ici qu'on va pouvoir gérer les codes retours
+rem rien oblige à ce que 0 soit le seul code retour OK
+rem mais c'est le cas le plus courant
+if "%TOM_STATUS%"=="0" goto TERMINE
+goto ERREUR
+
+:ERREUR
+rem le fameux tsend qui permet de statuer le traitement sous VTOM
+rem l'option -r"n°coderetour" est bien pratique pour visualiser le code retour
+rem directement entre crochet sur le traitement dans VTOM 
+%ABM_BIN%\tsend -sE  -r"%TOM_STATUS%" -m'ERRORLEVEL=%TOM_STATUS%'
+echo Exit-^>%TOM_STATUS% - Abort sans acquitement
+goto FIN
+
+:TERMINE
+%ABM_BIN%\tsend -sT -r"%TOM_STATUS%"
+echo Exit-^>%TOM_STATUS% * Terminaison avec acquitement
+
+:FIN
+if not "%TOM_LOG_ACTION%"=="   " call %ABM_BIN%\Gestlog_wnt.bat
+echo _________________________________________
+echo Fin d'exécution de la file d'attente
+exit %TOM_STATUS%
+:DIE

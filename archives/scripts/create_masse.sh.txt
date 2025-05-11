@@ -1,0 +1,127 @@
+#!/bin/bash
+#set -x
+__fic_data=$1
+
+debug=""
+#debug="echo"
+
+__trigram="DTK"
+__env_name=$__trigram"_SIDDATALAKE"
+__app_basename="CZZ"$__trigram
+__app_period="M"
+__app_sequence=0
+__job_sequence=0
+__geomx=200
+__geomy=40
+__geomxpas=75
+__geomypas=200
+__geomxpas_sep_ress=0
+__script_integration="PATH_DTK_SHELL/bigdata_alim_datalake.sh"
+__script_extract="PATH_DTK_SHELL/bigdata_export.ksh"
+__script_ias="#/tech/ias3/SCRIPT/ficdon_dep.sh"
+__job_integration_user="SVC_E1_ITCEDTLK"
+__repRessourceFic="/home/vtom/PATH_DTK_SAS"
+__hostIntegration="_E1_LDTKBIG01"
+__ressourcePoids="P_DTK_00_PARAOAG"
+__job_extract_user="_e1_ce_dtmp"
+__job_ias_user="ias3"
+
+# suppression des jobs avant création
+#tlist jobs -f DTK_SIDDATALAKE | awk '$2 ~ /0[123456789]M$/ {printf"vtdeljob /nom=%s/%s/%s\n",$1,$2,$3}'
+
+# création ressource poids
+$debug vtaddres /name=${__ressourcePoids} /type="poi" /value="0" /max="1"
+
+__usage()
+{
+    echo "$0 <chemin complet du fichier de données>"
+    echo "${2:-""}"
+    echo "Exit->${1:-123}"
+    exit ${1:-123}
+}
+
+[ -s "$1" ] || __usage 10 "le fichier est vide"
+
+__print2Hex()
+{
+    printf "%02X" $1
+}
+__print2Digits()
+{
+    #printf "%02d" $1
+    __print2Hex $1
+}
+
+__join()
+{
+    # usage premier param separateur
+    FS="$1"
+    shift
+    echo $* | awk -v OFS="$FS" '{$1=$1"";print}'
+}
+
+
+__OldTableDTMFamille=""
+
+while read line
+do
+    # on saute les lignes vides ou commentées
+    [ -z "$line" ] && continue
+    echo "$line" | egrep "^#" > /dev/null && continue
+
+    # init var
+     __job_sequence=`expr $__job_sequence + 1`
+
+    # récupération des data du fichier
+    __tableDTM=`echo $line | awk '{print $2}'`
+    __tableDTMFamille=`echo $line | awk '{print $1}'`
+    __indexIAS=`echo $line | awk '{print $3}'`
+
+    # On vérifie que les data récupérées sont correctes
+    [ "$__tableDTMFamille" == "" -o "$__tableDTM" == "" ] && echo "ERROR - $line semble ne pas contenir les infos" && continue
+
+    # On change d'appli quand on change de __tableDTMFamille
+    if test "$__OldTableDTMFamille" != "$__tableDTMFamille"; then
+        __app_sequence=`expr $__app_sequence + 1`
+        __job_sequence=1
+    fi
+    __OldTableDTMFamille=$__tableDTMFamille
+    
+    __ressourceFicZipName="ZZ_"$__tableDTM".zip"
+    __ressourceFic=$__repRessourceFic"/"$__ressourceFicZipName
+    __ressourceFicName="F_DTK"${__tableDTM:0:6}""$__job_sequence"ZZ"
+
+    # Application construction des noms (l'appli existe déjà, je pars de l'existant)
+    __app_name=${__app_basename}`__print2Digits $__app_sequence`"M"
+    __app_obj=$(__join "/" $__env_name $__app_name)
+    $debug tlist app -f $__app_obj
+    [ $? -ne 0 ] && echo "[ERROR] $__app_obj" && continue
+
+    # création des ressources, si elles existent déjà, ça n'est pas gênant
+    $debug vtaddres /name=${__ressourceFicName} /type="fic" /value=$__ressourceFic /host=$__hostIntegration
+
+
+    # construction et add job d'extract
+    __job_extract_obj_previous=$(__join "/" $__app_obj $__app_name`__print2Digits $(($__job_sequence - 1))`"X")
+    __lien_vers_job_extract_previous=""
+    $debug tlist job -f $__job_extract_obj_previous && __lien_vers_job_extract_previous=$__job_extract_obj_previous"[facu]"
+    __job_extract_obj=$(__join "/" $__app_obj $__app_name`__print2Digits $__job_sequence`"X")
+    $debug vtaddjob /nom=$__job_extract_obj /script="$__script_extract" /Par="$__tableDTM,ZZ" /geom="200x40+"$(( $__geomy + $__geomypas * ($__job_sequence - 1) ))"+"$__geomx"" /User=$__job_extract_user /LienVers="$__lien_vers_job_extract_previous" /comm="$__tableDTM" /NonDepl="oui"
+    $debug tlist job -f $__job_extract_obj
+    [ $? -ne 0 ] && echo "[ERROR] $__job_extract_obj" && continue
+
+    # construction et add job ias
+    __job_ias_obj=$(__join "/" $__app_obj $__app_name`__print2Digits $__job_sequence`"T")
+    $debug vtaddjob /nom=$__job_ias_obj /script="$__script_ias" /Par="$__indexIAS,ZZ" /LienVers="$__job_extract_obj" /geom="200x40+"$(( $__geomy + $__geomypas * ($__job_sequence - 1) ))"+"$(( $__geomx * 2 + $__geomxpas ))""  /User=$__job_ias_user /comm="$__indexIAS" /NonDepl="oui"
+    $debug tlist job -f $__job_ias_obj
+    [ $? -ne 0 ] && echo "[ERROR] $__job_ias_obj" && continue
+
+    # construction et add job d'integration (ingestion)
+    __job_integration_obj=$(__join "/" $__app_obj $__app_name`__print2Digits $__job_sequence`"I")
+    __job_iasprev_obj=$(__join "/" $__app_obj $__app_name`__print2Digits $__job_sequence`"T")
+    $debug vtaddjob /nom=$__job_integration_obj /script="$__script_integration" /Par="${__ressourceFic}" /geom="200x40+"$(( $__geomy + $__geomypas * ($__job_sequence - 1) + $__geomypas / 2 ))"+"$(( $__geomx * 2 + $__geomxpas ))"" /User=$__job_integration_user /LienVers="$__job_iasprev_obj"  /res="+"$__ressourceFicName" P [attend==oui jusqu'a==Illimité], +"$__ressourcePoids" ! 1 [attend==oui jusqu'a==Illimité liberation==oui]" /machine="$__hostIntegration" /comm="$__ressourceFicZipName" /NonDepl="oui"
+    $debug tlist job -f $__job_integration_obj
+    [ $? -ne 0 ] && echo "[ERROR] $__job_integration_obj" && continue
+
+
+done < $__fic_data

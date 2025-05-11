@@ -1,0 +1,97 @@
+git add --all && git commit -m "all" && git push
+
+docker-machine env --shell powershell default
+docker-machine -s /d/workspace/default start default
+docker-machine -s /d/workspace/default env --shell shell
+
+sudo mkdir /mnt/workspace ; sudo mount -t vboxsf workspace /mnt/workspace
+
+docker exec -it compose_dev_tools_1 bash
+
+sudo mount -t vboxsf -o uid=1000,gid=50 workspace /mnt/workspace
+
+docker run -v /mnt/workspace:/mnt/workspace -p 30007-30008:30007-30008 -ti docker_vtom_dev
+
+# Postgres
+/opt/vtom/sgbd/bin/pg_restore /opt/vtom/bases/pg_dump.bakcup > /var/tmp/pg_dump.sql
+
+# Ouvrir les DBF
+# installer simpledbf et pandas
+from simpledbf import Dbf5
+dbf = Dbf5('/mnt/workspace/temp/bases_Thursday/appl.dbf', codec='latin-1')
+dbf.to_csv('/mnt/workspace/temp/osef.csv')
+
+### switch entre différent vtom server
+export TOM_PORT_vtserver=n°port
+export TOM_REMOTE_SERVER=Uxxxxxx
+export TOM_PORT_vtsgbd=30019
+export TOM_PORT_vtserver=30017
+
+#
+# ssh key 
+Le home user doit être en 750 (ou 755) 
+.ssh en 750
+authorized_keys en 600
+
+vi /etc/ssh/sshd_config
+
+ChallengeResponseAuthentication no
+PasswordAuthentication no
+UsePAM no
+
+/etc/init.d/sshd restart
+
+# sort uniq by columns (vtstools uniq on env,app,job,status)
+ vtstools -x -e "01-01-2000 00:00:00 20-05-2016 23:00:00" 2> /dev/null |sort -u -t";" -k"1,3" -k"18,18"
+
+tous les environnements touchés par une version 
+vthtools -e "17-12-2016 28-12-2020" | grep "/" | egrep "ihm|vtaddjob" | cut -d"/" -f1 | awk '{print $NF}' | sort -u
+
+
+nltest /dclist:domaine
+ldapsearch -D "domaine\user" -h  server.domaine -p 389 -w "mdp" -b "OU=Groupes,DC=domaine,DC=fr" -s sub '(&(objectClass=*)(mail=mailachercher))'
+ldapsearch -D "domaine\user" -h  server.domaine -p 389 -w "mdp" -b "DC=domaine,DC=fr" -s sub '(&(objectClass=*)(memberOf=CN=cequonatrouve,OU=Groupes,DC=domaine,DC=fr))'
+ldapsearch -D "user" -h ip -p 389 -w "mdp" -b "DC=domaine,DC=fr" -s sub '(&(objectClass=user)(CN=nomachercher,OU=rouge,OU=Utilisateurs,DC=domaine,DC=fr))'
+
+vtaddaccount -name TOM -p TOM -d ADM_prf
+
+
+C:\LINDUS\wamp\bin\php\php5.4.16\php.exe C:\LINDUS\wamp\www\Symfony\app\console cache:clear -e prod
+
+
+# marche niquel pour mon nouveau Windows 10
+new-alias npm C:\Users\Bxxxxxxx\Documents\node-v6.10.0-win-x64\npm.cmd
+${ENV:PATH}="${ENV:PATH};C:/Users/Bxxxxxx/Documents/node-v6.10.0-win-x64"
+git config --global http.proxy http://domaine\\Bxxxx:mdp@proxy:8080
+git config --global https.proxy http://domaine\\Bxxxx:mdp@proxy:8080
+set HTTP_PROXY=http://domaine\\Bxxxx:mdp@proxy:8080
+npm config set http-proxy http://dom%5CBxxxxx:mdp@proxy:8080
+npm config set https-proxy http://dom%5CBxxxxx:mdp@proxy:8080
+bower config dans le même rep que bower.json
+.bowerrc
+{
+"proxy":"http://dom%5CBxxxx:mdp@proxy:8080",
+"https-proxy":"http://dom%5CBxxxxx:mdp@proxy:8080"
+}
+Visual Code
+     // Paramètre de proxy à utiliser. S'il n'est pas défini, il est récupéré à partir des variables d'environnement http_proxy et https_proxy
+    "http.proxy": "http://proxy:8080",
+    "https.proxy": "http://proxy:8080",
+    // Valeur à envoyer en tant qu'en-tête 'Proxy-Authorization' pour chaque requête réseau.
+    "http.proxyAuthorization": "DOM/BXXXX:mdp"
+}
+
+docker install windows 10
+1. Installer la fonctionnalité de conteneur
+La fonctionnalité de conteneur doit être activée avant d’utiliser des conteneurs Windows. Pour ce faire, exécutez la commande suivante dans une session PowerShell avec élévation de privilèges.
+
+Si vous recevez un message d’erreur indiquant que Enable-WindowsOptionalFeature n’existe pas, vérifiez que vous exécutez PowerShell comme administrateur.
+
+Copy
+none
+Enable-WindowsOptionalFeature -Online -FeatureName containers -All
+Étant donné que Windows 10 prend uniquement en charge les conteneurs Hyper-V, la fonctionnalité Hyper-V doit également être activée. Pour activer la fonctionnalité Hyper-V à l’aide de PowerShell, exécutez la commande suivante dans une session PowerShell avec élévation de privilèges.
+
+Copy
+none
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All

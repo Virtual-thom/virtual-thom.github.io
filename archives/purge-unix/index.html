@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="apple-touch-icon" href="https://virtual-thom.github.io/archives/apple-touch-icon.png">
+  <link rel="icon" href="https://virtual-thom.github.io/archives/favicon.ico" />
+  <!-- Remplacé par Jekyll SEO (sinon apparait en double)
+  <title>Purge shell</title>
+  <meta name="description" content="#!/bin/ksh# Script de purge unix# fichier de param nécessaire à passer en paramètre de ce script# 1 ligne = une conf de purge (champs séparés par des ;)# REP...">
+  --> 
+  
+  <link rel="canonical" href="https://virtual-thom.github.io/archives/purge-unix/">
+  
+  <link rel="stylesheet" media="screen" href="https://virtual-thom.github.io/archives/assets/main.css">
+  
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Purge shell | Virtual-Thom Blog-notes VTOM et informatique</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Purge shell" />
+<meta name="author" content="Virtual Thom" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="#!/bin/ksh # Script de purge unix # fichier de param nécessaire à passer en paramètre de ce script # 1 ligne = une conf de purge (champs séparés par des ;) # REP(chemin du répertoire);FIC_PATTERN(fichier(s) à supprimer, peut contenir des étoiles);RETENTION(en jour);VERSION(nombre de version gardée à minima - peut être 0) FIC_PARAM=$1 export CR=0 # on peut mettre DEBUG à &quot;true&quot; pour ne pas réellement purger et passer le script en simulation export DEBUG=&quot;true&quot; if ! test -s &quot;$FIC_PARAM&quot;;then echo &quot;[ERROR] Le fichier de param n&#39;existe pas ou est vide&quot; fi # on boucle sur le fichier param while read ligne ; do # on saute les lignes vides ou commentées echo &quot;$ligne&quot; | egrep &quot;^$&quot; &gt; /dev/null &amp;&amp; continue echo &quot;$ligne&quot; | egrep &quot;^#&quot; &gt; /dev/null &amp;&amp; continue # on parse la ligne de conf REP=$(echo &quot;$ligne&quot; | cut -d&quot;;&quot; -f1) FIC_PATTERN=$(echo &quot;$ligne&quot; | cut -d&quot;;&quot; -f2) RETENTION=$(echo &quot;$ligne&quot; | cut -d&quot;;&quot; -f3) export VERSION=$(echo &quot;$ligne&quot; | cut -d&quot;;&quot; -f4) # on affiche la conf echo &quot;[INFO] Purge de REP=$REP FIC=$FIC_PATTERN RETENTION=$RETENTION VERSION=$VERSION&quot; # on vérifie que REP est un répertoire if test ! -d &quot;$REP&quot; -o -z &quot;$REP&quot;; then echo &quot;[ERROR] $REP n&#39;est pas un répertoire&quot; CR=`$CR + 1` continue fi # on purge # on peut tomber sur une erreur si la liste de fichier à supprimer est trop grande à cause du ls # dans ce cas, supprimer ceci de la commande find : -exec ls -1td &quot;{}&quot; + # mais vous n&#39;aurez plus l&#39;assurance d&#39;avoir garder les n $VERSION les plus vieilles export i=0 find $REP -name &quot;$FIC_PATTERN&quot; -mtime &quot;+$RETENTION&quot; -exec ls -1td &quot;{}&quot; + | while read findLine; do i=`expr $i + 1` # on garde n version de fichiers test $i -le $VERSION &amp;&amp; continue # on liste ou on purge selon DEBUG if test &quot;$DEBUG&quot; == &quot;true&quot;;then ls -ld $findLine else rm -Rf $findLine || CR=`$CR + 1` fi done done &lt; &quot;$FIC_PARAM&quot; test $CR -ne 0 &amp;&amp; echo &quot;[ERROR] Au moins une erreur dans le script de purge&quot; exit $CR" />
+<meta property="og:description" content="#!/bin/ksh # Script de purge unix # fichier de param nécessaire à passer en paramètre de ce script # 1 ligne = une conf de purge (champs séparés par des ;) # REP(chemin du répertoire);FIC_PATTERN(fichier(s) à supprimer, peut contenir des étoiles);RETENTION(en jour);VERSION(nombre de version gardée à minima - peut être 0) FIC_PARAM=$1 export CR=0 # on peut mettre DEBUG à &quot;true&quot; pour ne pas réellement purger et passer le script en simulation export DEBUG=&quot;true&quot; if ! test -s &quot;$FIC_PARAM&quot;;then echo &quot;[ERROR] Le fichier de param n&#39;existe pas ou est vide&quot; fi # on boucle sur le fichier param while read ligne ; do # on saute les lignes vides ou commentées echo &quot;$ligne&quot; | egrep &quot;^$&quot; &gt; /dev/null &amp;&amp; continue echo &quot;$ligne&quot; | egrep &quot;^#&quot; &gt; /dev/null &amp;&amp; continue # on parse la ligne de conf REP=$(echo &quot;$ligne&quot; | cut -d&quot;;&quot; -f1) FIC_PATTERN=$(echo &quot;$ligne&quot; | cut -d&quot;;&quot; -f2) RETENTION=$(echo &quot;$ligne&quot; | cut -d&quot;;&quot; -f3) export VERSION=$(echo &quot;$ligne&quot; | cut -d&quot;;&quot; -f4) # on affiche la conf echo &quot;[INFO] Purge de REP=$REP FIC=$FIC_PATTERN RETENTION=$RETENTION VERSION=$VERSION&quot; # on vérifie que REP est un répertoire if test ! -d &quot;$REP&quot; -o -z &quot;$REP&quot;; then echo &quot;[ERROR] $REP n&#39;est pas un répertoire&quot; CR=`$CR + 1` continue fi # on purge # on peut tomber sur une erreur si la liste de fichier à supprimer est trop grande à cause du ls # dans ce cas, supprimer ceci de la commande find : -exec ls -1td &quot;{}&quot; + # mais vous n&#39;aurez plus l&#39;assurance d&#39;avoir garder les n $VERSION les plus vieilles export i=0 find $REP -name &quot;$FIC_PATTERN&quot; -mtime &quot;+$RETENTION&quot; -exec ls -1td &quot;{}&quot; + | while read findLine; do i=`expr $i + 1` # on garde n version de fichiers test $i -le $VERSION &amp;&amp; continue # on liste ou on purge selon DEBUG if test &quot;$DEBUG&quot; == &quot;true&quot;;then ls -ld $findLine else rm -Rf $findLine || CR=`$CR + 1` fi done done &lt; &quot;$FIC_PARAM&quot; test $CR -ne 0 &amp;&amp; echo &quot;[ERROR] Au moins une erreur dans le script de purge&quot; exit $CR" />
+<link rel="canonical" href="https://virtual-thom.github.io/archives/purge-unix/" />
+<meta property="og:url" content="https://virtual-thom.github.io/archives/purge-unix/" />
+<meta property="og:site_name" content="Virtual-Thom Blog-notes VTOM et informatique" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-02-13T20:14:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Purge shell" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Virtual Thom"},"dateModified":"2018-02-13T20:14:00+00:00","datePublished":"2018-02-13T20:14:00+00:00","description":"#!/bin/ksh # Script de purge unix # fichier de param nécessaire à passer en paramètre de ce script # 1 ligne = une conf de purge (champs séparés par des ;) # REP(chemin du répertoire);FIC_PATTERN(fichier(s) à supprimer, peut contenir des étoiles);RETENTION(en jour);VERSION(nombre de version gardée à minima - peut être 0) FIC_PARAM=$1 export CR=0 # on peut mettre DEBUG à &quot;true&quot; pour ne pas réellement purger et passer le script en simulation export DEBUG=&quot;true&quot; if ! test -s &quot;$FIC_PARAM&quot;;then echo &quot;[ERROR] Le fichier de param n&#39;existe pas ou est vide&quot; fi # on boucle sur le fichier param while read ligne ; do # on saute les lignes vides ou commentées echo &quot;$ligne&quot; | egrep &quot;^$&quot; &gt; /dev/null &amp;&amp; continue echo &quot;$ligne&quot; | egrep &quot;^#&quot; &gt; /dev/null &amp;&amp; continue # on parse la ligne de conf REP=$(echo &quot;$ligne&quot; | cut -d&quot;;&quot; -f1) FIC_PATTERN=$(echo &quot;$ligne&quot; | cut -d&quot;;&quot; -f2) RETENTION=$(echo &quot;$ligne&quot; | cut -d&quot;;&quot; -f3) export VERSION=$(echo &quot;$ligne&quot; | cut -d&quot;;&quot; -f4) # on affiche la conf echo &quot;[INFO] Purge de REP=$REP FIC=$FIC_PATTERN RETENTION=$RETENTION VERSION=$VERSION&quot; # on vérifie que REP est un répertoire if test ! -d &quot;$REP&quot; -o -z &quot;$REP&quot;; then echo &quot;[ERROR] $REP n&#39;est pas un répertoire&quot; CR=`$CR + 1` continue fi # on purge # on peut tomber sur une erreur si la liste de fichier à supprimer est trop grande à cause du ls # dans ce cas, supprimer ceci de la commande find : -exec ls -1td &quot;{}&quot; + # mais vous n&#39;aurez plus l&#39;assurance d&#39;avoir garder les n $VERSION les plus vieilles export i=0 find $REP -name &quot;$FIC_PATTERN&quot; -mtime &quot;+$RETENTION&quot; -exec ls -1td &quot;{}&quot; + | while read findLine; do i=`expr $i + 1` # on garde n version de fichiers test $i -le $VERSION &amp;&amp; continue # on liste ou on purge selon DEBUG if test &quot;$DEBUG&quot; == &quot;true&quot;;then ls -ld $findLine else rm -Rf $findLine || CR=`$CR + 1` fi done done &lt; &quot;$FIC_PARAM&quot; test $CR -ne 0 &amp;&amp; echo &quot;[ERROR] Au moins une erreur dans le script de purge&quot; exit $CR","headline":"Purge shell","mainEntityOfPage":{"@type":"WebPage","@id":"https://virtual-thom.github.io/archives/purge-unix/"},"url":"https://virtual-thom.github.io/archives/purge-unix/"}</script>
+<!-- End Jekyll SEO tag -->
+
+  
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z8Y7902GRV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Z8Y7902GRV');
+</script>
+
+
+  <body>
+    <div class="container">
+      <header id="site-header">
+  <h1>Blog-notes VTOM, informatique, industrialisation, ordonnancement, DevOps</h1>
+  <nav>
+    <ul>
+      <li>
+        <a href="https://virtual-thom.github.io/archives" title="Home">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M18.121,9.88l-7.832-7.836c-0.155-0.158-0.428-0.155-0.584,0L1.842,9.913c-0.262,0.263-0.073,0.705,0.292,0.705h2.069v7.042c0,0.227,0.187,0.414,0.414,0.414h3.725c0.228,0,0.414-0.188,0.414-0.414v-3.313h2.483v3.313c0,0.227,0.187,0.414,0.413,0.414h3.726c0.229,0,0.414-0.188,0.414-0.414v-7.042h2.068h0.004C18.331,10.617,18.389,10.146,18.121,9.88 M14.963,17.245h-2.896v-3.313c0-0.229-0.186-0.415-0.414-0.415H8.342c-0.228,0-0.414,0.187-0.414,0.415v3.313H5.032v-6.628h9.931V17.245z M3.133,9.79l6.864-6.868l6.867,6.868H3.133z"></path>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a href="https://virtual-thom.github.io/archives/vos-commentaires-livre-d-or/" title="Commentaires - livre d'or">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M17.657,2.982H2.342c-0.234,0-0.425,0.191-0.425,0.426v10.21c0,0.234,0.191,0.426,0.425,0.426h3.404v2.553c0,0.397,0.48,0.547,0.725,0.302l2.889-2.854h8.298c0.234,0,0.426-0.191,0.426-0.426V3.408C18.083,3.174,17.892,2.982,17.657,2.982M17.232,13.192H9.185c-0.113,0-0.219,0.045-0.3,0.124l-2.289,2.262v-1.96c0-0.233-0.191-0.426-0.425-0.426H2.767V3.833h14.465V13.192z M10,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.488-0.668,1.488-1.489C11.488,7.905,10.821,7.237,10,7.237 M10,9.364c-0.352,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C10.638,9.077,10.351,9.364,10,9.364 M14.254,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489s1.489-0.668,1.489-1.489C15.743,7.905,15.075,7.237,14.254,7.237 M14.254,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.352,0,0.639,0.287,0.639,0.638C14.893,9.077,14.605,9.364,14.254,9.364 M5.746,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.489-0.668,1.489-1.489C7.234,7.905,6.566,7.237,5.746,7.237 M5.746,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C6.384,9.077,6.096,9.364,5.746,9.364"></path>
+          </svg>
+        </a>
+      </li>
+      
+      <li>
+        <a href="https://virtual-thom.github.io/about" title="Curriculum Vitae Thom">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z"></path>
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+      <div itemscope itemtype ="http://schema.org/Article" class="post">
+  
+  <header class="post-header">
+    <h1 itemprop="name about headline" class="post-title">Purge shell</h1>
+    <p class="post-meta">
+      <time itemprop="datePublished dateModified" datetime="2018-02-13T20:14:00+00:00">13-02-2018</time></p>
+  </header>
+
+  <article class="post-content" itemprop="articleBody">
+    <h1 class="hidden">Purge shell</h1>
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/ksh</span>
+<span class="c"># Script de purge unix</span>
+<span class="c"># fichier de param nécessaire à passer en paramètre de ce script</span>
+<span class="c"># 1 ligne = une conf de purge (champs séparés par des ;)</span>
+<span class="c"># REP(chemin du répertoire);FIC_PATTERN(fichier(s) à supprimer, peut contenir des étoiles);RETENTION(en jour);VERSION(nombre de version gardée à minima - peut être 0)</span>
+
+<span class="nv">FIC_PARAM</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nb">export </span><span class="nv">CR</span><span class="o">=</span>0
+
+<span class="c"># on peut mettre DEBUG à "true" pour ne pas réellement purger et passer le script en simulation</span>
+<span class="nb">export </span><span class="nv">DEBUG</span><span class="o">=</span><span class="s2">"true"</span>
+
+<span class="k">if</span> <span class="o">!</span> <span class="nb">test</span> <span class="nt">-s</span> <span class="s2">"</span><span class="nv">$FIC_PARAM</span><span class="s2">"</span><span class="p">;</span><span class="k">then
+    </span><span class="nb">echo</span> <span class="s2">"[ERROR] Le fichier de param n'existe pas ou est vide"</span>
+<span class="k">fi</span>
+
+<span class="c"># on boucle sur le fichier param</span>
+<span class="k">while </span><span class="nb">read </span>ligne <span class="p">;</span> <span class="k">do</span>
+
+    <span class="c"># on saute les lignes vides ou commentées</span>
+    <span class="nb">echo</span> <span class="s2">"</span><span class="nv">$ligne</span><span class="s2">"</span> | egrep <span class="s2">"^$"</span> <span class="o">&gt;</span> /dev/null <span class="o">&amp;&amp;</span> <span class="k">continue
+    </span><span class="nb">echo</span> <span class="s2">"</span><span class="nv">$ligne</span><span class="s2">"</span> | egrep <span class="s2">"^#"</span> <span class="o">&gt;</span> /dev/null <span class="o">&amp;&amp;</span> <span class="k">continue</span>
+
+    <span class="c"># on parse la ligne de conf</span>
+    <span class="nv">REP</span><span class="o">=</span><span class="si">$(</span><span class="nb">echo</span> <span class="s2">"</span><span class="nv">$ligne</span><span class="s2">"</span> | <span class="nb">cut</span> <span class="nt">-d</span><span class="s2">";"</span> <span class="nt">-f1</span><span class="si">)</span>
+    <span class="nv">FIC_PATTERN</span><span class="o">=</span><span class="si">$(</span><span class="nb">echo</span> <span class="s2">"</span><span class="nv">$ligne</span><span class="s2">"</span> | <span class="nb">cut</span> <span class="nt">-d</span><span class="s2">";"</span> <span class="nt">-f2</span><span class="si">)</span>
+    <span class="nv">RETENTION</span><span class="o">=</span><span class="si">$(</span><span class="nb">echo</span> <span class="s2">"</span><span class="nv">$ligne</span><span class="s2">"</span> | <span class="nb">cut</span> <span class="nt">-d</span><span class="s2">";"</span> <span class="nt">-f3</span><span class="si">)</span>
+    <span class="nb">export </span><span class="nv">VERSION</span><span class="o">=</span><span class="si">$(</span><span class="nb">echo</span> <span class="s2">"</span><span class="nv">$ligne</span><span class="s2">"</span> | <span class="nb">cut</span> <span class="nt">-d</span><span class="s2">";"</span> <span class="nt">-f4</span><span class="si">)</span>
+
+    <span class="c"># on affiche la conf</span>
+    <span class="nb">echo</span> <span class="s2">"[INFO] Purge de REP=</span><span class="nv">$REP</span><span class="s2"> FIC=</span><span class="nv">$FIC_PATTERN</span><span class="s2"> RETENTION=</span><span class="nv">$RETENTION</span><span class="s2"> VERSION=</span><span class="nv">$VERSION</span><span class="s2">"</span>
+
+    <span class="c"># on vérifie que REP est un répertoire</span>
+    <span class="k">if </span><span class="nb">test</span> <span class="o">!</span> <span class="nt">-d</span> <span class="s2">"</span><span class="nv">$REP</span><span class="s2">"</span> <span class="nt">-o</span> <span class="nt">-z</span> <span class="s2">"</span><span class="nv">$REP</span><span class="s2">"</span><span class="p">;</span> <span class="k">then
+        </span><span class="nb">echo</span> <span class="s2">"[ERROR] </span><span class="nv">$REP</span><span class="s2"> n'est pas un répertoire"</span>
+        <span class="nv">CR</span><span class="o">=</span><span class="sb">`</span><span class="nv">$CR</span> + 1<span class="sb">`</span>
+        <span class="k">continue
+    fi</span>
+
+
+    <span class="c"># on purge</span>
+    <span class="c"># on peut tomber sur une erreur si la liste de fichier à supprimer est trop grande à cause du ls</span>
+    <span class="c"># dans ce cas, supprimer ceci de la commande find : -exec ls -1td "{}" +</span>
+    <span class="c"># mais vous n'aurez plus l'assurance d'avoir garder les n $VERSION les plus vieilles</span>
+    <span class="nb">export </span><span class="nv">i</span><span class="o">=</span>0
+    find <span class="nv">$REP</span> <span class="nt">-name</span> <span class="s2">"</span><span class="nv">$FIC_PATTERN</span><span class="s2">"</span> <span class="nt">-mtime</span> <span class="s2">"+</span><span class="nv">$RETENTION</span><span class="s2">"</span> <span class="nt">-exec</span> <span class="nb">ls</span> <span class="nt">-1td</span> <span class="s2">"{}"</span> + | <span class="k">while </span><span class="nb">read </span>findLine<span class="p">;</span> <span class="k">do
+        </span><span class="nv">i</span><span class="o">=</span><span class="sb">`</span><span class="nb">expr</span> <span class="nv">$i</span> + 1<span class="sb">`</span>
+        <span class="c"># on garde n version de fichiers</span>
+        <span class="nb">test</span> <span class="nv">$i</span> <span class="nt">-le</span> <span class="nv">$VERSION</span> <span class="o">&amp;&amp;</span> <span class="k">continue</span>
+
+        <span class="c"># on liste ou on purge selon DEBUG</span>
+        <span class="k">if </span><span class="nb">test</span> <span class="s2">"</span><span class="nv">$DEBUG</span><span class="s2">"</span> <span class="o">==</span> <span class="s2">"true"</span><span class="p">;</span><span class="k">then
+            </span><span class="nb">ls</span> <span class="nt">-ld</span> <span class="nv">$findLine</span>
+        <span class="k">else
+            </span><span class="nb">rm</span> <span class="nt">-Rf</span> <span class="nv">$findLine</span> <span class="o">||</span> <span class="nv">CR</span><span class="o">=</span><span class="sb">`</span><span class="nv">$CR</span> + 1<span class="sb">`</span>
+        <span class="k">fi
+    done
+
+
+done</span> &lt; <span class="s2">"</span><span class="nv">$FIC_PARAM</span><span class="s2">"</span>
+
+<span class="nb">test</span> <span class="nv">$CR</span> <span class="nt">-ne</span> 0 <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">"[ERROR] Au moins une erreur dans le script de purge"</span>
+
+<span class="nb">exit</span> <span class="nv">$CR</span>
+</code></pre></div></div>
+
+  </article>
+  
+<nav>
+  <ul class="pager">
+    
+     
+    <li class="previous">
+      <a href="https://virtual-thom.github.io/archives/checkboot-powershell/"><span aria-hidden="true">&larr;</span> Checkboot Powershell</a> 
+    </li>
+    
+     
+     <li class="next">
+      <a class="next" href="https://virtual-thom.github.io/archives/purge-log-vtom-fin-job/">Purge log VTOM en fin de traitement <span aria-hidden="true">&rarr;</span></a> 
+    </li>
+     
+    
+  </ul>
+</nav>
+
+
+  <footer class="post-footer">
+    
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>purge</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>shell</a>
+      
+    
+    <span  itemprop="author publisher" class="hidden">Virtual Thom</span>
+  </footer>
+  
+  <div id="disqus_thread" ></div>
+  <script>
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'thomas-asnar'; // required: replace example with your forum shortname
+  
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+</div>
+
+      <footer id="site-footer">
+    <div>&copy;<a href="https://github.com/virtual-thom/" title="Github Virtual-Thom">Virtual-Thom</a></div>
+    <div>
+            <a href="https://virtual-thom.github.io/archives/plan" title="Plan du site">sitemap</a> | <a href="https://virtual-thom.github.io/about" rel="publisher author" title="Curriculum vitae Thom">A propos</a>
+    </div>
+    <div>
+        <a id="goto-site-header" href="#site-header" title="Retourner au début">&uArr; Top</a>
+    </div>
+    <div id="footer-disclaimer">
+        <p>Avertissement : vous ne devez pas prendre pour argent comptant le contenu de ce site. Testez toujours la solution en environnement de test.</p>
+        <p>Malgré le sérieux que je m'efforce de mettre dans le contenu de ces billets, je ne pourrai être tenu responsable d'éventuelles erreurs que cela pourrait engendrer.</p>
+    </div>
+    <div>
+        <a class="hidden" href="https://virtual-thom.github.io/archives/sitemap.xml" title="SiteMap">sitemap</a>
+    </div>
+</footer>
+
+    </div>
+  </body>
+
+</html>

@@ -1,0 +1,10 @@
+services:
+  jekyll-buildarch:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      bundle exec jekyll build --config _config.yml
+    working_dir: /srv/jekyll
+    volumes:
+      - .:/srv/jekyll:cached

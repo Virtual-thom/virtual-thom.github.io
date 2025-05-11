@@ -1,0 +1,94 @@
+#!/usr/bin/ksh
+###############################################################################
+#=Nom fichier  : ftp_mget.sh
+#=Description  : Permet de déposer plusieurs fichiers protocole ftp
+#
+#=Usage        :
+# Le fichier ftp_get_param.ini doit contenir les clés/valeurs suivantes
+# SRV : serveur
+# USR : user
+# MDP : password
+# REP_SOURCE : répertoire source
+# FIC_PATTERN : pattern (fichiers à transférer)
+# REP_CIBLE : répertoire cible
+#
+#=Codes retour : 0=OK autres =pb
+#
+# Historique des modifications
+# Date     Auteur        Ref/Modifications/Motifs
+# -------- ------------- -------------------------------------------------------
+# 22/11/17  TA          Création
+###############################################################################
+
+#---------------------------------------
+# Variables
+
+DD=`date +"%d%m%y%H%M%S"`
+
+CR=0
+
+if [ "$#" -ne 1 ]; then
+  echo "Usage: $0 1 parametre attendu"
+  echo " le fichier ftp_mget_param.ini"
+  exit 120
+fi
+
+if [ ! -f "$1" ];then
+        echo "Le fichier $1  n'existe pas"
+        exit 121
+fi
+
+# On source le fichie param.ini
+. $1
+
+LOG=/tmp/`basename $0 .sh`_${DD}.log
+
+Log ()
+{
+HEURE=`date +"%d.%m.%y-%H:%M:%S"`
+echo ${HEURE}" $@" >>${LOG}
+# rajout dans sortie standard pour VTOM
+echo ${HEURE}" $@"
+}
+
+mget_ftp()
+{
+
+ftp -inv $SRV << END_SCRIPT > $LOG
+quote USER $USR
+quote PASS $MDP
+cd $REP_SOURCE
+lcd $REP_CIBLE
+binary
+mget $FIC_PATTERN
+bye
+END_SCRIPT
+
+cat $LOG
+
+NB_TRANSFER_COMPLETE=`grep "226 Transfer complete" ${LOG} | wc -l | sed 's/ //g'`
+NB_FIC_A_TRANSFER=`ls -1 ${REP_CIBLE}/${FIC_PATTERN} | wc -l | sed 's/ //g'`
+if test "${NB_TRANSFER_COMPLETE}" -ne "${NB_FIC_A_TRANSFER}";then
+        return 123
+fi
+return 0
+}
+
+#### Debut ###
+
+Log "Debut script"
+
+mget_ftp
+CR=$?
+if [ $CR -ne  0 ]
+then
+  Log "Pb de depot"
+  Log "Voir dans la log : $LOG"
+  Log "Exit -> ${CR}"
+  exit $CR
+fi
+
+rm ${LOG}
+
+exit $CR
+

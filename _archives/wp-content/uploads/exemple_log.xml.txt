@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="#stylesheet" type="text/xsl"?>
+
+<!DOCTYPE xsl:stylesheet [
+<!ATTLIST xsl:stylesheet
+id	ID	#REQUIRED>
+]>
+
+<!-- balises de transformation xsl -->
+<xsl:stylesheet version="2.0" id="stylesheet"  xmlns:data="localhost" 
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:output method="html" indent="yes"/>
+
+<!-- définition du template principal avec le rendu html -->
+<xsl:template match="/">
+<html>
+<head>
+<title>Rapport log d execution job VTOM</title>
+<style type="text/css">
+h1 a {
+	background-color : #339933 ;
+	border : 1pt solid black ;
+	margin : 0 0 0 10pt ; 
+	padding : 2pt ;
+}
+h2 a {
+	background-color : #33FF66 ;
+	border : 1pt solid black ;
+	margin : 0 0 0 20pt ;
+	padding : 2pt ;
+}
+div.in{	
+	border: inset 5pt green;
+}
+div.pair{
+	border: outset 5pt green; 
+    border-collapse: separate;
+    border-spacing: 5pt ;
+	margin : 0 0 10pt 0 ;
+	background-color: #33FF66 ;
+}
+div.impair{
+	border: outset 5pt green; 
+    border-collapse: separate;
+    border-spacing: 5pt ;
+	margin : 0 0 10pt 0 ;
+	background-color: #339933 ;
+}
+div.erreur1{
+	border: outset 5pt red; 
+    border-collapse: separate;
+    border-spacing: 5pt ;
+	margin : 0 0 10pt 0 ;
+	background-color: brown ;
+}
+div.erreur2{
+	border: outset 5pt red; 
+    border-collapse: separate;
+    border-spacing: 5pt ;
+	margin : 0 0 10pt 0 ;
+	background-color: coral ;
+}
+div.encours1{
+	border: outset 5pt aqua; 
+    border-collapse: separate;
+    border-spacing: 5pt ;
+	margin : 0 0 10pt 0 ;
+	background-color: blue ;
+}
+div.encours2{
+	border: outset 5pt aqua; 
+    border-collapse: separate;
+    border-spacing: 5pt ;
+	margin : 0 0 10pt 0 ;
+	background-color: aqua ;
+}
+div.logok{
+	border : 1pt solid black ;
+	margin : 5pt ; 
+	padding : 10pt ;
+}
+div.logok a{
+	font : 12pt ;
+	color : lawngreen ;
+	text-decoration : underline ;
+	background-color : darkgreen ;
+	padding : 5 pt ;
+}
+div.logko {
+	border : 1pt solid black ;
+	margin : 5pt ; 
+	padding : 10pt ;
+}
+div.logko a{
+	text-decoration : underline ;
+	color : red ;
+	background-color : yellow ;
+	padding : 5 pt ;
+}
+</style>
+</head>
+<body>
+<!-- appel des templates qui vont chercher dans les datas (les logs) --> 
+<xsl:apply-templates select="/xsl:stylesheet/data:data" />
+</body>
+</html>
+</xsl:template>
+
+
+<xsl:template match="/xsl:stylesheet/data:data">
+<!--
+    Ce premier appel de template va définir le layout de l'état de l'enregistrement
+    1 row = un log d'exécution
+-->
+
+<xsl:if test="count(row) = 0"> 
+<a>Aucun traitement</a> 
+</xsl:if>
+
+<!-- JOBS EN COURS
+     j'ai défini dans mon script
+     que les jobs en cours ont un exit 321321
+-->
+<xsl:for-each select="row[exit = 321321]">
+<!-- le modulo est juste là pour faire une couleur un peu différente 
+     si plusieurs enregistrements de même type sont à la suite -->
+<xsl:choose>
+<xsl:when test="position() mod 2 = 0" >
+<div class="encours1">
+<div class="in">
+<!-- appel du template pour le contenu du log -->
+<xsl:call-template name="rapport" />
+</div>
+</div>
+</xsl:when>
+<xsl:otherwise>
+<div class="encours2">
+<div class="in">
+<!-- appel du template pour le contenu du log -->
+<xsl:call-template name="rapport" />
+</div>
+</div>
+</xsl:otherwise>
+</xsl:choose>
+</xsl:for-each> <!-- fin des row EN COURS -->
+
+
+<!-- JOB EN ERREUR -->
+<xsl:for-each select="row[exit != 0 and exit != 321321]">
+
+<xsl:choose>
+<xsl:when test="position() mod 2 = 0" >
+<div class="erreur1">
+<div class="in">
+<xsl:call-template name="rapport" />
+</div>
+</div>
+</xsl:when>
+<xsl:otherwise>
+<div class="erreur2">
+<div class="in">
+<xsl:call-template name="rapport" />
+</div>
+</div>
+</xsl:otherwise>
+</xsl:choose>
+</xsl:for-each> <!-- fin des row EN ERREUR -->
+
+<!-- JOB TERMINES -->
+<xsl:for-each select="row[exit = 0]">
+
+<xsl:choose>
+<xsl:when test="position() mod 2 = 0" >
+<div class="pair">
+<div class="in">
+<xsl:call-template name="rapport" />
+</div>
+</div>
+</xsl:when>
+<xsl:otherwise>
+<div class="impair">
+<div class="in">
+<xsl:call-template name="rapport" />
+</div>
+</div>
+</xsl:otherwise>
+</xsl:choose>
+</xsl:for-each> <!-- fin des row TERMINES -->
+
+</xsl:template> <!-- fin du template des datas -->
+
+<!-- appel du template pour le contenu du log -->
+<xsl:template name="rapport">
+<h1><a>Application : <xsl:value-of select="app" /></a></h1>
+<h2><a>Traitement : <xsl:value-of select="job" /></a></h2>
+<div class="logok">
+<a>Log d'execution : sortie standard : </a><br />
+<pre>
+<xsl:value-of select="logok" />
+</pre>
+</div>
+<div class="logko">
+<a>Log d'execution : sortie en erreur : </a><br />
+<pre>
+<xsl:value-of select="logko" />
+</pre>
+</div>
+</xsl:template> <!-- fin du template rapport -->
+
+<!-- les datas, les logs d'exécutions 
+     1 row = 1 enregistrement
+     1 enregistrement = nom de l'application et job, le n°exit
+                        les logs d'exécution
+-->
+<data:data>
+	<row>
+		<app>
+		 APPLICATION_1
+		</app>
+		<job>
+		 TRAITEMENT_1
+		</job>
+		<exit>
+		0
+		</exit>
+		<logok>
+_______________________________________________________________________
+Contexte Visual TOM du traitement
+ 
+Machine             : machine-la01
+Utilisateur         : root
+Script              : /path/monscript.sh
+Shell               : /bin/ksh
+Serveur Visual TOM  : serveur-vtom
+ 
+Traitement          : TRAITEMENT_1
+Application         : APPLICATION_1
+Environnement       : ENVIRONNEMENT_A
+Job ID              : 3348
+Nombre de relances  : 0
+Label de reprise    : 0
+Mode Execution      : NORMAL
+Date d'exploitation : DATE_PROD
+Valeur de la date   : 31/08/2012
+_______________________________________________________________________
+vendredi 31/08/2012 - 04:29:58
+ Debut de l'execution du script ...
+_______________________________________________________________________
+  
+  LUKE aime LEIA sortie standard
+_______________________________________________________________________
+vendredi 31/08/2012 - 04:30:59
+Fin de l'execution du script.
+ 
+--&gt; Exit [0] donc acquitement
+		</logok>
+		<logko>
+		</logko>
+	</row>
+	<row>
+		<app>
+		 APPLICATION_1
+		</app>
+		<job>
+		 TRAITEMENT_2
+		</job>
+		<exit>
+		123
+		</exit>
+		<logok>
+_______________________________________________________________________
+Contexte Visual TOM du traitement
+ 
+Machine             : machine-la01
+Utilisateur         : root
+Script              : /path/monscript.sh
+Shell               : /bin/ksh
+Serveur Visual TOM  : serveur-vtom
+ 
+Traitement          : TRAITEMENT_2
+Application         : APPLICATION_1
+Environnement       : ENVIRONNEMENT_A
+Job ID              : 3349
+Nombre de relances  : 0
+Label de reprise    : 0
+Mode Execution      : NORMAL
+Date d'exploitation : DATE_PROD
+Valeur de la date   : 31/08/2012
+_______________________________________________________________________
+vendredi 31/08/2012 - 04:29:58
+ Debut de l'execution du script ...
+_______________________________________________________________________
+  
+  LUKE aime LEIA sortie standard
+_______________________________________________________________________
+vendredi 31/08/2012 - 04:30:59
+Fin de l'execution du script.
+ 
+--&gt; Exit [123] donc acquitement
+		</logok>
+		<logko>
+		JE SUIS TON PERE sortie erreur
+		</logko>
+	</row>
+	<row>
+		<app>
+		 APPLICATION_1
+		</app>
+		<job>
+		 TRAITEMENT_3
+		</job>
+		<exit>
+		321321
+		</exit>
+		<logok>
+_______________________________________________________________________
+Contexte Visual TOM du traitement
+ 
+Machine             : machine-la01
+Utilisateur         : root
+Script              : /path/monscript.sh
+Shell               : /bin/ksh
+Serveur Visual TOM  : serveur-vtom
+ 
+Traitement          : TRAITEMENT_3
+Application         : APPLICATION_1
+Environnement       : ENVIRONNEMENT_A
+Job ID              : 3350
+Nombre de relances  : 0
+Label de reprise    : 0
+Mode Execution      : NORMAL
+Date d'exploitation : DATE_PROD
+Valeur de la date   : 31/08/2012
+_______________________________________________________________________
+vendredi 31/08/2012 - 04:29:58
+ Debut de l'execution du script ...
+_______________________________________________________________________
+  
+  LUKE aime ...
+		</logok>
+		<logko>
+		</logko>
+	</row>
+</data:data> <!-- fin des datas -->
+</xsl:stylesheet> <!-- fin du fichier xml -->
+

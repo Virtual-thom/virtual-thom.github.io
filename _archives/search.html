@@ -1,0 +1,66 @@
+---
+layout: default
+title: "Recherche VTOM"
+description: "Moteur de recherche sur le site virtual-thom"
+---
+<script>
+  (function() {
+    var cx = '018119522205008003437:yfgzbfgxepc';
+    var gcse = document.createElement('script');
+    gcse.type = 'text/javascript';
+    gcse.async = true;
+    gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(gcse, s);
+  })();
+</script>
+<gcse:search></gcse:search>
+<style>.gsib_a{padding:0}</style>
+
+<div class="mb-4">
+  <label class="block text-gray-700 text-sm font-bold mb-2" for="recherche">
+    Recherche via le feed.xml Jekyll (<a href="/comment-rechercher-des-mots-site-jekyll-javascript/" title="search js jekyll feed.xml">voir le post ici</a>)
+  </label>
+  <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="recherche" type="text" placeholder="Recherche">
+</div>
+<div id="result" class="p-4 rounded">
+
+</div>
+<script type="text/javascript">
+document.querySelector("head").innerHTML = document.querySelector("head").innerHTML + '<link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">'
+
+function buildResult(arr, textToMatch){
+  let res = document.querySelector("#result")
+  res.innerHTML = ""
+  arr.forEach(item => {
+    let resMatch = "(...) " +  item.textContent.slice(item.textContent.indexOf(textToMatch) - 100, item.textContent.indexOf(textToMatch))
+    resMatch += "<span class='font-bold'>" +  item.textContent.slice(item.textContent.indexOf(textToMatch), item.textContent.indexOf(textToMatch) + textToMatch.length) + "</span>"
+    resMatch += item.textContent.slice(item.textContent.indexOf(textToMatch) + textToMatch.length, item.textContent.indexOf(textToMatch) + textToMatch.length + 100) + "(...)"
+    let resCard = document.createElement("div")
+    resCard.classList.add("mb-4", "p-4", "rounded", "border")
+    let resLink = item.innerHTML.slice(
+      item.innerHTML.indexOf("<link>") + 6, 
+      item.innerHTML.indexOf("</link>"), 
+    )
+    resCard.innerHTML = `<a href="${resLink}" class="font-bold">${resLink}</a>
+        <p>
+          ${resMatch}
+        </p>`
+    res.append(resCard)
+  })
+}
+
+// events search
+document.querySelector("#recherche").addEventListener('keyup',function(e){
+  fetch("/feed.xml")
+  .then(r => r.text())
+  .then(xmlAsText => {
+    let responseDoc = new DOMParser().parseFromString(xmlAsText, 'application/xml')
+    buildResult(
+      Array.from(responseDoc.getElementsByTagName('item'))
+      .filter(item => item.textContent.match(e.target.value))
+      , e.target.value
+    )
+  })
+})
+</script>

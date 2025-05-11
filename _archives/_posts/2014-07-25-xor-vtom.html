@@ -1,0 +1,34 @@
+---
+layout: post
+title: Comment faire un XOR VTOM logique
+date: 2014-07-25 18:17
+author: Virtual Thom
+comments: true
+categories: [Ordonnancement, Visual TOM, VTOM, VTOM, xor]
+---
+<p>Ca n'arrive pas souvent mais on peut avoir besoin de jouer un traitement que si un des deux parents est terminé, mais pas les deux (XOR ou ou exclusif, je ne joue le fils C que si le père A ou B est terminé, mais pas les deux).
+Petite démo XOR VTOM en image.
+</p>
+<!--more-->
+<pre>Logique :
+Table de vérité de XOR
+A	B	R = A ⊕ B
+0	0	0
+0	1	1
+1	0	1
+1	1	0
+</pre>
+<a href="http://fr.wikipedia.org/wiki/Xor" title="XOR Wikipédia">source Wikipédia XOR</a>
+
+<p>VTOM :
+AcceptOrItems=1 (dans le vtom.ini)</p>
+<pre>
+A                     B
+
+<span style="text-decoration: line-through;">A</span>B                  A<span style="text-decoration: line-through;">B</span>
+
+OR_C
+
+C
+</pre>
+<a href=" /wp-content/uploads/xor_vtom.jpg"><img  src=" /wp-content/uploads/xor_vtom-300x239.jpg" alt="xor_vtom"/></a>

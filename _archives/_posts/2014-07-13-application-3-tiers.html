@@ -1,0 +1,25 @@
+---
+layout: post
+title: Application n tiers
+date: 2014-07-13 16:00
+author: Virtual Thom
+categories: [application, application, architecture, n-tiers, Ordonnancement, SAN, Stockage, Système d'information, Visual TOM, VTOM]
+---
+<p >&Agrave; force de travailler dans des domaines bien spécifiques (entreprise scindée en plusieurs cellules, aux métiers de production informatique bien différents, avec leurs propres missions), on ne sait plus très bien ce que font nos collègues (et vice versa, c'est ça d'avoir toujours la tête dans le guidon !).
+Comme j'aime m'intéresser à tous les aspects d'une production informatique, je me suis renseigné auprès de mes camarades sur l'architecture générale de nos Systèmes d'Information (SI).</p>
+<p >N'ayant à la bouche que cette "application 3 Tiers", j'ai décidé d'investiguer et me suis amusé à dessiner un schéma. J'ai pris pour exemple le Système d'Information de la Maintenance de l'Armée de Terre (SIM@T).</p>
+<!--more-->
+<p >La structure de SIM@T est basée sur une application 3 tiers. C’est un modèle logique d’architecture applicative qui scinde une application en trois couches dont les rôles sont clairement définis :</p>
+
+<ul>
+	<li>présentation des données : c’est le portail,</li>
+	<li>traitement métier des données par les serveurs applicatifs,</li>
+	<li>accès aux données par le Système de Gestion de base de données (SGBD).</li>
+</ul>
+<p ><a class="thumbnail" href=" /wp-content/uploads/application-3-tiers.jpg"><img src="{{ site.baseurl | prepend: site.url }}/wp-content/uploads/application-3-tiers-1024x720.jpg" alt="application-3-tiers"/></a></p>
+<p >Mon domaine d’exploitation (entouré de pointillés) est centré sur un ensemble de matériels et d’applications transverses. Ces dernières permettent la viabilité de l’application SIM@T :</p>
+<ul>
+	<li>le stockage en constitue le socle grâce à son architecture en constante consolidation</li>
+	<li>la sauvegarde en assure la pérennité en sécurisant les données</li>
+	<li>l'ordonnanceur VTOM libère les services d’exploitation en automatisant les tâches répétitives techniques, applicatives ou fonctionnelles</li>
+</ul>

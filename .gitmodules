@@ -1,0 +1,3 @@
+[submodule "vthom-don-btcpay-wordpress"]
+	path = vthom-don-btcpay-wordpress
+	url = https://github.com/Virtual-thom/vthom-don-btcpay-wordpress.git

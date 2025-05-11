@@ -1,0 +1,180 @@
+<html lang=fr">
+<head>
+<meta charset="utf-8" />
+</head>
+<body>
+
+<button id="refresh-button">Refresh</button>
+<table id="list-jobs"></table>
+
+<script>
+// Variables Globales
+var serveurVtom = "http://192.168.99.100:30080" ; // just an example, here my docker machine IP running my vtom container
+var authVtom = "VE9NOlRPTQ==" ; //base64 user:password, here TOM:TOM
+var itemsVtom = [ "environment", "application", "job", "date", "host", "queue" ] ; 
+itemsVtom.forEach(function(item){
+	eval("window.API_" + item + "_LIST = null ;") ;
+});
+
+
+// Fonctions
+function findItemById(source, id){
+    return source.filter(function( obj ) {
+        return obj.id == id;
+    })[ 0 ];
+}
+
+function debutAffichage(){
+	
+	window.API_job_LIST.result.forEach(function(entry){
+		var application = findItemById(window.API_application_LIST.result, entry.applicationSId) ;
+		var environment = findItemById(window.API_environment_LIST.result, application.environmentSId) ;
+		var host = findItemById(window.API_host_LIST.result, entry.host) ;
+		if(!host){
+			var host = findItemById(window.API_host_LIST.result, application.host) ;
+			if(!host){
+				var host = findItemById(window.API_host_LIST.result, environment.host) ;
+			}
+		}
+		var dateVtom = findItemById(window.API_date_LIST.result, entry.date) ;
+		if(!dateVtom){
+			var dateVtom = findItemById(window.API_date_LIST.result, application.date) ;
+			if(!dateVtom){
+				var dateVtom = findItemById(window.API_date_LIST.result, environment.date) ;
+			}
+		}
+		var queue = findItemById(window.API_queue_LIST.result, entry.queue) ;
+		if(!queue){
+			var queue = findItemById(window.API_queue_LIST.result, application.queue) ;
+			if(!queue){
+				var queue = findItemById(window.API_queue_LIST.result, environment.queue) ;
+			}
+		}
+		
+		var tableListJobs = document.querySelector('table#list-jobs') ;
+		var this_tr = document.createElement("tr");
+		this_tr.innerHTML = "<td>" + environment.name + "</td>" +
+			"<td>" + application.name + "</td>" +
+			"<td>" + entry.name + "</td>" +
+			"<td>" + dateVtom.name + "</td>" +
+			"<td>" + queue.name + "</td>" +
+			"<td>" + host.name + "</td>" +
+			"<td>" + entry.Script + "</td>" ;
+
+		if(entry.Parameters){
+			this_tr.innerHTML = this_tr.innerHTML + "<td>" ;
+			entry.Parameters.forEach(function(parameter){
+				this_tr.innerHTML = this_tr.innerHTML + parameter + "<br>" ;
+			});
+			this_tr.innerHTML = this_tr.innerHTML + "</td>" ;
+		}
+
+		tableListJobs.appendChild(this_tr);
+	}); //eof foreach job list
+
+} // eof debutAffichage
+
+function getItemsVtom(){
+	if(typeof(Storage) !== "undefined") {
+		var isAllItemsInStorage = true ;
+		itemsVtom.forEach(function(item){
+			if(sessionStorage["API_"+item+"_LIST"]){
+				eval('window.API_'+item+'_LIST = JSON.parse(sessionStorage.getItem("API_'+item+'_LIST")) ;') ;
+			}else{
+				isAllItemsInStorage = false ;
+			}
+
+		});
+		if(! isAllItemsInStorage){
+			getItemsVtomAPI() ;
+		}
+
+	}else{
+		getItemsVtomAPI() ;
+	}
+} // eof getItemsVtom
+
+function removeItemsFromSessionStorage(){
+	itemsVtom.forEach(function(item){
+		sessionStorage.removeItem("API_"+item+"_LIST");
+	});
+}
+
+// http://www.html5rocks.com/en/tutorials/cors/
+// cross domain 
+function getItemsVtomAPI(){
+  
+ itemsVtom.forEach(function(item){
+
+	eval('var xhr'+item+' = new XMLHttpRequest();') ; 
+	var strCode = 'xhr'+item+'.onreadystatechange = function(){' + 
+	      'var status = xhr'+item+'.status;' +
+
+	      'if (status == 200) {'+
+		'if(xhr'+item+'.response != null) {' +
+			'window.API_'+item+'_LIST = xhr'+item+'.response ;' +
+			'if(typeof(Storage) !== "undefined") {' +
+				'sessionStorage.setItem("API_'+item+'_LIST",JSON.stringify(window.API_'+item+'_LIST)) ;' +
+			'}' +
+		'}' + 
+	      '}' +
+
+	'}' ;
+	eval(strCode);
+	eval('xhr'+item+".open('GET', serveurVtom + '/api/"+item+"/getAll',true);") ;
+	eval('xhr'+item+".responseType = 'json';") ;
+	eval('xhr'+item+".setRequestHeader('Authorization', 'Basic ' + authVtom);");
+	eval('xhr'+item+'.send();') ;
+ });
+
+} // eof getItemsVtomAPI
+
+// On récupère les items
+getItemsVtom() ;
+
+function _isAllItemsLoaded(){
+
+ console.log((new Date()).getTime()); // debug to make sure we pass through this
+ 
+ var isAllItemsLoaded = true ;
+ itemsVtom.forEach(function(item){
+  
+	if(eval('window.API_'+item+'_LIST') == null){
+		isAllItemsLoaded = false ;
+	}else if(eval('window.API_'+item+'_LIST.rc') == 4){
+		isAllItemsLoaded = false ;
+    console.log(eval('window.API_'+item+'_LIST.errmsg')) ;
+    clearInterval(window.intervalDebutAffichage);
+  }
+ });
+ if( isAllItemsLoaded )
+ { 
+  console.log("loaded"); // debug to make sure we pass through this 
+	clearInterval(window.intervalDebutAffichage);
+	debutAffichage();
+  return true ;
+ }else{
+  return false ; 
+ }  
+}
+if(! _isAllItemsLoaded()){ // si les items ne sont pas chargés au démarrage, on lance une boucle interval
+  // On vérifie qu'on a bien chargé toutes les données, on affiche quand c'est ok
+  window.intervalDebutAffichage = setInterval(_isAllItemsLoaded,1000); 
+
+  // quoi qu'il arrive on sort de la boucle au bout de x secondes
+  setTimeout(function(){ 
+    clearInterval(window.intervalDebutAffichage);
+  }, 60000);
+}
+
+// Events
+
+// Refresh data
+document.querySelector('#refresh-button').addEventListener('click',function(e){
+	removeItemsFromSessionStorage();
+	window.location = window.location ;	
+}) ;
+
+</script>
+</body>
+</html>

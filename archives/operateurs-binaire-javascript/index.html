@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="apple-touch-icon" href="https://virtual-thom.github.io/archives/apple-touch-icon.png">
+  <link rel="icon" href="https://virtual-thom.github.io/archives/favicon.ico" />
+  <!-- Remplacé par Jekyll SEO (sinon apparait en double)
+  <title>Opérateurs binaire exemple concret</title>
+  <meta name="description" content="Une vidéo de Grafikart m’a inspiré pour un besoin que j’avais en javascript pour stocker en base les horaires cron des utilisateurs pour déclencher des alarm...">
+  --> 
+  
+  <link rel="canonical" href="https://virtual-thom.github.io/archives/operateurs-binaire-javascript/">
+  
+  <link rel="stylesheet" media="screen" href="https://virtual-thom.github.io/archives/assets/main.css">
+  
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Opérateurs binaire exemple concret | Virtual-Thom Blog-notes VTOM et informatique</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Opérateurs binaire exemple concret" />
+<meta name="author" content="Virtual Thom" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Une vidéo de Grafikart m’a inspiré pour un besoin que j’avais en javascript pour stocker en base les horaires cron des utilisateurs pour déclencher des alarmes. // ex. Le nombre binaire 000000000000000001000000 est équivalent à l&#39;entier 64. // getChoices(64) donnera donc [ 7 ] // Le nombre binaire 000000000000000001000001 est équivalent à l&#39;entier 65. // getChoices(65) donnera donc [ 1, 7 ] function getChoices(number) { let choices = []; let position = 1; while (number &gt; 0) { // Si le bit de poids faible est 1, ajoutez la position à la liste des choix if ((number &amp; 1) === 1) { choices.push(position); } // Décalez les bits vers la droite et passez à la position suivante number &gt;&gt;= 1; position++; } return choices; } // fonction inverse, on donne le tableau en entrée pour donner l&#39;entier correspondants des heures // getNumber( [1, 7] ) donnera 65 function getNumber(choices) { let number = 0; for (let i = 0; i &lt; choices.length; i++) { let position = choices[i]; // Définir le bit à la position spécifiée à 1 number |= 1 &lt;&lt; (position - 1); } return number; } Les sources : Lien MDN Javascript Grafikart opérateurs binaires Opérateurs binairesUn opérateur binaire traite les opérandes comme des suites de 32 bits (des zéros ou des uns) plutôt que comme des nombres décimaux, hexadécimaux et octaux. Ainsi, le nombre décimal 9 se représente en binaire comme 1001. Les opérateurs binaires effectuent leur opération sur des représentations binaires et renvoient des valeurs numériques. Le tableau qui suit détaille les opérateurs binaires JavaScript. Opérateur Utilisation Description ET binaire a &amp; b Renvoie un à chaque position pour laquelle les bits des deux opérandes valent un. OU binaire a | b Renvoie un zéro à chaque position pour laquelle les bits des deux opérandes valent zéro. OU exclusif binaire a ^ b Renvoie un zéro à chaque position pour laquelle les bits sont les mêmes. [Renvoie un à chaque position où les bits sont différents.] NON binaire ~ a Inverse les bits de l&#39;opérande. Décalage à gauche a &lt;&lt; b Décale la représentation binaire de a de b bits vers la gauche, en ajoutant des zéros à droite. Décalage à droite avec propagation du signe a &gt;&gt; b Décale la représentation binaire de a de b bits vers la droite, enlevant les bits en trop. Décalage à droite avec remplissage à zéro a &gt;&gt;&gt; b Décale la représentation binaire de a de b bits vers la droite, enlevant les bits en trop et en ajoutant des zéros à gauche. Opérateurs binaires logiquesLes opérateurs logiques binaires fonctionnent de la façon suivante&nbsp;: Les opérandes sont convertis en entiers sur 32 bits. Pour les nombres dont la valeur binaire dépasse 32 bits, les bits les plus hauts sont abandonnés. Ainsi, l&#39;entier suivant sur plus de 32 bits sera converti en entier sur 32 bits&nbsp;: Avant : 1110 0110 1111 1010 0000 0000 0000 0110 0000 0000 0001 Après : 1010 0000 0000 0000 0110 0000 0000 0001 Chaque bit du premier opérande est associé au bit correspondant du second opérande&nbsp;: le premier bit avec le premier bit, le second avec le second et ainsi de suite. L&#39;opérateur est appliqué sur chaque paire ainsi constituée et le résultat est construit en binaire. Par exemple, la représentation binaire du nombre décimal 9 est 1001, et celle du nombre décimal 15 est 1111. Aussi, quand on utilise les opérateurs binaires sur ces valeurs, on a les résultats suivants&nbsp;: Expression Résultat Description binaire 15 &amp; 9 9 1111 &amp; 1001 = 1001 15 | 9 15 1111 | 1001 = 1111 15 ^ 9 6 1111 ^ 1001 = 0110 ~15 -16 ~ 0000 0000 … 0000 1111 = 1111 1111 … 1111 0000 ~9 -10 ~ 0000 0000 … 0000 1001 = 1111 1111 … 1111 0110 On notera que tous les 32 bits sont inversés lors de l&#39;utilisation de l&#39;opérateur NON binaire et que les valeurs avec le bit le plus à gauche à 1 représentent des valeurs négatives (représentation en complément à deux). Aussi, l&#39;évaluation de ~x fournira la même valeur que -x - 1. Opérateurs de décalage binaireLes opérateurs de décalage binaire utilisent deux opérandes&nbsp;: celui de gauche est la quantité sur laquelle effectuer le décalage et celui de droite indique le nombre de bits à décaler. La direction de l&#39;opération de décalage dépend de l&#39;opérateur utilisé. Les opérateurs de décalage convertissent leurs opérandes en entiers sur 32 bits et renvoient un résultat de type Number ou BigInt selon la règle suivante&nbsp;: si l&#39;opérande gauche est de type BigInt, la valeur de retour sera de type BigInt et sinon, la valeur de retour sera de type Number. Les opérateurs de décalage sont listés dans le tableau suivant. Opérateurs de décalage binaire Opérateur Description Exemple Décalage à gauche (&lt;&lt;) Cet opérateur décale la valeur du premier opérande du nombre de bits indiqué vers la gauche. Les bits en trop sont abandonnés et des bits à 0 sont ajoutés sur la droite. 9&lt;&lt;2 donne 36, car 1001, décalé de 2 bits à gauche vaut 100100 en binaire, ce qui correspond à 36 en décimal. Décalage à droite avec propagation du signe (&gt;&gt;) Cet opérateur décale la valeur du premier opérande du nombre de bits indiqué vers la droite. Les bits en trop à droite sont abandonnés. Des copies du bit le plus à gauche sont ajoutés sur la gauche. 9&gt;&gt;2 donne 2, car 1001 décalé de 2 bits à droite vaut 10 en binaire, ce qui correspond à 2 en décimal. De même, -9&gt;&gt;2 donne -3, car le signe est conservé. Décalage à droite avec remplissage à zéro (&gt;&gt;&gt;) Cet opérateur décale la valeur du premier opérande du nombre de bits indiqué vers la droite. Les bits en trop à droite sont abandonnés. Des bits à zéro sont ajoutés sur la gauche. 19&gt;&gt;&gt;2 donne 4, car 10011 décalé de deux bits à droite devient 100 en binaire, ce qui vaut 4 en décimal. Pour les valeurs positives, le décalage à droite avec remplissage à zéro et le décalage à droite avec propagation du signe fourniront le même résultat." />
+<meta property="og:description" content="Une vidéo de Grafikart m’a inspiré pour un besoin que j’avais en javascript pour stocker en base les horaires cron des utilisateurs pour déclencher des alarmes. // ex. Le nombre binaire 000000000000000001000000 est équivalent à l&#39;entier 64. // getChoices(64) donnera donc [ 7 ] // Le nombre binaire 000000000000000001000001 est équivalent à l&#39;entier 65. // getChoices(65) donnera donc [ 1, 7 ] function getChoices(number) { let choices = []; let position = 1; while (number &gt; 0) { // Si le bit de poids faible est 1, ajoutez la position à la liste des choix if ((number &amp; 1) === 1) { choices.push(position); } // Décalez les bits vers la droite et passez à la position suivante number &gt;&gt;= 1; position++; } return choices; } // fonction inverse, on donne le tableau en entrée pour donner l&#39;entier correspondants des heures // getNumber( [1, 7] ) donnera 65 function getNumber(choices) { let number = 0; for (let i = 0; i &lt; choices.length; i++) { let position = choices[i]; // Définir le bit à la position spécifiée à 1 number |= 1 &lt;&lt; (position - 1); } return number; } Les sources : Lien MDN Javascript Grafikart opérateurs binaires Opérateurs binairesUn opérateur binaire traite les opérandes comme des suites de 32 bits (des zéros ou des uns) plutôt que comme des nombres décimaux, hexadécimaux et octaux. Ainsi, le nombre décimal 9 se représente en binaire comme 1001. Les opérateurs binaires effectuent leur opération sur des représentations binaires et renvoient des valeurs numériques. Le tableau qui suit détaille les opérateurs binaires JavaScript. Opérateur Utilisation Description ET binaire a &amp; b Renvoie un à chaque position pour laquelle les bits des deux opérandes valent un. OU binaire a | b Renvoie un zéro à chaque position pour laquelle les bits des deux opérandes valent zéro. OU exclusif binaire a ^ b Renvoie un zéro à chaque position pour laquelle les bits sont les mêmes. [Renvoie un à chaque position où les bits sont différents.] NON binaire ~ a Inverse les bits de l&#39;opérande. Décalage à gauche a &lt;&lt; b Décale la représentation binaire de a de b bits vers la gauche, en ajoutant des zéros à droite. Décalage à droite avec propagation du signe a &gt;&gt; b Décale la représentation binaire de a de b bits vers la droite, enlevant les bits en trop. Décalage à droite avec remplissage à zéro a &gt;&gt;&gt; b Décale la représentation binaire de a de b bits vers la droite, enlevant les bits en trop et en ajoutant des zéros à gauche. Opérateurs binaires logiquesLes opérateurs logiques binaires fonctionnent de la façon suivante&nbsp;: Les opérandes sont convertis en entiers sur 32 bits. Pour les nombres dont la valeur binaire dépasse 32 bits, les bits les plus hauts sont abandonnés. Ainsi, l&#39;entier suivant sur plus de 32 bits sera converti en entier sur 32 bits&nbsp;: Avant : 1110 0110 1111 1010 0000 0000 0000 0110 0000 0000 0001 Après : 1010 0000 0000 0000 0110 0000 0000 0001 Chaque bit du premier opérande est associé au bit correspondant du second opérande&nbsp;: le premier bit avec le premier bit, le second avec le second et ainsi de suite. L&#39;opérateur est appliqué sur chaque paire ainsi constituée et le résultat est construit en binaire. Par exemple, la représentation binaire du nombre décimal 9 est 1001, et celle du nombre décimal 15 est 1111. Aussi, quand on utilise les opérateurs binaires sur ces valeurs, on a les résultats suivants&nbsp;: Expression Résultat Description binaire 15 &amp; 9 9 1111 &amp; 1001 = 1001 15 | 9 15 1111 | 1001 = 1111 15 ^ 9 6 1111 ^ 1001 = 0110 ~15 -16 ~ 0000 0000 … 0000 1111 = 1111 1111 … 1111 0000 ~9 -10 ~ 0000 0000 … 0000 1001 = 1111 1111 … 1111 0110 On notera que tous les 32 bits sont inversés lors de l&#39;utilisation de l&#39;opérateur NON binaire et que les valeurs avec le bit le plus à gauche à 1 représentent des valeurs négatives (représentation en complément à deux). Aussi, l&#39;évaluation de ~x fournira la même valeur que -x - 1. Opérateurs de décalage binaireLes opérateurs de décalage binaire utilisent deux opérandes&nbsp;: celui de gauche est la quantité sur laquelle effectuer le décalage et celui de droite indique le nombre de bits à décaler. La direction de l&#39;opération de décalage dépend de l&#39;opérateur utilisé. Les opérateurs de décalage convertissent leurs opérandes en entiers sur 32 bits et renvoient un résultat de type Number ou BigInt selon la règle suivante&nbsp;: si l&#39;opérande gauche est de type BigInt, la valeur de retour sera de type BigInt et sinon, la valeur de retour sera de type Number. Les opérateurs de décalage sont listés dans le tableau suivant. Opérateurs de décalage binaire Opérateur Description Exemple Décalage à gauche (&lt;&lt;) Cet opérateur décale la valeur du premier opérande du nombre de bits indiqué vers la gauche. Les bits en trop sont abandonnés et des bits à 0 sont ajoutés sur la droite. 9&lt;&lt;2 donne 36, car 1001, décalé de 2 bits à gauche vaut 100100 en binaire, ce qui correspond à 36 en décimal. Décalage à droite avec propagation du signe (&gt;&gt;) Cet opérateur décale la valeur du premier opérande du nombre de bits indiqué vers la droite. Les bits en trop à droite sont abandonnés. Des copies du bit le plus à gauche sont ajoutés sur la gauche. 9&gt;&gt;2 donne 2, car 1001 décalé de 2 bits à droite vaut 10 en binaire, ce qui correspond à 2 en décimal. De même, -9&gt;&gt;2 donne -3, car le signe est conservé. Décalage à droite avec remplissage à zéro (&gt;&gt;&gt;) Cet opérateur décale la valeur du premier opérande du nombre de bits indiqué vers la droite. Les bits en trop à droite sont abandonnés. Des bits à zéro sont ajoutés sur la gauche. 19&gt;&gt;&gt;2 donne 4, car 10011 décalé de deux bits à droite devient 100 en binaire, ce qui vaut 4 en décimal. Pour les valeurs positives, le décalage à droite avec remplissage à zéro et le décalage à droite avec propagation du signe fourniront le même résultat." />
+<link rel="canonical" href="https://virtual-thom.github.io/archives/operateurs-binaire-javascript/" />
+<meta property="og:url" content="https://virtual-thom.github.io/archives/operateurs-binaire-javascript/" />
+<meta property="og:site_name" content="Virtual-Thom Blog-notes VTOM et informatique" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-01-15T09:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Opérateurs binaire exemple concret" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Virtual Thom"},"dateModified":"2024-01-15T09:00:00+00:00","datePublished":"2024-01-15T09:00:00+00:00","description":"Une vidéo de Grafikart m’a inspiré pour un besoin que j’avais en javascript pour stocker en base les horaires cron des utilisateurs pour déclencher des alarmes. // ex. Le nombre binaire 000000000000000001000000 est équivalent à l&#39;entier 64. // getChoices(64) donnera donc [ 7 ] // Le nombre binaire 000000000000000001000001 est équivalent à l&#39;entier 65. // getChoices(65) donnera donc [ 1, 7 ] function getChoices(number) { let choices = []; let position = 1; while (number &gt; 0) { // Si le bit de poids faible est 1, ajoutez la position à la liste des choix if ((number &amp; 1) === 1) { choices.push(position); } // Décalez les bits vers la droite et passez à la position suivante number &gt;&gt;= 1; position++; } return choices; } // fonction inverse, on donne le tableau en entrée pour donner l&#39;entier correspondants des heures // getNumber( [1, 7] ) donnera 65 function getNumber(choices) { let number = 0; for (let i = 0; i &lt; choices.length; i++) { let position = choices[i]; // Définir le bit à la position spécifiée à 1 number |= 1 &lt;&lt; (position - 1); } return number; } Les sources : Lien MDN Javascript Grafikart opérateurs binaires Opérateurs binairesUn opérateur binaire traite les opérandes comme des suites de 32 bits (des zéros ou des uns) plutôt que comme des nombres décimaux, hexadécimaux et octaux. Ainsi, le nombre décimal 9 se représente en binaire comme 1001. Les opérateurs binaires effectuent leur opération sur des représentations binaires et renvoient des valeurs numériques. Le tableau qui suit détaille les opérateurs binaires JavaScript. Opérateur Utilisation Description ET binaire a &amp; b Renvoie un à chaque position pour laquelle les bits des deux opérandes valent un. OU binaire a | b Renvoie un zéro à chaque position pour laquelle les bits des deux opérandes valent zéro. OU exclusif binaire a ^ b Renvoie un zéro à chaque position pour laquelle les bits sont les mêmes. [Renvoie un à chaque position où les bits sont différents.] NON binaire ~ a Inverse les bits de l&#39;opérande. Décalage à gauche a &lt;&lt; b Décale la représentation binaire de a de b bits vers la gauche, en ajoutant des zéros à droite. Décalage à droite avec propagation du signe a &gt;&gt; b Décale la représentation binaire de a de b bits vers la droite, enlevant les bits en trop. Décalage à droite avec remplissage à zéro a &gt;&gt;&gt; b Décale la représentation binaire de a de b bits vers la droite, enlevant les bits en trop et en ajoutant des zéros à gauche. Opérateurs binaires logiquesLes opérateurs logiques binaires fonctionnent de la façon suivante&nbsp;: Les opérandes sont convertis en entiers sur 32 bits. Pour les nombres dont la valeur binaire dépasse 32 bits, les bits les plus hauts sont abandonnés. Ainsi, l&#39;entier suivant sur plus de 32 bits sera converti en entier sur 32 bits&nbsp;: Avant : 1110 0110 1111 1010 0000 0000 0000 0110 0000 0000 0001 Après : 1010 0000 0000 0000 0110 0000 0000 0001 Chaque bit du premier opérande est associé au bit correspondant du second opérande&nbsp;: le premier bit avec le premier bit, le second avec le second et ainsi de suite. L&#39;opérateur est appliqué sur chaque paire ainsi constituée et le résultat est construit en binaire. Par exemple, la représentation binaire du nombre décimal 9 est 1001, et celle du nombre décimal 15 est 1111. Aussi, quand on utilise les opérateurs binaires sur ces valeurs, on a les résultats suivants&nbsp;: Expression Résultat Description binaire 15 &amp; 9 9 1111 &amp; 1001 = 1001 15 | 9 15 1111 | 1001 = 1111 15 ^ 9 6 1111 ^ 1001 = 0110 ~15 -16 ~ 0000 0000 … 0000 1111 = 1111 1111 … 1111 0000 ~9 -10 ~ 0000 0000 … 0000 1001 = 1111 1111 … 1111 0110 On notera que tous les 32 bits sont inversés lors de l&#39;utilisation de l&#39;opérateur NON binaire et que les valeurs avec le bit le plus à gauche à 1 représentent des valeurs négatives (représentation en complément à deux). Aussi, l&#39;évaluation de ~x fournira la même valeur que -x - 1. Opérateurs de décalage binaireLes opérateurs de décalage binaire utilisent deux opérandes&nbsp;: celui de gauche est la quantité sur laquelle effectuer le décalage et celui de droite indique le nombre de bits à décaler. La direction de l&#39;opération de décalage dépend de l&#39;opérateur utilisé. Les opérateurs de décalage convertissent leurs opérandes en entiers sur 32 bits et renvoient un résultat de type Number ou BigInt selon la règle suivante&nbsp;: si l&#39;opérande gauche est de type BigInt, la valeur de retour sera de type BigInt et sinon, la valeur de retour sera de type Number. Les opérateurs de décalage sont listés dans le tableau suivant. Opérateurs de décalage binaire Opérateur Description Exemple Décalage à gauche (&lt;&lt;) Cet opérateur décale la valeur du premier opérande du nombre de bits indiqué vers la gauche. Les bits en trop sont abandonnés et des bits à 0 sont ajoutés sur la droite. 9&lt;&lt;2 donne 36, car 1001, décalé de 2 bits à gauche vaut 100100 en binaire, ce qui correspond à 36 en décimal. Décalage à droite avec propagation du signe (&gt;&gt;) Cet opérateur décale la valeur du premier opérande du nombre de bits indiqué vers la droite. Les bits en trop à droite sont abandonnés. Des copies du bit le plus à gauche sont ajoutés sur la gauche. 9&gt;&gt;2 donne 2, car 1001 décalé de 2 bits à droite vaut 10 en binaire, ce qui correspond à 2 en décimal. De même, -9&gt;&gt;2 donne -3, car le signe est conservé. Décalage à droite avec remplissage à zéro (&gt;&gt;&gt;) Cet opérateur décale la valeur du premier opérande du nombre de bits indiqué vers la droite. Les bits en trop à droite sont abandonnés. Des bits à zéro sont ajoutés sur la gauche. 19&gt;&gt;&gt;2 donne 4, car 10011 décalé de deux bits à droite devient 100 en binaire, ce qui vaut 4 en décimal. Pour les valeurs positives, le décalage à droite avec remplissage à zéro et le décalage à droite avec propagation du signe fourniront le même résultat.","headline":"Opérateurs binaire exemple concret","mainEntityOfPage":{"@type":"WebPage","@id":"https://virtual-thom.github.io/archives/operateurs-binaire-javascript/"},"url":"https://virtual-thom.github.io/archives/operateurs-binaire-javascript/"}</script>
+<!-- End Jekyll SEO tag -->
+
+  
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z8Y7902GRV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Z8Y7902GRV');
+</script>
+
+
+  <body>
+    <div class="container">
+      <header id="site-header">
+  <h1>Blog-notes VTOM, informatique, industrialisation, ordonnancement, DevOps</h1>
+  <nav>
+    <ul>
+      <li>
+        <a href="https://virtual-thom.github.io/archives" title="Home">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M18.121,9.88l-7.832-7.836c-0.155-0.158-0.428-0.155-0.584,0L1.842,9.913c-0.262,0.263-0.073,0.705,0.292,0.705h2.069v7.042c0,0.227,0.187,0.414,0.414,0.414h3.725c0.228,0,0.414-0.188,0.414-0.414v-3.313h2.483v3.313c0,0.227,0.187,0.414,0.413,0.414h3.726c0.229,0,0.414-0.188,0.414-0.414v-7.042h2.068h0.004C18.331,10.617,18.389,10.146,18.121,9.88 M14.963,17.245h-2.896v-3.313c0-0.229-0.186-0.415-0.414-0.415H8.342c-0.228,0-0.414,0.187-0.414,0.415v3.313H5.032v-6.628h9.931V17.245z M3.133,9.79l6.864-6.868l6.867,6.868H3.133z"></path>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a href="https://virtual-thom.github.io/archives/vos-commentaires-livre-d-or/" title="Commentaires - livre d'or">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M17.657,2.982H2.342c-0.234,0-0.425,0.191-0.425,0.426v10.21c0,0.234,0.191,0.426,0.425,0.426h3.404v2.553c0,0.397,0.48,0.547,0.725,0.302l2.889-2.854h8.298c0.234,0,0.426-0.191,0.426-0.426V3.408C18.083,3.174,17.892,2.982,17.657,2.982M17.232,13.192H9.185c-0.113,0-0.219,0.045-0.3,0.124l-2.289,2.262v-1.96c0-0.233-0.191-0.426-0.425-0.426H2.767V3.833h14.465V13.192z M10,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.488-0.668,1.488-1.489C11.488,7.905,10.821,7.237,10,7.237 M10,9.364c-0.352,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C10.638,9.077,10.351,9.364,10,9.364 M14.254,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489s1.489-0.668,1.489-1.489C15.743,7.905,15.075,7.237,14.254,7.237 M14.254,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.352,0,0.639,0.287,0.639,0.638C14.893,9.077,14.605,9.364,14.254,9.364 M5.746,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.489-0.668,1.489-1.489C7.234,7.905,6.566,7.237,5.746,7.237 M5.746,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C6.384,9.077,6.096,9.364,5.746,9.364"></path>
+          </svg>
+        </a>
+      </li>
+      
+      <li>
+        <a href="https://virtual-thom.github.io/about" title="Curriculum Vitae Thom">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z"></path>
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+      <div itemscope itemtype ="http://schema.org/Article" class="post">
+  
+  <header class="post-header">
+    <h1 itemprop="name about headline" class="post-title">Opérateurs binaire exemple concret</h1>
+    <p class="post-meta">
+      <time itemprop="datePublished dateModified" datetime="2024-01-15T09:00:00+00:00">15-01-2024</time></p>
+  </header>
+
+  <article class="post-content" itemprop="articleBody">
+    <h1 class="hidden">Opérateurs binaire exemple concret</h1>
+    <p>Une vidéo de Grafikart m’a inspiré pour un besoin que j’avais en javascript pour stocker en base les horaires cron des utilisateurs pour déclencher des alarmes.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ex. Le nombre binaire 000000000000000001000000 est équivalent à l'entier 64.</span>
+<span class="c1">// getChoices(64) donnera donc [ 7 ]</span>
+<span class="c1">// Le nombre binaire 000000000000000001000001 est équivalent à l'entier 65.</span>
+<span class="c1">// getChoices(65) donnera donc [ 1, 7 ]</span>
+<span class="kd">function</span> <span class="nf">getChoices</span><span class="p">(</span><span class="nx">number</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">choices</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="kd">let</span> <span class="nx">position</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+    <span class="k">while </span><span class="p">(</span><span class="nx">number</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Si le bit de poids faible est 1, ajoutez la position à la liste des choix</span>
+        <span class="k">if </span><span class="p">((</span><span class="nx">number</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">===</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">choices</span><span class="p">.</span><span class="nf">push</span><span class="p">(</span><span class="nx">position</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="c1">// Décalez les bits vers la droite et passez à la position suivante</span>
+        <span class="nx">number</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="nx">position</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nx">choices</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">// fonction inverse, on donne le tableau en entrée pour donner l'entier correspondants des heures</span>
+<span class="c1">// getNumber( [1, 7] ) donnera 65</span>
+<span class="kd">function</span> <span class="nf">getNumber</span><span class="p">(</span><span class="nx">choices</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">number</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">for </span><span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">choices</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">let</span> <span class="nx">position</span> <span class="o">=</span> <span class="nx">choices</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+        <span class="c1">// Définir le bit à la position spécifiée à 1</span>
+        <span class="nx">number</span> <span class="o">|=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="nx">position</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nx">number</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Les sources :</p>
+
+<p><a href="https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide/Expressions_and_operators">Lien MDN Javascript</a>
+<a href="https://grafikart.fr/tutoriels/binary-operator-flag-2171">Grafikart opérateurs binaires</a></p>
+
+<section aria-labelledby="opérateurs_binaires"><h2 id="opérateurs_binaires"><a href="#opérateurs_binaires">Opérateurs binaires</a></h2><div class="section-content"><p>Un opérateur binaire traite les opérandes comme des suites de 32 bits (des zéros ou des uns) plutôt que comme des nombres décimaux, hexadécimaux et octaux. Ainsi, le nombre décimal 9 se représente en binaire comme 1001. Les opérateurs binaires effectuent leur opération sur des représentations binaires et renvoient des valeurs numériques.</p>
+<p>Le tableau qui suit détaille les opérateurs binaires JavaScript.</p>
+<figure class="table-container"><table>
+  <thead>
+    <tr>
+      <th>Opérateur</th>
+      <th>Utilisation</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_AND">ET binaire</a></td>
+      <td><code>a &amp; b</code></td>
+      <td>Renvoie un à chaque position pour laquelle les bits des deux opérandes valent un.</td>
+    </tr>
+    <tr>
+      <td><a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_OR">OU binaire</a></td>
+      <td><code>a | b</code></td>
+      <td>Renvoie un zéro à chaque position pour laquelle les bits des deux opérandes valent zéro.</td>
+    </tr>
+    <tr>
+      <td><a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_XOR">OU exclusif binaire</a></td>
+      <td><code>a ^ b</code></td>
+      <td>Renvoie un zéro à chaque position pour laquelle les bits sont les mêmes. [Renvoie un à chaque position où les bits sont différents.]</td>
+    </tr>
+    <tr>
+      <td><a href="/fr/docs/Web/JavaScript/Reference/Operators/Bitwise_NOT">NON binaire</a></td>
+      <td><code>~ a</code></td>
+      <td>Inverse les bits de l'opérande.</td>
+    </tr>
+    <tr>
+      <td><a href="/fr/docs/Web/JavaScript/Reference/Operators/Left_shift">Décalage à gauche</a></td>
+      <td><code>a &lt;&lt; b</code></td>
+      <td>Décale la représentation binaire de <code>a</code> de <code>b</code> bits vers la gauche, en ajoutant des zéros à droite.</td>
+    </tr>
+    <tr>
+      <td><a href="/fr/docs/Web/JavaScript/Reference/Operators/Right_shift">Décalage à droite avec propagation du signe</a></td>
+      <td><code>a &gt;&gt; b</code></td>
+      <td>Décale la représentation binaire de <code>a</code> de <code>b</code> bits vers la droite, enlevant les bits en trop.</td>
+    </tr>
+    <tr>
+      <td><a href="/fr/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift">Décalage à droite avec remplissage à zéro</a></td>
+      <td><code>a &gt;&gt;&gt; b</code></td>
+      <td>Décale la représentation binaire de <code>a</code> de <code>b</code> bits vers la droite, enlevant les bits en trop et en ajoutant des zéros à gauche.</td>
+    </tr>
+  </tbody>
+</table></figure></div></section>
+
+<section aria-labelledby="opérateurs_binaires_logiques"><h3 id="opérateurs_binaires_logiques"><a href="#opérateurs_binaires_logiques">Opérateurs binaires logiques</a></h3><div class="section-content"><p>Les opérateurs logiques binaires fonctionnent de la façon suivante&nbsp;:</p>
+<ul>
+  <li>Les opérandes sont convertis en entiers sur 32 bits. Pour les nombres dont la valeur binaire dépasse 32 bits, les bits les plus hauts sont abandonnés. Ainsi, l'entier suivant sur plus de 32 bits sera converti en entier sur 32 bits&nbsp;:
+    <pre class="notranslate">Avant : 1110 0110 1111 1010 0000 0000 0000 0110 0000 0000 0001
+Après :                1010 0000 0000 0000 0110 0000 0000 0001
+</pre>
+  </li>
+  <li>Chaque bit du premier opérande est associé au bit correspondant du second opérande&nbsp;: le premier bit avec le premier bit, le second avec le second et ainsi de suite.</li>
+  <li>L'opérateur est appliqué sur chaque paire ainsi constituée et le résultat est construit en binaire.</li>
+</ul>
+<p>Par exemple, la représentation binaire du nombre décimal <code>9</code> est <code>1001</code>, et celle du nombre décimal <code>15</code> est <code>1111</code>. Aussi, quand on utilise les opérateurs binaires sur ces valeurs, on a les résultats suivants&nbsp;:</p>
+<figure class="table-container"><table>
+  <thead>
+    <tr>
+      <th>Expression</th>
+      <th>Résultat</th>
+      <th>Description binaire</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>15 &amp; 9</code></td>
+      <td><code>9</code></td>
+      <td><code>1111 &amp; 1001 = 1001</code></td>
+    </tr>
+    <tr>
+      <td><code>15 | 9</code></td>
+      <td><code>15</code></td>
+      <td><code>1111 | 1001 = 1111</code></td>
+    </tr>
+    <tr>
+      <td><code>15 ^ 9</code></td>
+      <td><code>6</code></td>
+      <td><code>1111 ^ 1001 = 0110</code></td>
+    </tr>
+    <tr>
+      <td><code>~15</code></td>
+      <td><code>-16</code></td>
+      <td><code>~ 0000 0000 … 0000 1111 = 1111 1111 … 1111 0000</code></td>
+    </tr>
+    <tr>
+      <td><code>~9</code></td>
+      <td><code>-10</code></td>
+      <td><code>~ 0000 0000 … 0000 1001 = 1111 1111 … 1111 0110</code></td>
+    </tr>
+  </tbody>
+</table></figure>
+<p>On notera que tous les 32 bits sont inversés lors de l'utilisation de l'opérateur NON binaire et que les valeurs avec le bit le plus à gauche à 1 représentent des valeurs négatives (représentation en complément à deux). Aussi, l'évaluation de <code>~x</code> fournira la même valeur que <code>-x - 1</code>.</p></div></section>
+<section aria-labelledby="opérateurs_de_décalage_binaire"><h3 id="opérateurs_de_décalage_binaire"><a href="#opérateurs_de_décalage_binaire">Opérateurs de décalage binaire</a></h3><div class="section-content"><p>Les opérateurs de décalage binaire utilisent deux opérandes&nbsp;: celui de gauche est la quantité sur laquelle effectuer le décalage et celui de droite indique le nombre de bits à décaler. La direction de l'opération de décalage dépend de l'opérateur utilisé.</p>
+<p>Les opérateurs de décalage convertissent leurs opérandes en entiers sur 32 bits et renvoient un résultat de type <a href="/fr/docs/Web/JavaScript/Reference/Global_Objects/Number"><code>Number</code></a> ou <a href="/fr/docs/Web/JavaScript/Reference/Global_Objects/BigInt"><code>BigInt</code></a> selon la règle suivante&nbsp;: si l'opérande gauche est de type <a href="/fr/docs/Web/JavaScript/Reference/Global_Objects/BigInt"><code>BigInt</code></a>, la valeur de retour sera de type <a href="/fr/docs/Web/JavaScript/Reference/Global_Objects/BigInt"><code>BigInt</code></a> et sinon, la valeur de retour sera de type <a href="/fr/docs/Web/JavaScript/Reference/Global_Objects/Number"><code>Number</code></a>.</p>
+<p>Les opérateurs de décalage sont listés dans le tableau suivant.</p>
+<figure class="table-container"><table class="fullwidth-table">
+  <caption>Opérateurs de décalage binaire</caption>
+  <thead>
+    <tr>
+      <th scope="col">Opérateur</th>
+      <th scope="col">Description</th>
+      <th scope="col">Exemple</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="/fr/docs/Web/JavaScript/Reference/Operators/Left_shift">Décalage à gauche</a> (<code>&lt;&lt;</code>)</td>
+      <td>Cet opérateur décale la valeur du premier opérande du nombre de bits indiqué vers la gauche. Les bits en trop sont abandonnés et des bits à 0 sont ajoutés sur la droite.</td>
+      <td><code>9&lt;&lt;2</code> donne <code>36</code>, car <code>1001</code>, décalé de 2 bits à gauche vaut <code>100100</code> en binaire, ce qui correspond à <code>36</code> en décimal.</td>
+    </tr>
+    <tr>
+      <td><a href="/fr/docs/Web/JavaScript/Reference/Operators/Right_shift">Décalage à droite avec propagation du signe</a> (<code>&gt;&gt;</code>)</td>
+      <td>Cet opérateur décale la valeur du premier opérande du nombre de bits indiqué vers la droite. Les bits en trop à droite sont abandonnés. Des copies du bit le plus à gauche sont ajoutés sur la gauche.</td>
+      <td><code>9&gt;&gt;2</code> donne <code>2</code>, car <code>1001</code> décalé de 2 bits à droite vaut <code>10</code> en binaire, ce qui correspond à <code>2</code> en décimal. De même, <code>-9&gt;&gt;2</code> donne <code>-3</code>, car le signe est conservé.</td>
+    </tr>
+    <tr>
+      <td><a href="/fr/docs/Web/JavaScript/Reference/Operators/Unsigned_right_shift">Décalage à droite avec remplissage à zéro</a> (<code>&gt;&gt;&gt;</code>)</td>
+      <td>Cet opérateur décale la valeur du premier opérande du nombre de bits indiqué vers la droite. Les bits en trop à droite sont abandonnés. Des bits à zéro sont ajoutés sur la gauche.</td>
+      <td><code>19&gt;&gt;&gt;2</code> donne <code>4</code>, car <code>10011</code> décalé de deux bits à droite devient <code>100</code> en binaire, ce qui vaut <code>4</code> en décimal. Pour les valeurs positives, le décalage à droite avec remplissage à zéro et le décalage à droite avec propagation du signe fourniront le même résultat.</td>
+    </tr>
+  </tbody>
+</table></figure></div></section>
+
+  </article>
+  
+<nav>
+  <ul class="pager">
+    
+     
+    <li class="previous">
+      <a href="https://virtual-thom.github.io/archives/powershell-vtom-vtexport-xml/"><span aria-hidden="true">&larr;</span> Une autre façon de parcourir et rechercher des infos dans VTOM</a> 
+    </li>
+    
+     
+     <li class="next">
+      <a class="next" href="https://virtual-thom.github.io/archives/api-vtom-example/">Exemple script python API VTOM <span aria-hidden="true">&rarr;</span></a> 
+    </li>
+     
+    
+  </ul>
+</nav>
+
+
+  <footer class="post-footer">
+    
+      
+    
+    <span  itemprop="author publisher" class="hidden">Virtual Thom</span>
+  </footer>
+  
+  <div id="disqus_thread" ></div>
+  <script>
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'thomas-asnar'; // required: replace example with your forum shortname
+  
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+</div>
+
+      <footer id="site-footer">
+    <div>&copy;<a href="https://github.com/virtual-thom/" title="Github Virtual-Thom">Virtual-Thom</a></div>
+    <div>
+            <a href="https://virtual-thom.github.io/archives/plan" title="Plan du site">sitemap</a> | <a href="https://virtual-thom.github.io/about" rel="publisher author" title="Curriculum vitae Thom">A propos</a>
+    </div>
+    <div>
+        <a id="goto-site-header" href="#site-header" title="Retourner au début">&uArr; Top</a>
+    </div>
+    <div id="footer-disclaimer">
+        <p>Avertissement : vous ne devez pas prendre pour argent comptant le contenu de ce site. Testez toujours la solution en environnement de test.</p>
+        <p>Malgré le sérieux que je m'efforce de mettre dans le contenu de ces billets, je ne pourrai être tenu responsable d'éventuelles erreurs que cela pourrait engendrer.</p>
+    </div>
+    <div>
+        <a class="hidden" href="https://virtual-thom.github.io/archives/sitemap.xml" title="SiteMap">sitemap</a>
+    </div>
+</footer>
+
+    </div>
+  </body>
+
+</html>

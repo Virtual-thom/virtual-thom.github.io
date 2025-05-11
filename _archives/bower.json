@@ -1,0 +1,19 @@
+{
+  "name": "virtual-thom",
+  "version": "0.0.0",
+  "homepage": "https://github.com/Virtual-thom/virtual-thom.github.io",
+  "authors": [
+    "Virtual-thom <virtual-thom@protonmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap-sass-official": "~3.3.3"
+  }
+}

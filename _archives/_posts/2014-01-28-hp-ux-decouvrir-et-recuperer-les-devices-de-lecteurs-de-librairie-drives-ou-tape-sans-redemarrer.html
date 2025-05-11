@@ -1,0 +1,36 @@
+---
+layout: post
+title: HP-UX découvrir et récupérer les devices de lecteurs de librairie (drives ou tape) sans redémarrer
+date: 2014-01-28 23:17
+author: Virtual Thom
+comments: true
+categories: [HP-UX]
+---
+<pre>
+# ioscan -fnkC tape
+Class     I  H/W Path  Driver S/W State   H/W Type     Description
+==================================================================
+tape      0  0/2/1/0.8.0.255.7.12.0  stape   CLAIMED     DEVICE       HP      Ultrium 4-SCSI
+                      /dev/rmt/0m             /dev/rmt/0mn            /dev/rmt/c1t12d0BEST    /dev/rmt/c1t12d0BESTn
+                      /dev/rmt/0mb            /dev/rmt/0mnb           /dev/rmt/c1t12d0BESTb   /dev/rmt/c1t12d0BESTnb
+tape      7  0/2/1/1.8.0.255.7.12.0  stape   CLAIMED     DEVICE       HP      Ultrium 4-SCSI
+                      /dev/rmt/7m             /dev/rmt/7mn            /dev/rmt/c2t12d0BEST    /dev/rmt/c2t12d0BESTn
+                      /dev/rmt/7mb            /dev/rmt/7mnb           /dev/rmt/c2t12d0BESTb   /dev/rmt/c2t12d0BESTnb
+tape      2  0/5/1/0.8.0.255.7.12.0  stape   CLAIMED     DEVICE       HP      Ultrium 4-SCSI
+                      /dev/rmt/2m             /dev/rmt/2mn            /dev/rmt/c4t12d0BEST    /dev/rmt/c4t12d0BESTn
+                      /dev/rmt/2mb            /dev/rmt/2mnb           /dev/rmt/c4t12d0BESTb   /dev/rmt/c4t12d0BESTnb
+tape      4  0/5/1/1.8.0.255.7.12.0  stape   CLAIMED     DEVICE       HP      Ultrium 4-SCSI
+                      /dev/rmt/4m             /dev/rmt/4mn            /dev/rmt/c3t12d0BEST    /dev/rmt/c3t12d0BESTn
+                      /dev/rmt/4mb            /dev/rmt/4mnb           /dev/rmt/c3t12d0BESTb   /dev/rmt/c3t12d0BESTnb
+ 
+# ioscan -fnk | grep DEVICE
+tape        0  0/2/1/0.8.0.255.7.12.0   stape          CLAIMED     DEVICE       HP      Ultrium 4-SCSI
+autoch      2  0/2/1/0.8.0.255.7.12.1   schgr          CLAIMED     DEVICE       HP      MSL G3 Series
+target      1  0/2/1/1.8.0.255.7.12     tgt            CLAIMED     DEVICE
+tape        7  0/2/1/1.8.0.255.7.12.0   stape          CLAIMED     DEVICE       HP      Ultrium 4-SCSI
+target      3  0/5/1/0.8.0.255.7.12     tgt            CLAIMED     DEVICE
+tape        2  0/5/1/0.8.0.255.7.12.0   stape          CLAIMED     DEVICE       HP      Ultrium 4-SCSI
+target      4  0/5/1/1.8.0.255.7.12     tgt            CLAIMED     DEVICE
+tape        4  0/5/1/1.8.0.255.7.12.0   stape          CLAIMED     DEVICE       HP      Ultrium 4-SCSI
+</pre>
+

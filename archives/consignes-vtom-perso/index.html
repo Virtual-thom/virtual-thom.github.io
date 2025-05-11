@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="apple-touch-icon" href="https://virtual-thom.github.io/archives/apple-touch-icon.png">
+  <link rel="icon" href="https://virtual-thom.github.io/archives/favicon.ico" />
+  <!-- Remplacé par Jekyll SEO (sinon apparait en double)
+  <title>Consignes VTOM perso</title>
+  <meta name="description" content="Je suis sûr que vous avez vos Dossiers d’Exploitation ou vos consignes en cas d’abort bien rangé sur votre site de production ou de gestion électronique de d...">
+  --> 
+  
+  <link rel="canonical" href="https://virtual-thom.github.io/archives/consignes-vtom-perso/">
+  
+  <link rel="stylesheet" media="screen" href="https://virtual-thom.github.io/archives/assets/main.css">
+  
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Consignes VTOM perso | Virtual-Thom Blog-notes VTOM et informatique</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Consignes VTOM perso" />
+<meta name="author" content="Virtual Thom" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Je suis sûr que vous avez vos Dossiers d’Exploitation ou vos consignes en cas d’abort bien rangé sur votre site de production ou de gestion électronique de document. Et vous aimeriez bien faire un clique droit sur votre application ou traitement, puis Consignes pour avoir la page ou le document en rapport avec ces derniers. Créez votre consigne dans VTOM et donner lui le nom que vous voulez (consigne_monsite par exemple) Donnez lui la page php qui va traiter votre requête et les noms d’environnement, application et traitement en paramètres comme ceci : http://votresite/vtom.php?{VT_ENVIRONMENT_NAME}.{VT_APPLICATION_NAME}.{VT_JOB_NAME} Vous appliquerez cette consigne sur tous les traitements ou applications que vous souhaitez. Il suffit de la rajouter dans la définition. Petit exemple de ma page vtom.php &lt;?php $repBase = &#39;f:/DE/DE/&#39; ; // répertoire de base des Dossiers d&#39;Exploitation $isFilePresent = $env = $app = $job = false ; $EnvAppJobTab = split(&#39;\.&#39;,$_SERVER[&#39;QUERY_STRING&#39;]); // QUERY_STRING = retour du clique droit sur un élément dans VTOM if($EnvAppJobTab[0]) $env = $EnvAppJobTab[0] ; if($EnvAppJobTab[1]) $app = $EnvAppJobTab[1] ; if($EnvAppJobTab[2]) $job = $EnvAppJobTab[2] ; if($env){ if($handle = opendir($repBase . $env )){ while( false !== ( $entry = readdir($handle) ) ){ if( $entry != &quot;.&quot; &amp;&amp; $entry != &quot;..&quot; ){ if($job){ $pattern = &quot;/$job/&quot; ; }elseif($app){ $pattern = &quot;/$app/&quot; ; }else{ echo &quot;l&#39;application ou le job doivent être renseigné&quot; ; die ; } if( preg_match($pattern,$entry) ){ $filename = split(&#39;\.&#39;,$entry) ; $extension = array_pop($filename); $media = false ; switch($extension){ case &quot;doc&quot;: case &quot;pdf&quot;: $media = &quot;application/&quot;.$extension; break; case &quot;html&quot;: case &quot;htm&quot; : $media = &quot;text/html&quot; ; break; default: echo &quot;Ce format n&#39;est pris en compte&quot; ; die ; } $isFilePresent = true ; header(&quot;Content-type: ${media}&quot;); if(${media} != &quot;text/html&quot;){ header(&quot;Content-Disposition: attachment; filename=\&quot;${repBase}${env}/${entry}\&quot;&quot;); } readfile(&quot;${repBase}${env}/${entry}&quot;) ; } } } }else{ echo &quot;Ne peut pas ouvrir &quot;.$repBase . $env ; } }else{ echo &quot;Manque nom d&#39;environnement&quot; ; } if(!$isFilePresent){ echo &quot;Fichier non present pour $env $app $job dans $repBase&quot; ; }" />
+<meta property="og:description" content="Je suis sûr que vous avez vos Dossiers d’Exploitation ou vos consignes en cas d’abort bien rangé sur votre site de production ou de gestion électronique de document. Et vous aimeriez bien faire un clique droit sur votre application ou traitement, puis Consignes pour avoir la page ou le document en rapport avec ces derniers. Créez votre consigne dans VTOM et donner lui le nom que vous voulez (consigne_monsite par exemple) Donnez lui la page php qui va traiter votre requête et les noms d’environnement, application et traitement en paramètres comme ceci : http://votresite/vtom.php?{VT_ENVIRONMENT_NAME}.{VT_APPLICATION_NAME}.{VT_JOB_NAME} Vous appliquerez cette consigne sur tous les traitements ou applications que vous souhaitez. Il suffit de la rajouter dans la définition. Petit exemple de ma page vtom.php &lt;?php $repBase = &#39;f:/DE/DE/&#39; ; // répertoire de base des Dossiers d&#39;Exploitation $isFilePresent = $env = $app = $job = false ; $EnvAppJobTab = split(&#39;\.&#39;,$_SERVER[&#39;QUERY_STRING&#39;]); // QUERY_STRING = retour du clique droit sur un élément dans VTOM if($EnvAppJobTab[0]) $env = $EnvAppJobTab[0] ; if($EnvAppJobTab[1]) $app = $EnvAppJobTab[1] ; if($EnvAppJobTab[2]) $job = $EnvAppJobTab[2] ; if($env){ if($handle = opendir($repBase . $env )){ while( false !== ( $entry = readdir($handle) ) ){ if( $entry != &quot;.&quot; &amp;&amp; $entry != &quot;..&quot; ){ if($job){ $pattern = &quot;/$job/&quot; ; }elseif($app){ $pattern = &quot;/$app/&quot; ; }else{ echo &quot;l&#39;application ou le job doivent être renseigné&quot; ; die ; } if( preg_match($pattern,$entry) ){ $filename = split(&#39;\.&#39;,$entry) ; $extension = array_pop($filename); $media = false ; switch($extension){ case &quot;doc&quot;: case &quot;pdf&quot;: $media = &quot;application/&quot;.$extension; break; case &quot;html&quot;: case &quot;htm&quot; : $media = &quot;text/html&quot; ; break; default: echo &quot;Ce format n&#39;est pris en compte&quot; ; die ; } $isFilePresent = true ; header(&quot;Content-type: ${media}&quot;); if(${media} != &quot;text/html&quot;){ header(&quot;Content-Disposition: attachment; filename=\&quot;${repBase}${env}/${entry}\&quot;&quot;); } readfile(&quot;${repBase}${env}/${entry}&quot;) ; } } } }else{ echo &quot;Ne peut pas ouvrir &quot;.$repBase . $env ; } }else{ echo &quot;Manque nom d&#39;environnement&quot; ; } if(!$isFilePresent){ echo &quot;Fichier non present pour $env $app $job dans $repBase&quot; ; }" />
+<link rel="canonical" href="https://virtual-thom.github.io/archives/consignes-vtom-perso/" />
+<meta property="og:url" content="https://virtual-thom.github.io/archives/consignes-vtom-perso/" />
+<meta property="og:site_name" content="Virtual-Thom Blog-notes VTOM et informatique" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2012-10-29T21:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Consignes VTOM perso" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Virtual Thom"},"dateModified":"2012-10-29T21:00:00+00:00","datePublished":"2012-10-29T21:00:00+00:00","description":"Je suis sûr que vous avez vos Dossiers d’Exploitation ou vos consignes en cas d’abort bien rangé sur votre site de production ou de gestion électronique de document. Et vous aimeriez bien faire un clique droit sur votre application ou traitement, puis Consignes pour avoir la page ou le document en rapport avec ces derniers. Créez votre consigne dans VTOM et donner lui le nom que vous voulez (consigne_monsite par exemple) Donnez lui la page php qui va traiter votre requête et les noms d’environnement, application et traitement en paramètres comme ceci : http://votresite/vtom.php?{VT_ENVIRONMENT_NAME}.{VT_APPLICATION_NAME}.{VT_JOB_NAME} Vous appliquerez cette consigne sur tous les traitements ou applications que vous souhaitez. Il suffit de la rajouter dans la définition. Petit exemple de ma page vtom.php &lt;?php $repBase = &#39;f:/DE/DE/&#39; ; // répertoire de base des Dossiers d&#39;Exploitation $isFilePresent = $env = $app = $job = false ; $EnvAppJobTab = split(&#39;\\.&#39;,$_SERVER[&#39;QUERY_STRING&#39;]); // QUERY_STRING = retour du clique droit sur un élément dans VTOM if($EnvAppJobTab[0]) $env = $EnvAppJobTab[0] ; if($EnvAppJobTab[1]) $app = $EnvAppJobTab[1] ; if($EnvAppJobTab[2]) $job = $EnvAppJobTab[2] ; if($env){ if($handle = opendir($repBase . $env )){ while( false !== ( $entry = readdir($handle) ) ){ if( $entry != &quot;.&quot; &amp;&amp; $entry != &quot;..&quot; ){ if($job){ $pattern = &quot;/$job/&quot; ; }elseif($app){ $pattern = &quot;/$app/&quot; ; }else{ echo &quot;l&#39;application ou le job doivent être renseigné&quot; ; die ; } if( preg_match($pattern,$entry) ){ $filename = split(&#39;\\.&#39;,$entry) ; $extension = array_pop($filename); $media = false ; switch($extension){ case &quot;doc&quot;: case &quot;pdf&quot;: $media = &quot;application/&quot;.$extension; break; case &quot;html&quot;: case &quot;htm&quot; : $media = &quot;text/html&quot; ; break; default: echo &quot;Ce format n&#39;est pris en compte&quot; ; die ; } $isFilePresent = true ; header(&quot;Content-type: ${media}&quot;); if(${media} != &quot;text/html&quot;){ header(&quot;Content-Disposition: attachment; filename=\\&quot;${repBase}${env}/${entry}\\&quot;&quot;); } readfile(&quot;${repBase}${env}/${entry}&quot;) ; } } } }else{ echo &quot;Ne peut pas ouvrir &quot;.$repBase . $env ; } }else{ echo &quot;Manque nom d&#39;environnement&quot; ; } if(!$isFilePresent){ echo &quot;Fichier non present pour $env $app $job dans $repBase&quot; ; }","headline":"Consignes VTOM perso","mainEntityOfPage":{"@type":"WebPage","@id":"https://virtual-thom.github.io/archives/consignes-vtom-perso/"},"url":"https://virtual-thom.github.io/archives/consignes-vtom-perso/"}</script>
+<!-- End Jekyll SEO tag -->
+
+  
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z8Y7902GRV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Z8Y7902GRV');
+</script>
+
+
+  <body>
+    <div class="container">
+      <header id="site-header">
+  <h1>Blog-notes VTOM, informatique, industrialisation, ordonnancement, DevOps</h1>
+  <nav>
+    <ul>
+      <li>
+        <a href="https://virtual-thom.github.io/archives" title="Home">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M18.121,9.88l-7.832-7.836c-0.155-0.158-0.428-0.155-0.584,0L1.842,9.913c-0.262,0.263-0.073,0.705,0.292,0.705h2.069v7.042c0,0.227,0.187,0.414,0.414,0.414h3.725c0.228,0,0.414-0.188,0.414-0.414v-3.313h2.483v3.313c0,0.227,0.187,0.414,0.413,0.414h3.726c0.229,0,0.414-0.188,0.414-0.414v-7.042h2.068h0.004C18.331,10.617,18.389,10.146,18.121,9.88 M14.963,17.245h-2.896v-3.313c0-0.229-0.186-0.415-0.414-0.415H8.342c-0.228,0-0.414,0.187-0.414,0.415v3.313H5.032v-6.628h9.931V17.245z M3.133,9.79l6.864-6.868l6.867,6.868H3.133z"></path>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a href="https://virtual-thom.github.io/archives/vos-commentaires-livre-d-or/" title="Commentaires - livre d'or">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M17.657,2.982H2.342c-0.234,0-0.425,0.191-0.425,0.426v10.21c0,0.234,0.191,0.426,0.425,0.426h3.404v2.553c0,0.397,0.48,0.547,0.725,0.302l2.889-2.854h8.298c0.234,0,0.426-0.191,0.426-0.426V3.408C18.083,3.174,17.892,2.982,17.657,2.982M17.232,13.192H9.185c-0.113,0-0.219,0.045-0.3,0.124l-2.289,2.262v-1.96c0-0.233-0.191-0.426-0.425-0.426H2.767V3.833h14.465V13.192z M10,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.488-0.668,1.488-1.489C11.488,7.905,10.821,7.237,10,7.237 M10,9.364c-0.352,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C10.638,9.077,10.351,9.364,10,9.364 M14.254,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489s1.489-0.668,1.489-1.489C15.743,7.905,15.075,7.237,14.254,7.237 M14.254,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.352,0,0.639,0.287,0.639,0.638C14.893,9.077,14.605,9.364,14.254,9.364 M5.746,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.489-0.668,1.489-1.489C7.234,7.905,6.566,7.237,5.746,7.237 M5.746,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C6.384,9.077,6.096,9.364,5.746,9.364"></path>
+          </svg>
+        </a>
+      </li>
+      
+      <li>
+        <a href="https://virtual-thom.github.io/about" title="Curriculum Vitae Thom">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z"></path>
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+      <div itemscope itemtype ="http://schema.org/Article" class="post">
+  
+  <header class="post-header">
+    <h1 itemprop="name about headline" class="post-title">Consignes VTOM perso</h1>
+    <p class="post-meta">
+      <time itemprop="datePublished dateModified" datetime="2012-10-29T21:00:00+00:00">29-10-2012</time></p>
+  </header>
+
+  <article class="post-content" itemprop="articleBody">
+    <h1 class="hidden">Consignes VTOM perso</h1>
+    <p>Je suis sûr que vous avez vos Dossiers d’Exploitation ou vos consignes en cas d’abort bien rangé sur votre site de production ou de gestion électronique de document. Et vous aimeriez bien faire un clique droit sur votre application ou traitement, puis Consignes pour avoir la page ou le document en rapport avec ces derniers.</p>
+
+<p>Créez votre consigne dans VTOM et donner lui le nom que vous voulez (consigne_monsite par exemple)</p>
+
+<p>Donnez lui la page php qui va traiter votre requête et les noms d’environnement, application et traitement en paramètres comme ceci : http://votresite/vtom.php?{VT_ENVIRONMENT_NAME}.{VT_APPLICATION_NAME}.{VT_JOB_NAME}
+Vous appliquerez cette consigne sur tous les traitements ou applications que vous souhaitez. Il suffit de la rajouter dans la définition.</p>
+
+<p>Petit exemple de ma page vtom.php</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;?php
+
+$repBase = 'f:/DE/DE/' ; // répertoire de base des Dossiers d'Exploitation
+$isFilePresent = $env = $app = $job = false ;
+
+$EnvAppJobTab = split('\.',$_SERVER['QUERY_STRING']); // QUERY_STRING = retour du clique droit sur un élément dans VTOM
+if($EnvAppJobTab[0])
+	$env = $EnvAppJobTab[0] ;
+if($EnvAppJobTab[1])
+	$app = $EnvAppJobTab[1] ;
+if($EnvAppJobTab[2])
+	$job = $EnvAppJobTab[2] ;
+
+if($env){
+	if($handle = opendir($repBase . $env )){
+		while( false !== ( $entry = readdir($handle) ) ){
+			if( $entry != "." &amp;&amp; $entry != ".." ){
+				if($job){
+					$pattern = "/$job/" ;
+				}elseif($app){
+					$pattern = "/$app/" ;
+				}else{
+					echo "l'application ou le job doivent être renseigné" ;
+					die ;
+				}
+				if( preg_match($pattern,$entry) ){
+					$filename = split('\.',$entry) ;
+					$extension = array_pop($filename);
+					$media = false ;
+					switch($extension){
+						case "doc":
+						case "pdf":
+							$media = "application/".$extension;
+							break;
+						case "html":
+						case "htm" :
+							$media = "text/html" ;
+							break;
+						default:
+							echo "Ce format n'est pris en compte" ;
+							die ;
+					}
+					$isFilePresent = true ;
+					header("Content-type: ${media}");
+					if(${media} != "text/html"){
+						header("Content-Disposition: attachment; filename=\"${repBase}${env}/${entry}\"");
+					}
+					readfile("${repBase}${env}/${entry}") ;
+				}
+			}
+		}
+	}else{
+		echo "Ne peut pas ouvrir ".$repBase . $env  ;
+	}
+}else{
+	echo "Manque nom d'environnement" ;
+}
+if(!$isFilePresent){
+	echo "Fichier non present pour $env $app $job dans $repBase" ;
+}
+</code></pre></div></div>
+
+  </article>
+  
+<nav>
+  <ul class="pager">
+    
+     
+    <li class="previous">
+      <a href="https://virtual-thom.github.io/archives/wordpress-galerie-filtre-categorie-avec-commentaires/"><span aria-hidden="true">&larr;</span> Wordpress - Galerie filtree categorie sans plugin avec commentaire (avec son shortcode)</a> 
+    </li>
+    
+     
+     <li class="next">
+      <a class="next" href="https://virtual-thom.github.io/archives/ajouter-importer-fichier-xml-dans-wordpress-mime-type/">Ajouter / Importer un fichier XML dans wordpress (mime type) <span aria-hidden="true">&rarr;</span></a> 
+    </li>
+     
+    
+  </ul>
+</nav>
+
+
+  <footer class="post-footer">
+    
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>consignes</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>Ordonnancement</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>PHP</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>php</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>Script</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>Visual TOM</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>VTOM</a>
+      
+    
+    <span  itemprop="author publisher" class="hidden">Virtual Thom</span>
+  </footer>
+  
+  <div id="disqus_thread" ></div>
+  <script>
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'thomas-asnar'; // required: replace example with your forum shortname
+  
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+</div>
+
+      <footer id="site-footer">
+    <div>&copy;<a href="https://github.com/virtual-thom/" title="Github Virtual-Thom">Virtual-Thom</a></div>
+    <div>
+            <a href="https://virtual-thom.github.io/archives/plan" title="Plan du site">sitemap</a> | <a href="https://virtual-thom.github.io/about" rel="publisher author" title="Curriculum vitae Thom">A propos</a>
+    </div>
+    <div>
+        <a id="goto-site-header" href="#site-header" title="Retourner au début">&uArr; Top</a>
+    </div>
+    <div id="footer-disclaimer">
+        <p>Avertissement : vous ne devez pas prendre pour argent comptant le contenu de ce site. Testez toujours la solution en environnement de test.</p>
+        <p>Malgré le sérieux que je m'efforce de mettre dans le contenu de ces billets, je ne pourrai être tenu responsable d'éventuelles erreurs que cela pourrait engendrer.</p>
+    </div>
+    <div>
+        <a class="hidden" href="https://virtual-thom.github.io/archives/sitemap.xml" title="SiteMap">sitemap</a>
+    </div>
+</footer>
+
+    </div>
+  </body>
+
+</html>

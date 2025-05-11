@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="apple-touch-icon" href="https://virtual-thom.github.io/archives/apple-touch-icon.png">
+  <link rel="icon" href="https://virtual-thom.github.io/archives/favicon.ico" />
+  <!-- Remplacé par Jekyll SEO (sinon apparait en double)
+  <title>Exemple de Merge avec Pandas Python</title>
+  <meta name="description" content="Note à moi même :Merge method	SQL Join Name	Descriptionleft	LEFT OUTER JOIN	Use keys from left frame onlyright	RIGHT OUTER JOIN	Use keys from right frame onl...">
+  --> 
+  
+  <link rel="canonical" href="https://virtual-thom.github.io/archives/exemple-merge-pandas-python/">
+  
+  <link rel="stylesheet" media="screen" href="https://virtual-thom.github.io/archives/assets/main.css">
+  
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Exemple de Merge avec Pandas Python | Virtual-Thom Blog-notes VTOM et informatique</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Exemple de Merge avec Pandas Python" />
+<meta name="author" content="Virtual Thom" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Note à moi même : Merge method SQL Join Name Description left LEFT OUTER JOIN Use keys from left frame only right RIGHT OUTER JOIN Use keys from right frame only outer FULL OUTER JOIN Use union of keys from both frames inner INNER JOIN Use intersection of keys from both frames Image docker : docker run -v D:\MonDossier\csvpandas:/mnt/workspace -t -i fastgenomics/pandas bash import pandas as pd csvDEV = pd.read_csv(&#39;/mnt/workspace/lastexecvtom_dev.csv&#39;,delimiter=r&quot;;&quot;,usecols=[&quot;ENV&quot;,&quot;APP&quot;,&quot;JOB&quot;,&quot;HOST&quot;,&quot;MODEAPP&quot;,&quot;MODEJOB&quot;]) csvAllProd = pd.read_csv(&#39;/mnt/workspace/lastexecvtom_allprod.csv&#39;,delimiter=r&quot;;&quot;,usecols=[&quot;ENV&quot;,&quot;APP&quot;,&quot;JOB&quot;,&quot;HOST&quot;,&quot;MODEAPP&quot;,&quot;MODEJOB&quot;,&quot;DEBUT&quot;,&quot;FIN&quot;,&quot;STATUT&quot;,&quot;DOMAINE&quot;]) csvIP = pd.read_csv(&#39;/mnt/workspace/ip.csv&#39;,delimiter=r&quot;;&quot;,usecols=[&quot;DOMAINE&quot;,&quot;HOST&quot;,&quot;HOSTNAME&quot;,&quot;IP&quot;]) csvIP = csvIP.drop_duplicates() merge1 = pd.merge(csvDEV,csvAllProd,how=&#39;outer&#39;, on=[&quot;ENV&quot;,&quot;APP&quot;,&quot;JOB&quot;,&quot;HOST&quot;],indicator=True) merge2 = pd.merge(merge1,csvIP,how=&#39;left&#39;, on=[&quot;HOST&quot;,&quot;DOMAINE&quot;]) merge2.sort_values(by=[&#39;ENV&#39;,&#39;APP&#39;,&#39;JOB&#39;]).to_csv(&#39;/mnt/workspace/merged.csv&#39;,sep=&quot;;&quot;)" />
+<meta property="og:description" content="Note à moi même : Merge method SQL Join Name Description left LEFT OUTER JOIN Use keys from left frame only right RIGHT OUTER JOIN Use keys from right frame only outer FULL OUTER JOIN Use union of keys from both frames inner INNER JOIN Use intersection of keys from both frames Image docker : docker run -v D:\MonDossier\csvpandas:/mnt/workspace -t -i fastgenomics/pandas bash import pandas as pd csvDEV = pd.read_csv(&#39;/mnt/workspace/lastexecvtom_dev.csv&#39;,delimiter=r&quot;;&quot;,usecols=[&quot;ENV&quot;,&quot;APP&quot;,&quot;JOB&quot;,&quot;HOST&quot;,&quot;MODEAPP&quot;,&quot;MODEJOB&quot;]) csvAllProd = pd.read_csv(&#39;/mnt/workspace/lastexecvtom_allprod.csv&#39;,delimiter=r&quot;;&quot;,usecols=[&quot;ENV&quot;,&quot;APP&quot;,&quot;JOB&quot;,&quot;HOST&quot;,&quot;MODEAPP&quot;,&quot;MODEJOB&quot;,&quot;DEBUT&quot;,&quot;FIN&quot;,&quot;STATUT&quot;,&quot;DOMAINE&quot;]) csvIP = pd.read_csv(&#39;/mnt/workspace/ip.csv&#39;,delimiter=r&quot;;&quot;,usecols=[&quot;DOMAINE&quot;,&quot;HOST&quot;,&quot;HOSTNAME&quot;,&quot;IP&quot;]) csvIP = csvIP.drop_duplicates() merge1 = pd.merge(csvDEV,csvAllProd,how=&#39;outer&#39;, on=[&quot;ENV&quot;,&quot;APP&quot;,&quot;JOB&quot;,&quot;HOST&quot;],indicator=True) merge2 = pd.merge(merge1,csvIP,how=&#39;left&#39;, on=[&quot;HOST&quot;,&quot;DOMAINE&quot;]) merge2.sort_values(by=[&#39;ENV&#39;,&#39;APP&#39;,&#39;JOB&#39;]).to_csv(&#39;/mnt/workspace/merged.csv&#39;,sep=&quot;;&quot;)" />
+<link rel="canonical" href="https://virtual-thom.github.io/archives/exemple-merge-pandas-python/" />
+<meta property="og:url" content="https://virtual-thom.github.io/archives/exemple-merge-pandas-python/" />
+<meta property="og:site_name" content="Virtual-Thom Blog-notes VTOM et informatique" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-10-10T12:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Exemple de Merge avec Pandas Python" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Virtual Thom"},"dateModified":"2017-10-10T12:00:00+00:00","datePublished":"2017-10-10T12:00:00+00:00","description":"Note à moi même : Merge method SQL Join Name Description left LEFT OUTER JOIN Use keys from left frame only right RIGHT OUTER JOIN Use keys from right frame only outer FULL OUTER JOIN Use union of keys from both frames inner INNER JOIN Use intersection of keys from both frames Image docker : docker run -v D:\\MonDossier\\csvpandas:/mnt/workspace -t -i fastgenomics/pandas bash import pandas as pd csvDEV = pd.read_csv(&#39;/mnt/workspace/lastexecvtom_dev.csv&#39;,delimiter=r&quot;;&quot;,usecols=[&quot;ENV&quot;,&quot;APP&quot;,&quot;JOB&quot;,&quot;HOST&quot;,&quot;MODEAPP&quot;,&quot;MODEJOB&quot;]) csvAllProd = pd.read_csv(&#39;/mnt/workspace/lastexecvtom_allprod.csv&#39;,delimiter=r&quot;;&quot;,usecols=[&quot;ENV&quot;,&quot;APP&quot;,&quot;JOB&quot;,&quot;HOST&quot;,&quot;MODEAPP&quot;,&quot;MODEJOB&quot;,&quot;DEBUT&quot;,&quot;FIN&quot;,&quot;STATUT&quot;,&quot;DOMAINE&quot;]) csvIP = pd.read_csv(&#39;/mnt/workspace/ip.csv&#39;,delimiter=r&quot;;&quot;,usecols=[&quot;DOMAINE&quot;,&quot;HOST&quot;,&quot;HOSTNAME&quot;,&quot;IP&quot;]) csvIP = csvIP.drop_duplicates() merge1 = pd.merge(csvDEV,csvAllProd,how=&#39;outer&#39;, on=[&quot;ENV&quot;,&quot;APP&quot;,&quot;JOB&quot;,&quot;HOST&quot;],indicator=True) merge2 = pd.merge(merge1,csvIP,how=&#39;left&#39;, on=[&quot;HOST&quot;,&quot;DOMAINE&quot;]) merge2.sort_values(by=[&#39;ENV&#39;,&#39;APP&#39;,&#39;JOB&#39;]).to_csv(&#39;/mnt/workspace/merged.csv&#39;,sep=&quot;;&quot;)","headline":"Exemple de Merge avec Pandas Python","mainEntityOfPage":{"@type":"WebPage","@id":"https://virtual-thom.github.io/archives/exemple-merge-pandas-python/"},"url":"https://virtual-thom.github.io/archives/exemple-merge-pandas-python/"}</script>
+<!-- End Jekyll SEO tag -->
+
+  
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z8Y7902GRV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Z8Y7902GRV');
+</script>
+
+
+  <body>
+    <div class="container">
+      <header id="site-header">
+  <h1>Blog-notes VTOM, informatique, industrialisation, ordonnancement, DevOps</h1>
+  <nav>
+    <ul>
+      <li>
+        <a href="https://virtual-thom.github.io/archives" title="Home">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M18.121,9.88l-7.832-7.836c-0.155-0.158-0.428-0.155-0.584,0L1.842,9.913c-0.262,0.263-0.073,0.705,0.292,0.705h2.069v7.042c0,0.227,0.187,0.414,0.414,0.414h3.725c0.228,0,0.414-0.188,0.414-0.414v-3.313h2.483v3.313c0,0.227,0.187,0.414,0.413,0.414h3.726c0.229,0,0.414-0.188,0.414-0.414v-7.042h2.068h0.004C18.331,10.617,18.389,10.146,18.121,9.88 M14.963,17.245h-2.896v-3.313c0-0.229-0.186-0.415-0.414-0.415H8.342c-0.228,0-0.414,0.187-0.414,0.415v3.313H5.032v-6.628h9.931V17.245z M3.133,9.79l6.864-6.868l6.867,6.868H3.133z"></path>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a href="https://virtual-thom.github.io/archives/vos-commentaires-livre-d-or/" title="Commentaires - livre d'or">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M17.657,2.982H2.342c-0.234,0-0.425,0.191-0.425,0.426v10.21c0,0.234,0.191,0.426,0.425,0.426h3.404v2.553c0,0.397,0.48,0.547,0.725,0.302l2.889-2.854h8.298c0.234,0,0.426-0.191,0.426-0.426V3.408C18.083,3.174,17.892,2.982,17.657,2.982M17.232,13.192H9.185c-0.113,0-0.219,0.045-0.3,0.124l-2.289,2.262v-1.96c0-0.233-0.191-0.426-0.425-0.426H2.767V3.833h14.465V13.192z M10,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.488-0.668,1.488-1.489C11.488,7.905,10.821,7.237,10,7.237 M10,9.364c-0.352,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C10.638,9.077,10.351,9.364,10,9.364 M14.254,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489s1.489-0.668,1.489-1.489C15.743,7.905,15.075,7.237,14.254,7.237 M14.254,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.352,0,0.639,0.287,0.639,0.638C14.893,9.077,14.605,9.364,14.254,9.364 M5.746,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.489-0.668,1.489-1.489C7.234,7.905,6.566,7.237,5.746,7.237 M5.746,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C6.384,9.077,6.096,9.364,5.746,9.364"></path>
+          </svg>
+        </a>
+      </li>
+      
+      <li>
+        <a href="https://virtual-thom.github.io/about" title="Curriculum Vitae Thom">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z"></path>
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+      <div itemscope itemtype ="http://schema.org/Article" class="post">
+  
+  <header class="post-header">
+    <h1 itemprop="name about headline" class="post-title">Exemple de Merge avec Pandas Python</h1>
+    <p class="post-meta">
+      <time itemprop="datePublished dateModified" datetime="2017-10-10T12:00:00+00:00">10-10-2017</time></p>
+  </header>
+
+  <article class="post-content" itemprop="articleBody">
+    <h1 class="hidden">Exemple de Merge avec Pandas Python</h1>
+    <p>Note à moi même :</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Merge method	SQL Join Name	Description
+left	LEFT OUTER JOIN	Use keys from left frame only
+right	RIGHT OUTER JOIN	Use keys from right frame only
+outer	FULL OUTER JOIN	Use union of keys from both frames
+inner	INNER JOIN	Use intersection of keys from both frames
+</code></pre></div></div>
+<p>Image docker : docker run -v D:\MonDossier\csvpandas:/mnt/workspace -t -i  fastgenomics/pandas bash</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="n">csvDEV</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">read_csv</span><span class="p">(</span><span class="sh">'</span><span class="s">/mnt/workspace/lastexecvtom_dev.csv</span><span class="sh">'</span><span class="p">,</span><span class="n">delimiter</span><span class="o">=</span><span class="sa">r</span><span class="sh">"</span><span class="s">;</span><span class="sh">"</span><span class="p">,</span><span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">ENV</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">APP</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">JOB</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">HOST</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">MODEAPP</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">MODEJOB</span><span class="sh">"</span><span class="p">])</span>
+<span class="n">csvAllProd</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">read_csv</span><span class="p">(</span><span class="sh">'</span><span class="s">/mnt/workspace/lastexecvtom_allprod.csv</span><span class="sh">'</span><span class="p">,</span><span class="n">delimiter</span><span class="o">=</span><span class="sa">r</span><span class="sh">"</span><span class="s">;</span><span class="sh">"</span><span class="p">,</span><span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">ENV</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">APP</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">JOB</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">HOST</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">MODEAPP</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">MODEJOB</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">DEBUT</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">FIN</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">STATUT</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">DOMAINE</span><span class="sh">"</span><span class="p">])</span>
+<span class="n">csvIP</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">read_csv</span><span class="p">(</span><span class="sh">'</span><span class="s">/mnt/workspace/ip.csv</span><span class="sh">'</span><span class="p">,</span><span class="n">delimiter</span><span class="o">=</span><span class="sa">r</span><span class="sh">"</span><span class="s">;</span><span class="sh">"</span><span class="p">,</span><span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">DOMAINE</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">HOST</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">HOSTNAME</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">IP</span><span class="sh">"</span><span class="p">])</span>
+<span class="n">csvIP</span> <span class="o">=</span> <span class="n">csvIP</span><span class="p">.</span><span class="nf">drop_duplicates</span><span class="p">()</span>
+
+<span class="n">merge1</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">merge</span><span class="p">(</span><span class="n">csvDEV</span><span class="p">,</span><span class="n">csvAllProd</span><span class="p">,</span><span class="n">how</span><span class="o">=</span><span class="sh">'</span><span class="s">outer</span><span class="sh">'</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">ENV</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">APP</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">JOB</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">HOST</span><span class="sh">"</span><span class="p">],</span><span class="n">indicator</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">merge2</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="nf">merge</span><span class="p">(</span><span class="n">merge1</span><span class="p">,</span><span class="n">csvIP</span><span class="p">,</span><span class="n">how</span><span class="o">=</span><span class="sh">'</span><span class="s">left</span><span class="sh">'</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">HOST</span><span class="sh">"</span><span class="p">,</span><span class="sh">"</span><span class="s">DOMAINE</span><span class="sh">"</span><span class="p">])</span>
+
+<span class="n">merge2</span><span class="p">.</span><span class="nf">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="sh">'</span><span class="s">ENV</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">APP</span><span class="sh">'</span><span class="p">,</span><span class="sh">'</span><span class="s">JOB</span><span class="sh">'</span><span class="p">]).</span><span class="nf">to_csv</span><span class="p">(</span><span class="sh">'</span><span class="s">/mnt/workspace/merged.csv</span><span class="sh">'</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="sh">"</span><span class="s">;</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+  </article>
+  
+<nav>
+  <ul class="pager">
+    
+     
+    <li class="previous">
+      <a href="https://virtual-thom.github.io/archives/representation-graphique-commentaire/"><span aria-hidden="true">&larr;</span> Représentation graphique Nom + Commentaire</a> 
+    </li>
+    
+     
+     <li class="next">
+      <a class="next" href="https://virtual-thom.github.io/archives/border-line-2-vtom-psql-collections/">Border Line (n°2 !!!) VTOM V6 <span aria-hidden="true">&rarr;</span></a> 
+    </li>
+     
+    
+  </ul>
+</nav>
+
+
+  <footer class="post-footer">
+    
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>python</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>csv</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>pandas</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>merge</a>
+      
+    
+    <span  itemprop="author publisher" class="hidden">Virtual Thom</span>
+  </footer>
+  
+  <div id="disqus_thread" ></div>
+  <script>
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'thomas-asnar'; // required: replace example with your forum shortname
+  
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+</div>
+
+      <footer id="site-footer">
+    <div>&copy;<a href="https://github.com/virtual-thom/" title="Github Virtual-Thom">Virtual-Thom</a></div>
+    <div>
+            <a href="https://virtual-thom.github.io/archives/plan" title="Plan du site">sitemap</a> | <a href="https://virtual-thom.github.io/about" rel="publisher author" title="Curriculum vitae Thom">A propos</a>
+    </div>
+    <div>
+        <a id="goto-site-header" href="#site-header" title="Retourner au début">&uArr; Top</a>
+    </div>
+    <div id="footer-disclaimer">
+        <p>Avertissement : vous ne devez pas prendre pour argent comptant le contenu de ce site. Testez toujours la solution en environnement de test.</p>
+        <p>Malgré le sérieux que je m'efforce de mettre dans le contenu de ces billets, je ne pourrai être tenu responsable d'éventuelles erreurs que cela pourrait engendrer.</p>
+    </div>
+    <div>
+        <a class="hidden" href="https://virtual-thom.github.io/archives/sitemap.xml" title="SiteMap">sitemap</a>
+    </div>
+</footer>
+
+    </div>
+  </body>
+
+</html>

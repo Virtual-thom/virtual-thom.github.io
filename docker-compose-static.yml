@@ -1,0 +1,20 @@
+services:
+  site-static:
+    image: nginx:alpine
+    container_name: jekyll-static
+    volumes:
+      - .:/usr/share/nginx/html:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jekyll-static.rule=Host(`virtualthom-dev.ddns.net`)"
+      - "traefik.http.routers.jekyll-static.tls=true"
+      - "traefik.http.routers.jekyll-static.tls.certResolver=myresolver"
+      - "traefik.http.routers.jekyll-static.entrypoints=websecure"
+      - "traefik.http.services.jekyll-static.loadbalancer.server.port=80"
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
+

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="apple-touch-icon" href="https://virtual-thom.github.io/archives/apple-touch-icon.png">
+  <link rel="icon" href="https://virtual-thom.github.io/archives/favicon.ico" />
+  <!-- Remplacé par Jekyll SEO (sinon apparait en double)
+  <title>Docker introduction aux conteneurs</title>
+  <meta name="description" content="Quatre ans après ce billet, quelques petites modifications étaient nécessaires à mon sens. Autant, certaines techno’ tombent dans les oubliettes rapidement (...">
+  --> 
+  
+  <link rel="canonical" href="https://virtual-thom.github.io/archives/docker-conteneurs/">
+  
+  <link rel="stylesheet" media="screen" href="https://virtual-thom.github.io/archives/assets/main.css">
+  
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Docker introduction aux conteneurs | Virtual-Thom Blog-notes VTOM et informatique</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Docker introduction aux conteneurs" />
+<meta name="author" content="Virtual Thom" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Quatre ans après ce billet, quelques petites modifications étaient nécessaires à mon sens. Autant, certaines techno’ tombent dans les oubliettes rapidement (4 ans c’est long en informatique) autant Docker n’a fait que prendre du poids. Personnellement, je n’utilise plus que ça pour maintenir et déployer mes applications. Et en plus, ça fonctionne très bien sur mon RPI4." />
+<meta property="og:description" content="Quatre ans après ce billet, quelques petites modifications étaient nécessaires à mon sens. Autant, certaines techno’ tombent dans les oubliettes rapidement (4 ans c’est long en informatique) autant Docker n’a fait que prendre du poids. Personnellement, je n’utilise plus que ça pour maintenir et déployer mes applications. Et en plus, ça fonctionne très bien sur mon RPI4." />
+<link rel="canonical" href="https://virtual-thom.github.io/archives/docker-conteneurs/" />
+<meta property="og:url" content="https://virtual-thom.github.io/archives/docker-conteneurs/" />
+<meta property="og:site_name" content="Virtual-Thom Blog-notes VTOM et informatique" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-12-05T09:03:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Docker introduction aux conteneurs" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Virtual Thom"},"dateModified":"2020-12-05T09:03:00+00:00","datePublished":"2020-12-05T09:03:00+00:00","description":"Quatre ans après ce billet, quelques petites modifications étaient nécessaires à mon sens. Autant, certaines techno’ tombent dans les oubliettes rapidement (4 ans c’est long en informatique) autant Docker n’a fait que prendre du poids. Personnellement, je n’utilise plus que ça pour maintenir et déployer mes applications. Et en plus, ça fonctionne très bien sur mon RPI4.","headline":"Docker introduction aux conteneurs","mainEntityOfPage":{"@type":"WebPage","@id":"https://virtual-thom.github.io/archives/docker-conteneurs/"},"url":"https://virtual-thom.github.io/archives/docker-conteneurs/"}</script>
+<!-- End Jekyll SEO tag -->
+
+  
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z8Y7902GRV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Z8Y7902GRV');
+</script>
+
+
+  <body>
+    <div class="container">
+      <header id="site-header">
+  <h1>Blog-notes VTOM, informatique, industrialisation, ordonnancement, DevOps</h1>
+  <nav>
+    <ul>
+      <li>
+        <a href="https://virtual-thom.github.io/archives" title="Home">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M18.121,9.88l-7.832-7.836c-0.155-0.158-0.428-0.155-0.584,0L1.842,9.913c-0.262,0.263-0.073,0.705,0.292,0.705h2.069v7.042c0,0.227,0.187,0.414,0.414,0.414h3.725c0.228,0,0.414-0.188,0.414-0.414v-3.313h2.483v3.313c0,0.227,0.187,0.414,0.413,0.414h3.726c0.229,0,0.414-0.188,0.414-0.414v-7.042h2.068h0.004C18.331,10.617,18.389,10.146,18.121,9.88 M14.963,17.245h-2.896v-3.313c0-0.229-0.186-0.415-0.414-0.415H8.342c-0.228,0-0.414,0.187-0.414,0.415v3.313H5.032v-6.628h9.931V17.245z M3.133,9.79l6.864-6.868l6.867,6.868H3.133z"></path>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a href="https://virtual-thom.github.io/archives/vos-commentaires-livre-d-or/" title="Commentaires - livre d'or">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M17.657,2.982H2.342c-0.234,0-0.425,0.191-0.425,0.426v10.21c0,0.234,0.191,0.426,0.425,0.426h3.404v2.553c0,0.397,0.48,0.547,0.725,0.302l2.889-2.854h8.298c0.234,0,0.426-0.191,0.426-0.426V3.408C18.083,3.174,17.892,2.982,17.657,2.982M17.232,13.192H9.185c-0.113,0-0.219,0.045-0.3,0.124l-2.289,2.262v-1.96c0-0.233-0.191-0.426-0.425-0.426H2.767V3.833h14.465V13.192z M10,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.488-0.668,1.488-1.489C11.488,7.905,10.821,7.237,10,7.237 M10,9.364c-0.352,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C10.638,9.077,10.351,9.364,10,9.364 M14.254,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489s1.489-0.668,1.489-1.489C15.743,7.905,15.075,7.237,14.254,7.237 M14.254,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.352,0,0.639,0.287,0.639,0.638C14.893,9.077,14.605,9.364,14.254,9.364 M5.746,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.489-0.668,1.489-1.489C7.234,7.905,6.566,7.237,5.746,7.237 M5.746,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C6.384,9.077,6.096,9.364,5.746,9.364"></path>
+          </svg>
+        </a>
+      </li>
+      
+      <li>
+        <a href="https://virtual-thom.github.io/about" title="Curriculum Vitae Thom">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z"></path>
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+      <div itemscope itemtype ="http://schema.org/Article" class="post">
+  
+  <header class="post-header">
+    <h1 itemprop="name about headline" class="post-title">Docker introduction aux conteneurs</h1>
+    <p class="post-meta">
+      <time itemprop="datePublished dateModified" datetime="2020-12-05T09:03:00+00:00">05-12-2020</time></p>
+  </header>
+
+  <article class="post-content" itemprop="articleBody">
+    <h1 class="hidden">Docker introduction aux conteneurs</h1>
+    <p>Quatre ans après ce billet, quelques petites modifications étaient nécessaires à mon sens. Autant, certaines techno’ tombent dans les oubliettes rapidement (4 ans c’est long en informatique) autant Docker n’a fait que prendre du poids.<br />
+Personnellement, je n’utilise plus que ça pour maintenir et déployer mes applications. Et en plus, ça fonctionne très bien sur mon RPI4.
+<!--more--></p>
+
+<h1 id="comprendre-et-exploiter-docker">Comprendre et Exploiter Docker</h1>
+
+<p>La virtualisation des infrastructures est omniprésente. Les besoins et les méthodes de travail évoluant, les conteneurs ont pris de plus en plus d’importance.</p>
+
+<p>Docker permet aux développeurs de ne plus se soucier de la partie système. Beaucoup plus simple d’utilisation (quelques commandes à connaître à peine) qu’un Ansible, Chef ou Puppet, les dev n’auront qu’à maintenir leurs infrastructures “as code” (IaC) et à déployer leur images : le Dockerfile pour la construction de l’image, le docker-compose.yml pour le déploiement de l’application en conteneurs.</p>
+
+<p>Par exemple, Google exécute environ 3300 conteneurs à la seconde ! (vrai en 2016)</p>
+
+<blockquote>
+  <p>Everything at Google, from Search to Gmail, is packaged and run in a Linux container. Each week we launch more than 2 billion container instances</p>
+</blockquote>
+
+<h2 id="introduction-à-docker">Introduction à Docker</h2>
+
+<p>Notez que la notion de conteneur n’est pas toute jeune (voir les zones Solaris par exemple, ou namespace + cgroups linux pour isoler) mais, pour moi, la grande force de Docker est sa facilité d’utilisation et une documentation en ligne vraiment riche en exemples et explications.</p>
+
+<p>J’aime bien cette conversation qui illustre bien le changement des relations entre Dev (Build) et Ops (Run) :</p>
+
+<p>Avant :</p>
+
+<ul>
+  <li>Dev : Hey, tiens, voilà mon application (mon script, mon service ou autre).</li>
+  <li>Ops : Rolala, il faut que je provisionne une VM, que j’installe toutes les dépendances, que je maintienne encore un nouveau host, que les DBA doivent encore monter une instance, etc.</li>
+  <li>Ops 3 jours plus tard : Ca ne fonctionne pas ton application</li>
+  <li>Dev : Hey, ça n’est pas mon problème, ça fonctionne chez moi. Ca doit être ton environnement qui est en cause</li>
+  <li>Ops : Allez que je cherche pendant 3 jours et que la version de telle ou telle librairie n’était pas la bonne. PepeHands</li>
+</ul>
+
+<p>Avec une infrastructure as code :</p>
+
+<ul>
+  <li>Dev : Hey, tiens, voilà mon code qui permet de déployer l’infrastructure et mon application.</li>
+  <li>Ops : Ok, super, je n’ai qu’à appuyer sur un bouton. Oh ça fonctionne !</li>
+</ul>
+
+<p>L’Ops n’aura plus qu’à gérer la partie “réseau”, routage, et autres TLS avec le reverse proxy <a href="https://doc.traefik.io/traefik/">Traefik</a>, la partie sauvegarde et réplication et basta. (partie qu’il aurait, de toutes manières, eu à gérer par ailleurs)</p>
+
+<p>Le plus facile pour appréhender Docker est de comprendre la différence entre une machine virtuelle et un conteneur.</p>
+
+<h3 id="différences-entre-les-vms-et-les-conteneurs"><a href="https://blog.netapp.com/blogs/containers-vs-vms/">Différences entre les VM’s et les Conteneurs</a></h3>
+
+<p>VMs</p>
+
+<p><img src="https://www.docker.com/sites/default/files/what-is-docker-diagram.png" alt="what-is-docker-diagram" title="what-is-docker-diagram" /></p>
+
+<p>Conteneurs</p>
+
+<p><img src="https://www.docker.com/sites/default/files/what-is-vm-diagram.png" alt="what-is-vm-diagram" title="what-is-vm-diagram" /></p>
+
+<p>Les machines virtuelles ont leur propre système d’exploitation et ressources allouées (CPU, mémoire, stockage, etc.) C’est un avantage car on a ce que l’on paye (ressources réservées). Mais c’est aussi un inconvéniant : d’une part, la limite de ressources à allouer est vite atteinte, et, d’autre part, les VM’s en exécution sont bien souvent sous-exploitées (gaspillage).</p>
+
+<p>Les conteneurs Docker, eux, se basent sur le système d’exploitation du host (noyau linux &gt; à 3.10). Avec Docker, on peut lancer des milliers d’applications hétérogènes (serveur web, serveur d’application, big data, etc.) sur la même machine ; et cela, sans la complexité ni la lourde charge d’un hyperviseur (comme par exemple un gros vCenter pour VMWare).</p>
+
+<p>Un autre avantage des conteneurs : ils garantissent que le code qui a été écrit et testé directement chez les Dev’ sera exécuté de la même manière une fois déployé ailleurs. Que ça soit sur le cloud, sur des VM’s ou sur une infrastructure complètement différente, l’application dispose déjà dans son conteneur des librairies dont elle a besoin.</p>
+
+<p>Une autre différence de taille (si je puis dire) : le poids des images. Contrairement aux VMs qui embarquent le SE et qui pèsent plusieurs dizaines de Giga Octets, les images sont très légères et leur poids dépend des librairies qui font tourner l’application (en général quelques centaines de Méga Octets)</p>
+
+<p>Les PCA et PRA (Plan de Continuité d’Activité ou Plan de Reprise d’Activité) deviendraient presque un jeu d’enfant (réplication et déploiement facilités)</p>
+
+<p><strong>Exemple pour récupérer une image de serveur web nginx</strong> : je vous laisse juger de la simplicité des commandes</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># pull de l'image depuis Docker Hub
+$ docker pull nginx
+Using default tag: latest
+latest: Pulling from library/nginx
+...
+Digest: sha256:46a1b05e9ded54272e11b06e13727371a65e2ef8a87f9fb447c64e0607b90340
+Status: Downloaded newer image for nginx:latest
+
+# liste des images locales
+$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+nginx               latest              3edcc5de5a79        3 days ago          182.8 MB
+</code></pre></div></div>
+
+<h3 id="produits-docker">Produits Docker</h3>
+
+<p><a href="https://www.docker.com/products/docker-engine">Docker Engine</a> est le moteur qui tourne sous Linux et permet la gestion/exécution des conteneurs.</p>
+
+<p><a href="https://www.docker.com/products/docker-machine">Docker Machine</a> permet de configurer et d’exécuter Docker Engine sur une machine virtuelle linux très légère. Indispensable sous Windows.</p>
+
+<p><a href="https://www.docker.com/products/docker-compose">Docker Compose</a> permet de définir la configuration d’un ou plusieurs conteneurs en un seul fichier puis, de les exécuter en une seule commande. On pourrait même dire, que c’est la configuration de l’application complète qui définit les liens entre les conteneurs, les ports à utiliser, les volumes, etc.</p>
+
+<p><a href="https://www.docker.com/products/docker-hub">Docker Hub</a> permet de publier sur le cloud (privé ou public) vos conteneurs versionnés.</p>
+
+<p>D’autres produits existent mais font l’objet d’une utilisation plus poussée (voir <a href="#pour-aller-plus-loin">Pour aller plus loin</a>)</p>
+
+<h3 id="principe-de-fonctionnement"><a href="https://docs.docker.com/engine/understanding-docker/">Principe de fonctionnement</a></h3>
+
+<h4 id="les-images">Les images</h4>
+
+<p>Elles sont construites comme une succession de couches avec pour base un système d’exploitation, une distribution type debian, ubuntu, ou alpine par exemple.</p>
+
+<p>Toutes les couches (exécution, dépendances librairies, ajout de fichier, variables d’environnement) peuvent être décrites comme des instructions dans un fichier <code class="language-plaintext highlighter-rouge">Dockerfile</code> qu’on peut utiliser comme template pour construire notre image.</p>
+
+<p>Autre possibilité pour construire votre image : exécutez une image de distribution de base (un conteneur donc), installez vos librairies et votre application puis perpétrez votre conteneur en image <a href="https://docs.docker.com/engine/reference/commandline/commit/">commit</a></p>
+
+<p>Avantages de cette construction en couches : si vous avez deux images basées sur deux ubuntu par exemple, la couche “ubuntu” ne prendra qu’une fois la place sur disque.</p>
+
+<h4 id="le-conteneur">Le conteneur</h4>
+
+<p>C’est l’image exécutée avec <code class="language-plaintext highlighter-rouge">docker run</code>. Pour que le conteneur puisse “vivre” et l’image étant en lecture seule, des couches systèmes supplémentaires sont allouées comme UnionFS en écriture pour le filesystem ou une interface réseau par exemple.</p>
+
+<p>A noter : le conteneur se basant sur l’image, toutes les modifications qu’on effectuera dans le conteneur seront “perdues” à la prochaine exécution (à moins de <a href="https://docs.docker.com/engine/reference/commandline/commit/">commit</a> le conteneur en image)</p>
+
+<p>D’où la nécessité d’utiliser les volumes.</p>
+
+<h4 id="les-volumes">Les volumes</h4>
+
+<p>Indispensable pour la persistance des données, on peut monter des volumes accessibles dans les conteneurs. Faciles à sauvegarder et à restaurer.</p>
+
+<p><a href="https://docs.docker.com/engine/userguide/containers/dockervolumes/">Plus de détails sur la data</a></p>
+
+<h2 id="exemple-dutilisation-avec-docker-compose">Exemple d’utilisation avec Docker Compose</h2>
+
+<p><a href="https://docs.docker.com/compose/gettingstarted/">Getting started</a></p>
+
+<p>Et si on exécutait un wordpress ? Rien de plus simple :</p>
+
+<p>Créons un fichier wordpress-compose.yml</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wordpress:
+  image: wordpress
+  links:
+    - db:mysql
+  ports:
+    - 8080:80
+
+db:
+  image: mariadb
+  environment:
+    MYSQL_ROOT_PASSWORD: example
+</code></pre></div></div>
+
+<p>Lançons maintenant ces deux conteneurs. Vous allez voir, c’est très très dur ! ou pas, en fait, docker-compose s’occupe de tout.</p>
+
+<p>Soit les images définies existent en local, soit il va les chercher sur Docker Hub. On peut aussi définir une commande build avec son propre Dockerfile pour construire l’image si elle n’existe pas. Par exemple, l’image <code class="language-plaintext highlighter-rouge">wordpress</code> ci-dessus est issue du <a href="https://github.com/docker-library/wordpress/blob/618490d4bdff6c5774b84b717979bfe3d6ba8ad1/apache/Dockerfile#L5-L9">Dockerfile suivant</a></p>
+
+<p>Il créé les dépendances, les ouvertures de ports, les variables d’environnement, etc.</p>
+
+<p>Petit bonus, lorsque Docker Compose redémarre les services, s’il trouve des conteneurs déjà existants, et s’il n’y a pas d’update à faire, il reprend les anciens. Pour voir tous les conteneurs même ceux arrêtés : <code class="language-plaintext highlighter-rouge">docker ps -a</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ docker-compose -f wordpress-compose.yml up
+Pulling db (mariadb:latest)...
+latest: Pulling from library/mariadb
+Digest: sha256:648500ff8eb35b9967a5e77735d0f66fefb8a48377a65312a375a944cdcfda0a
+Status: Downloaded newer image for mariadb:latest
+Creating compose_db_1
+Pulling wordpress (wordpress:latest)...
+latest: Pulling from library/wordpress
+Digest: sha256:282b474f38ef7c79b50ac45d7430a7c1851db54ccdd134472ad200fab405587e
+Status: Downloaded newer image for wordpress:latest
+Creating compose_wordpress_1
+Attaching to compose_db_1, compose_wordpress_1
+db_1        | Initializing database
+...
+
+</code></pre></div></div>
+
+<p><img src="https://virtual-thom.github.io/archives/assets/img/wordpress_intro.jpg" alt="wordpress accueil" title="wordpress accueil" /></p>
+
+<h3 id="en-aparté--iac-sauvegarde-déploiement">En aparté : IaC, Sauvegarde, déploiement</h3>
+<p>Les deux fichiers principaux à maintenir (versionner, gardienner avec git par ex.) sont le <a href="https://docs.docker.com/engine/reference/builder/">Dockerfile le builder infrastructure</a> et le <a href="https://docs.docker.com/compose/compose-file/">docker-compose.yml pour la partie déploiement de l’application</a>.<br />
+Le déploiement se résumera à exécuter <code class="language-plaintext highlighter-rouge">docker-compose up</code>.</p>
+
+<p>Sinon, on peut aussi sauvegarder les images :</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ docker save -o monImageNginx.tar nginx
+$ ls -lh
+-rw-r--r-- 1 thoma 197609 182M mai    7 22:12 monImageNginx.tar
+
+# la compression fonctionne très bien sur les conteneurs
+$ zip monImageNginx.tar.zip monImageNginx.tar
+  adding: monImageNginx.tar (172 bytes security) (deflated 63%)
+$ ls -lh
+-rw-r--r-- 1 thoma 197609  69M mai    7 22:14 monImageNginx.tar.zip
+
+</code></pre></div></div>
+
+<p>Il n’y a plus qu’à transférer la sauvegarde et à la recharger sur n’importe quelle plateforme :</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ docker load -i monImageNginx.tar
+</code></pre></div></div>
+
+<p>On peut aussi <a href="https://docs.docker.com/engine/reference/commandline/push/">pousser</a> son image sur le cloud (Docker Hub) en s’authentifiant sur son <a href="https://docs.docker.com/engine/reference/commandline/login/">Docker registry</a></p>
+
+<p>Vous voulez le meilleur ? toutes les modifications apportées à l’image de base constituent des couches (layers). Par conséquent, les transferts de vos applications conteneurs ne prennent en charge que les deltas des couches manquantes ou modifiées !!</p>
+
+<h2 id="pour-aller-plus-loin">Pour aller plus loin</h2>
+
+<p><a href="https://docs.docker.com/">Documentation Docker</a> : comment installer, utiliser les commandes en détails etc.</p>
+
+<p><a href="https://www.docker.com/products/docker-swarm">Doker Swarm</a> : Docker en mode cluster</p>
+
+<p><a href="http://kubernetes.io/">Kubernetes</a> : Automatisation des opérations d’exploitation de conteneurs à travers le cloud et clusters de machines</p>
+
+<p>et d’autres Docker Cloud, Datacenter, Kinematic etc. voir <a href="https://www.docker.com/products/overview">tous les produits</a></p>
+
+<p><a href="https://www.openshift.com/">Openshift</a> de RedHat. Plateforme d’hébergement basée sur Docker et Kubernetes qui propsent différents plans (dont un gratuit) pour développer et exécuter vos applications sur le cloud</p>
+
+<p>J’adore les tutoriels Grafikart et c’est en français :</p>
+
+<ul>
+  <li><a href="https://www.grafikart.fr/tutoriels/docker/docker-intro-634">Présentation de Docker</a></li>
+  <li><a href="https://www.grafikart.fr/tutoriels/docker/docker-stack-web-635">Environnement de développement basé sur Docker</a></li>
+</ul>
+
+<p><a href="https://msdn.microsoft.com/fr-fr/virtualization/windowscontainers/about/about_overview#vidéo-de-présentation">Superbe vidéo pour bien comprendre les conteneurs. Microsoft fait de gros efforts en ce moment ! Hyper-v et Docker</a></p>
+
+  </article>
+  
+<nav>
+  <ul class="pager">
+    
+     
+    <li class="previous">
+      <a href="https://virtual-thom.github.io/archives/algorithme-sudoku-resolver-python-javascript/"><span aria-hidden="true">&larr;</span> Algorithme pour résoudre un sudoku (python et javascript)</a> 
+    </li>
+    
+     
+     <li class="next">
+      <a class="next" href="https://virtual-thom.github.io/archives/statistiques-vtom-psql/">Statistiques VTOM PSQL <span aria-hidden="true">&rarr;</span></a> 
+    </li>
+     
+    
+  </ul>
+</nav>
+
+
+  <footer class="post-footer">
+    
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>docker</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>conteneurs</a>
+      
+    
+    <span  itemprop="author publisher" class="hidden">Virtual Thom</span>
+  </footer>
+  
+  <div id="disqus_thread" ></div>
+  <script>
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'thomas-asnar'; // required: replace example with your forum shortname
+  
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+</div>
+
+      <footer id="site-footer">
+    <div>&copy;<a href="https://github.com/virtual-thom/" title="Github Virtual-Thom">Virtual-Thom</a></div>
+    <div>
+            <a href="https://virtual-thom.github.io/archives/plan" title="Plan du site">sitemap</a> | <a href="https://virtual-thom.github.io/about" rel="publisher author" title="Curriculum vitae Thom">A propos</a>
+    </div>
+    <div>
+        <a id="goto-site-header" href="#site-header" title="Retourner au début">&uArr; Top</a>
+    </div>
+    <div id="footer-disclaimer">
+        <p>Avertissement : vous ne devez pas prendre pour argent comptant le contenu de ce site. Testez toujours la solution en environnement de test.</p>
+        <p>Malgré le sérieux que je m'efforce de mettre dans le contenu de ces billets, je ne pourrai être tenu responsable d'éventuelles erreurs que cela pourrait engendrer.</p>
+    </div>
+    <div>
+        <a class="hidden" href="https://virtual-thom.github.io/archives/sitemap.xml" title="SiteMap">sitemap</a>
+    </div>
+</footer>
+
+    </div>
+  </body>
+
+</html>

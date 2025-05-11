@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="apple-touch-icon" href="https://virtual-thom.github.io/archives/apple-touch-icon.png">
+  <link rel="icon" href="https://virtual-thom.github.io/archives/favicon.ico" />
+  <!-- Remplacé par Jekyll SEO (sinon apparait en double)
+  <title>Priorité queue batch VTOM</title>
+  <meta name="description" content="&lt;EDIT&gt;Une option de priorité a été ajoutée depuis 5.7+ et se gère au niveau des objets Applications et Traitements. (case à cocher “Priorité” de 0 jusq...">
+  --> 
+  
+  <link rel="canonical" href="https://virtual-thom.github.io/archives/priorite-queue-batch-vtom/">
+  
+  <link rel="stylesheet" media="screen" href="https://virtual-thom.github.io/archives/assets/main.css">
+  
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Priorité queue batch VTOM | Virtual-Thom Blog-notes VTOM et informatique</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Priorité queue batch VTOM" />
+<meta name="author" content="Virtual Thom" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="&lt;EDIT&gt; Une option de priorité a été ajoutée depuis 5.7+ et se gère au niveau des objets Applications et Traitements. (case à cocher “Priorité” de 0 jusqu’à 127, 0 étant le moins prioritaire). Cette nouvelle fonctionnalité palie à la décision arbitraire du moteur de mettre tel ou tel job (ou application) à ENCOURS avant tel ou tel autre, mais ne remplace pas la priorité de la queue batch dans la file d’attente. Problématique des gros environnements de production Certains clients VTOM à forte charge d’ordonnancement voient leurs files d’attente saturées, et des traitements non prioritaires qui durent des heures bloquent le passage de traitements “rapides” (qui pourraient débloquer des chaînes bien plus prioritaires). Priorité dans la file d’attente : principe Tous les jobs dont le moteur a validé les contraintes (horaires, liens, ressources) passent à « EN COURS » dans VTOM selon un ordre propre au moteur. (ex. JOB_1 commence avant JOB_2 qui commence avant JOB_3 etc. quelque soit la priorité de vos queues). « EN COURS » dans VTOM != d’en cours d’exécution sur le host. Seuls les n premiers jobs (nombre de jobs simultanés configuré dans le queue.conf) s’exécutent réellement, le reste passe en file d’attente (souvent illimitée -1). Dès qu’un job se termine, il libère une place et les jobs avec la queue batch la plus prioritaire se déclenchent. Mise en place des queues prioritaires La gestion des priorités est prise en charge suite à : Paramétrage du fichier vtom.ini, Déclaration des queues batch dans le référentiel. Paramètre ABM_QUEUES_PRIORITY_INCREMENT dans le vtom.ini sous [BDAEMON] sont les suivants : DISABLED : la gestion est désactivée. BY_ONE : après chaque fin de Traitement, la priorité des travaux présents dans la file est incrémentée de 1. (activé par défaut) BY_PRIORITY : après chaque fin de Traitement, la priorité des travaux présents dans la file est incrémentée de la priorité initiale. Ex. priorité sur la queue batch « queue_ksh » : queue_ksh.0 » pour les Traitements non prioritaires, queue_ksh.3 » pour les Traitements peu prioritaires, queue_ksh[.5] » par défaut, queue_ksh.7 » pour les Traitements relativement prioritaires, queue_ksh.10 » pour les Traitements prioritaires. Remarques : Les Traitements ayant une priorité initiale à 10 la conservent et sont prioritaires quelque soit la priorité des autres Traitements. Les Traitements ayant une priorité initiale à 0 la conservent. Solutions pour améliorer votre file d’attente mettre en place ce système de priorisation des queues batch &lt;nom queue&gt;.[0-10] analyser vos jobs, et éviter d’exécuter des jobs sur des clients de traitement/applicatif alors qu’ils pourraient/devraient tourner sur les clients du serveur VTOM (valorisation de ressource par exemple) éviter les scripts qui ne font rien d’autres que temporiser ou attendre des ressources (typiquement le job : exit 0, qui attend que telle ou telle ressource soit dispo) à une époque, il était pratique d’avoir la log d’exécution sur le traitement pour connaître les heures de passage, mais maintenant avec les statistiques sélectives, on s’en passe soit on remplace par un job en simulation (pas de passage dans la file d’attente), soit on essaye de positionner les ressources au niveau de l’application plutôt que du job (si c’est faisable) multiplier les queues d’exécution : 1 queue pour les traitements techniques “rapides” 1 queue pour les traitements applicatifs “longs” rappel queue batch 1 file d’attente = 1 queue batch VTOM sur 1 client VTOM 1 client VTOM = 1 process bdaemon sur 1 machine (si plusieurs bdaemon sur une machine, ce sont des clients VTOM différents - port qui change) Les queues sont configurées dans $ABM/config/queues du client 1 répertoire / queue : $ ls -l $ABM/config/queues drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 $job$ drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 $none$ drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_csh drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_ksh drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_perl drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_rexx drwxr-xr-x 2 u1vtom vtom 256 Jun 30 2014 queue_sap drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_sh drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_tcsh 1 queue.conf + 1 users / répertoire : $ cat $ABM/config/queues/queue_ksh/queue.conf queue_ksh nom de la queue 10 nombre max. de jobs en simultané -1 nombre max. de jobs dans la file d’attente (-1 illimité) /bin/ksh binaire pour lancer la queue 20 obsolète $ cat $ABM/config/queues/queue_ksh/users any:-1:-1 on peut surdéfinir la priorité par utilisateur unix : user:nb max. parall:nb max. file 1 job en cours dans VTOM = 1 fichier dans $ABM_SPOOL (+ .env si dans la file) $ ls $ABM_SPOOL 10 12 14 16 18 20 21 22 23 24 25 26 27 28 29 30 31 32 11 13 15 17 19 20.env 21.env 22.env 23.env 24.env 25.env 26.env 27.env 28.env 29.env 30.env 31.env 32.env Ecrire sa queue batch VTOM" />
+<meta property="og:description" content="&lt;EDIT&gt; Une option de priorité a été ajoutée depuis 5.7+ et se gère au niveau des objets Applications et Traitements. (case à cocher “Priorité” de 0 jusqu’à 127, 0 étant le moins prioritaire). Cette nouvelle fonctionnalité palie à la décision arbitraire du moteur de mettre tel ou tel job (ou application) à ENCOURS avant tel ou tel autre, mais ne remplace pas la priorité de la queue batch dans la file d’attente. Problématique des gros environnements de production Certains clients VTOM à forte charge d’ordonnancement voient leurs files d’attente saturées, et des traitements non prioritaires qui durent des heures bloquent le passage de traitements “rapides” (qui pourraient débloquer des chaînes bien plus prioritaires). Priorité dans la file d’attente : principe Tous les jobs dont le moteur a validé les contraintes (horaires, liens, ressources) passent à « EN COURS » dans VTOM selon un ordre propre au moteur. (ex. JOB_1 commence avant JOB_2 qui commence avant JOB_3 etc. quelque soit la priorité de vos queues). « EN COURS » dans VTOM != d’en cours d’exécution sur le host. Seuls les n premiers jobs (nombre de jobs simultanés configuré dans le queue.conf) s’exécutent réellement, le reste passe en file d’attente (souvent illimitée -1). Dès qu’un job se termine, il libère une place et les jobs avec la queue batch la plus prioritaire se déclenchent. Mise en place des queues prioritaires La gestion des priorités est prise en charge suite à : Paramétrage du fichier vtom.ini, Déclaration des queues batch dans le référentiel. Paramètre ABM_QUEUES_PRIORITY_INCREMENT dans le vtom.ini sous [BDAEMON] sont les suivants : DISABLED : la gestion est désactivée. BY_ONE : après chaque fin de Traitement, la priorité des travaux présents dans la file est incrémentée de 1. (activé par défaut) BY_PRIORITY : après chaque fin de Traitement, la priorité des travaux présents dans la file est incrémentée de la priorité initiale. Ex. priorité sur la queue batch « queue_ksh » : queue_ksh.0 » pour les Traitements non prioritaires, queue_ksh.3 » pour les Traitements peu prioritaires, queue_ksh[.5] » par défaut, queue_ksh.7 » pour les Traitements relativement prioritaires, queue_ksh.10 » pour les Traitements prioritaires. Remarques : Les Traitements ayant une priorité initiale à 10 la conservent et sont prioritaires quelque soit la priorité des autres Traitements. Les Traitements ayant une priorité initiale à 0 la conservent. Solutions pour améliorer votre file d’attente mettre en place ce système de priorisation des queues batch &lt;nom queue&gt;.[0-10] analyser vos jobs, et éviter d’exécuter des jobs sur des clients de traitement/applicatif alors qu’ils pourraient/devraient tourner sur les clients du serveur VTOM (valorisation de ressource par exemple) éviter les scripts qui ne font rien d’autres que temporiser ou attendre des ressources (typiquement le job : exit 0, qui attend que telle ou telle ressource soit dispo) à une époque, il était pratique d’avoir la log d’exécution sur le traitement pour connaître les heures de passage, mais maintenant avec les statistiques sélectives, on s’en passe soit on remplace par un job en simulation (pas de passage dans la file d’attente), soit on essaye de positionner les ressources au niveau de l’application plutôt que du job (si c’est faisable) multiplier les queues d’exécution : 1 queue pour les traitements techniques “rapides” 1 queue pour les traitements applicatifs “longs” rappel queue batch 1 file d’attente = 1 queue batch VTOM sur 1 client VTOM 1 client VTOM = 1 process bdaemon sur 1 machine (si plusieurs bdaemon sur une machine, ce sont des clients VTOM différents - port qui change) Les queues sont configurées dans $ABM/config/queues du client 1 répertoire / queue : $ ls -l $ABM/config/queues drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 $job$ drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 $none$ drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_csh drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_ksh drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_perl drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_rexx drwxr-xr-x 2 u1vtom vtom 256 Jun 30 2014 queue_sap drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_sh drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_tcsh 1 queue.conf + 1 users / répertoire : $ cat $ABM/config/queues/queue_ksh/queue.conf queue_ksh nom de la queue 10 nombre max. de jobs en simultané -1 nombre max. de jobs dans la file d’attente (-1 illimité) /bin/ksh binaire pour lancer la queue 20 obsolète $ cat $ABM/config/queues/queue_ksh/users any:-1:-1 on peut surdéfinir la priorité par utilisateur unix : user:nb max. parall:nb max. file 1 job en cours dans VTOM = 1 fichier dans $ABM_SPOOL (+ .env si dans la file) $ ls $ABM_SPOOL 10 12 14 16 18 20 21 22 23 24 25 26 27 28 29 30 31 32 11 13 15 17 19 20.env 21.env 22.env 23.env 24.env 25.env 26.env 27.env 28.env 29.env 30.env 31.env 32.env Ecrire sa queue batch VTOM" />
+<link rel="canonical" href="https://virtual-thom.github.io/archives/priorite-queue-batch-vtom/" />
+<meta property="og:url" content="https://virtual-thom.github.io/archives/priorite-queue-batch-vtom/" />
+<meta property="og:site_name" content="Virtual-Thom Blog-notes VTOM et informatique" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2016-03-10T22:53:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Priorité queue batch VTOM" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Virtual Thom"},"dateModified":"2016-03-10T22:53:00+00:00","datePublished":"2016-03-10T22:53:00+00:00","description":"&lt;EDIT&gt; Une option de priorité a été ajoutée depuis 5.7+ et se gère au niveau des objets Applications et Traitements. (case à cocher “Priorité” de 0 jusqu’à 127, 0 étant le moins prioritaire). Cette nouvelle fonctionnalité palie à la décision arbitraire du moteur de mettre tel ou tel job (ou application) à ENCOURS avant tel ou tel autre, mais ne remplace pas la priorité de la queue batch dans la file d’attente. Problématique des gros environnements de production Certains clients VTOM à forte charge d’ordonnancement voient leurs files d’attente saturées, et des traitements non prioritaires qui durent des heures bloquent le passage de traitements “rapides” (qui pourraient débloquer des chaînes bien plus prioritaires). Priorité dans la file d’attente : principe Tous les jobs dont le moteur a validé les contraintes (horaires, liens, ressources) passent à « EN COURS » dans VTOM selon un ordre propre au moteur. (ex. JOB_1 commence avant JOB_2 qui commence avant JOB_3 etc. quelque soit la priorité de vos queues). « EN COURS » dans VTOM != d’en cours d’exécution sur le host. Seuls les n premiers jobs (nombre de jobs simultanés configuré dans le queue.conf) s’exécutent réellement, le reste passe en file d’attente (souvent illimitée -1). Dès qu’un job se termine, il libère une place et les jobs avec la queue batch la plus prioritaire se déclenchent. Mise en place des queues prioritaires La gestion des priorités est prise en charge suite à : Paramétrage du fichier vtom.ini, Déclaration des queues batch dans le référentiel. Paramètre ABM_QUEUES_PRIORITY_INCREMENT dans le vtom.ini sous [BDAEMON] sont les suivants : DISABLED : la gestion est désactivée. BY_ONE : après chaque fin de Traitement, la priorité des travaux présents dans la file est incrémentée de 1. (activé par défaut) BY_PRIORITY : après chaque fin de Traitement, la priorité des travaux présents dans la file est incrémentée de la priorité initiale. Ex. priorité sur la queue batch « queue_ksh » : queue_ksh.0 » pour les Traitements non prioritaires, queue_ksh.3 » pour les Traitements peu prioritaires, queue_ksh[.5] » par défaut, queue_ksh.7 » pour les Traitements relativement prioritaires, queue_ksh.10 » pour les Traitements prioritaires. Remarques : Les Traitements ayant une priorité initiale à 10 la conservent et sont prioritaires quelque soit la priorité des autres Traitements. Les Traitements ayant une priorité initiale à 0 la conservent. Solutions pour améliorer votre file d’attente mettre en place ce système de priorisation des queues batch &lt;nom queue&gt;.[0-10] analyser vos jobs, et éviter d’exécuter des jobs sur des clients de traitement/applicatif alors qu’ils pourraient/devraient tourner sur les clients du serveur VTOM (valorisation de ressource par exemple) éviter les scripts qui ne font rien d’autres que temporiser ou attendre des ressources (typiquement le job : exit 0, qui attend que telle ou telle ressource soit dispo) à une époque, il était pratique d’avoir la log d’exécution sur le traitement pour connaître les heures de passage, mais maintenant avec les statistiques sélectives, on s’en passe soit on remplace par un job en simulation (pas de passage dans la file d’attente), soit on essaye de positionner les ressources au niveau de l’application plutôt que du job (si c’est faisable) multiplier les queues d’exécution : 1 queue pour les traitements techniques “rapides” 1 queue pour les traitements applicatifs “longs” rappel queue batch 1 file d’attente = 1 queue batch VTOM sur 1 client VTOM 1 client VTOM = 1 process bdaemon sur 1 machine (si plusieurs bdaemon sur une machine, ce sont des clients VTOM différents - port qui change) Les queues sont configurées dans $ABM/config/queues du client 1 répertoire / queue : $ ls -l $ABM/config/queues drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 $job$ drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 $none$ drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_csh drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_ksh drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_perl drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_rexx drwxr-xr-x 2 u1vtom vtom 256 Jun 30 2014 queue_sap drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_sh drwxr-xr-x 2 u1vtom vtom 256 Jun 7 2012 queue_tcsh 1 queue.conf + 1 users / répertoire : $ cat $ABM/config/queues/queue_ksh/queue.conf queue_ksh nom de la queue 10 nombre max. de jobs en simultané -1 nombre max. de jobs dans la file d’attente (-1 illimité) /bin/ksh binaire pour lancer la queue 20 obsolète $ cat $ABM/config/queues/queue_ksh/users any:-1:-1 on peut surdéfinir la priorité par utilisateur unix : user:nb max. parall:nb max. file 1 job en cours dans VTOM = 1 fichier dans $ABM_SPOOL (+ .env si dans la file) $ ls $ABM_SPOOL 10 12 14 16 18 20 21 22 23 24 25 26 27 28 29 30 31 32 11 13 15 17 19 20.env 21.env 22.env 23.env 24.env 25.env 26.env 27.env 28.env 29.env 30.env 31.env 32.env Ecrire sa queue batch VTOM","headline":"Priorité queue batch VTOM","mainEntityOfPage":{"@type":"WebPage","@id":"https://virtual-thom.github.io/archives/priorite-queue-batch-vtom/"},"url":"https://virtual-thom.github.io/archives/priorite-queue-batch-vtom/"}</script>
+<!-- End Jekyll SEO tag -->
+
+  
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z8Y7902GRV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Z8Y7902GRV');
+</script>
+
+
+  <body>
+    <div class="container">
+      <header id="site-header">
+  <h1>Blog-notes VTOM, informatique, industrialisation, ordonnancement, DevOps</h1>
+  <nav>
+    <ul>
+      <li>
+        <a href="https://virtual-thom.github.io/archives" title="Home">
+          <svg class="svg-icon" viewbox="0 0 20 20">
+            <path d="M18.121,9.88l-7.832-7.836c-0.155-0.158-0.428-0.155-0.584,0L1.842,9.913c-0.262,0.263-0.073,0.705,0.292,0.705h2.069v7.042c0,0.227,0.187,0.414,0.414,0.414h3.725c0.228,0,0.414-0.188,0.414-0.414v-3.313h2.483v3.313c0,0.227,0.187,0.414,0.413,0.414h3.726c0.229,0,0.414-0.188,0.414-0.414v-7.042h2.068h0.004C18.331,10.617,18.389,10.146,18.121,9.88 M14.963,17.245h-2.896v-3.313c0-0.229-0.186-0.415-0.414-0.415H8.342c-0.228,0-0.414,0.187-0.414,0.415v3.313H5.032v-6.628h9.931V17.245z M3.133,9.79l6.864-6.868l6.867,6.868H3.133z"></path>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a href="https://virtual-thom.github.io/archives/vos-commentaires-livre-d-or/" title="Commentaires - livre d'or">
+          <svg class="svg-icon" viewbox="0 0 20 20">
+            <path d="M17.657,2.982H2.342c-0.234,0-0.425,0.191-0.425,0.426v10.21c0,0.234,0.191,0.426,0.425,0.426h3.404v2.553c0,0.397,0.48,0.547,0.725,0.302l2.889-2.854h8.298c0.234,0,0.426-0.191,0.426-0.426V3.408C18.083,3.174,17.892,2.982,17.657,2.982M17.232,13.192H9.185c-0.113,0-0.219,0.045-0.3,0.124l-2.289,2.262v-1.96c0-0.233-0.191-0.426-0.425-0.426H2.767V3.833h14.465V13.192z M10,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.488-0.668,1.488-1.489C11.488,7.905,10.821,7.237,10,7.237 M10,9.364c-0.352,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C10.638,9.077,10.351,9.364,10,9.364 M14.254,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489s1.489-0.668,1.489-1.489C15.743,7.905,15.075,7.237,14.254,7.237 M14.254,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.352,0,0.639,0.287,0.639,0.638C14.893,9.077,14.605,9.364,14.254,9.364 M5.746,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.489-0.668,1.489-1.489C7.234,7.905,6.566,7.237,5.746,7.237 M5.746,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C6.384,9.077,6.096,9.364,5.746,9.364"></path>
+          </svg>
+        </a>
+      </li>
+      
+      <li>
+        <a href="https://virtual-thom.github.io/about" title="Curriculum Vitae Thom">
+          <svg class="svg-icon" viewbox="0 0 20 20">
+            <path d="M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z"></path>
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+      <div itemscope itemtype="http://schema.org/Article" class="post">
+  
+  <header class="post-header">
+    <h1 itemprop="name about headline" class="post-title">Priorité queue batch VTOM</h1>
+    <p class="post-meta">
+      <time itemprop="datePublished dateModified" datetime="2016-03-10T22:53:00+00:00">10-03-2016</time></p>
+  </header>
+
+  <article class="post-content" itemprop="articleBody">
+    <h1 class="hidden">Priorité queue batch VTOM</h1>
+    <p>&lt;EDIT&gt;
+<small>
+Une option de priorité a été ajoutée depuis 5.7+ et se gère au niveau des objets Applications et Traitements. (case à cocher “Priorité” de 0 jusqu’à 127, 0 étant le moins prioritaire). Cette nouvelle fonctionnalité palie à la décision arbitraire du moteur de mettre tel ou tel job (ou application) à ENCOURS avant tel ou tel autre, mais ne remplace pas la priorité de la queue batch dans la file d’attente.</small></p>
+
+<h2 id="problématique-des-gros-environnements-de-production">Problématique des gros environnements de production</h2>
+
+<p>Certains clients VTOM à forte charge d’ordonnancement voient leurs files d’attente saturées, et des traitements non prioritaires qui durent des heures bloquent le passage de traitements “rapides” (qui pourraient débloquer des chaînes bien plus prioritaires).</p>
+
+<h2 id="priorité-dans-la-file-dattente--principe">Priorité dans la file d’attente : principe</h2>
+
+<p>Tous les jobs dont le moteur a validé les contraintes (horaires, liens, ressources) passent à « EN COURS » dans VTOM selon un ordre  propre au moteur. (ex. JOB_1 commence avant JOB_2 qui commence avant JOB_3 etc. quelque soit la priorité de vos queues).</p>
+
+<p>« EN COURS » dans VTOM != d’en cours d’exécution sur le host.</p>
+
+<p>Seuls les n premiers jobs (nombre de jobs simultanés configuré dans le queue.conf) s’exécutent réellement, le reste passe en file d’attente (souvent illimitée -1).</p>
+
+<p>Dès qu’un job se termine, il libère une place et les jobs avec la queue batch la plus prioritaire se déclenchent.</p>
+
+<h2 id="mise-en-place-des-queues-prioritaires">Mise en place des queues prioritaires</h2>
+
+<p>La gestion des priorités est prise en charge suite à :</p>
+
+<ul>
+  <li>Paramétrage du fichier vtom.ini,</li>
+  <li>Déclaration des queues batch dans le référentiel.</li>
+</ul>
+
+<p>Paramètre ABM_QUEUES_PRIORITY_INCREMENT dans le vtom.ini sous [BDAEMON] sont les suivants :</p>
+
+<ul>
+  <li>DISABLED : 	la gestion est désactivée.</li>
+  <li>BY_ONE : 	après chaque fin de Traitement, la priorité des travaux présents dans la file est incrémentée de 1. (activé par défaut)</li>
+  <li>BY_PRIORITY : 	après chaque fin de Traitement, la priorité des travaux présents dans la file est incrémentée de la priorité initiale.</li>
+</ul>
+
+<p>Ex. priorité sur la queue batch « queue_ksh » :</p>
+
+<ul>
+  <li>queue_ksh.0 » pour les Traitements non prioritaires,</li>
+  <li>queue_ksh.3 » pour les Traitements peu prioritaires,</li>
+  <li>queue_ksh[.5] » par défaut,</li>
+  <li>queue_ksh.7 » pour les Traitements relativement prioritaires,</li>
+  <li>queue_ksh.10 » pour les Traitements prioritaires.</li>
+</ul>
+
+<p>Remarques :</p>
+
+<ul>
+  <li>Les Traitements ayant une priorité initiale à 10 la conservent et sont prioritaires quelque soit la priorité des autres Traitements.</li>
+  <li>Les Traitements ayant une priorité initiale à 0 la conservent.</li>
+</ul>
+
+<h2 id="solutions-pour-améliorer-votre-file-dattente">Solutions pour améliorer votre file d’attente</h2>
+
+<ul>
+  <li>mettre en place ce système de priorisation des queues batch &lt;nom queue&gt;.[0-10]</li>
+  <li>analyser vos jobs, et éviter d’exécuter des jobs sur des clients de traitement/applicatif alors qu’ils pourraient/devraient tourner sur les clients du serveur VTOM (valorisation de ressource par exemple)</li>
+  <li>éviter les scripts qui ne font rien d’autres que temporiser ou attendre des ressources (typiquement le job : exit 0, qui attend que telle ou telle ressource soit dispo)
+    <ul>
+      <li>à une époque, il était pratique d’avoir la log d’exécution sur le traitement pour connaître les heures de passage, mais maintenant avec les statistiques sélectives, on s’en passe</li>
+      <li>soit on remplace par un job en simulation (pas de passage dans la file d’attente), soit on essaye de positionner les ressources au niveau de l’application plutôt que du job (si c’est faisable)</li>
+    </ul>
+  </li>
+  <li>multiplier les queues d’exécution :
+    <ul>
+      <li>1 queue pour les traitements techniques “rapides”</li>
+      <li>1 queue pour les traitements applicatifs “longs”</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="rappel-queue-batch">rappel queue batch</h2>
+
+<ul>
+  <li>1 file d’attente = 1 queue batch VTOM sur 1 client VTOM</li>
+  <li>
+    <p>1 client VTOM = 1 process bdaemon sur 1 machine (si plusieurs bdaemon sur une machine, ce sont des clients VTOM différents - port qui change)</p>
+  </li>
+  <li>Les queues sont configurées dans $ABM/config/queues du client
+    <ul>
+      <li>1 répertoire / queue :</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-l</span> <span class="nv">$ABM</span>/config/queues
+drwxr-xr-x    2 u1vtom   vtom            256 Jun  7 2012  <span class="nv">$job</span><span class="err">$</span>
+drwxr-xr-x    2 u1vtom   vtom            256 Jun  7 2012  <span class="nv">$none</span><span class="err">$</span>
+drwxr-xr-x    2 u1vtom   vtom            256 Jun  7 2012  queue_csh
+drwxr-xr-x    2 u1vtom   vtom            256 Jun  7 2012  queue_ksh
+drwxr-xr-x    2 u1vtom   vtom            256 Jun  7 2012  queue_perl
+drwxr-xr-x    2 u1vtom   vtom            256 Jun  7 2012  queue_rexx
+drwxr-xr-x    2 u1vtom   vtom            256 Jun 30 2014  queue_sap
+drwxr-xr-x    2 u1vtom   vtom            256 Jun  7 2012  queue_sh
+drwxr-xr-x    2 u1vtom   vtom            256 Jun  7 2012  queue_tcsh
+</code></pre></div></div>
+<ul>
+  <li>1 queue.conf + 1 users / répertoire :</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> <span class="nv">$ABM</span>/config/queues/queue_ksh/queue.conf
+queue_ksh     nom de la queue
+10            nombre max. de <span class="nb">jobs </span>en simultané
+<span class="nt">-1</span>            nombre max. de <span class="nb">jobs </span>dans la file d’attente <span class="o">(</span><span class="nt">-1</span> illimité<span class="o">)</span>
+/bin/ksh      binaire pour lancer la queue
+20            obsolète
+<span class="nv">$ </span><span class="nb">cat</span> <span class="nv">$ABM</span>/config/queues/queue_ksh/users
+any:-1:-1     on peut surdéfinir la priorité par utilisateur unix : user:nb max. parall:nb max. file
+</code></pre></div></div>
+
+<ul>
+  <li>1 job en cours dans VTOM = 1 fichier dans $ABM_SPOOL (+ .env si dans la file)</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span> <span class="nv">$ABM_SPOOL</span>
+10      12      14      16      18      20      21      22      23      24      25      26      27      28      29      30      31      32
+11      13      15      17      19      20.env  21.env  22.env  23.env  24.env  25.env  26.env  27.env  28.env  29.env  30.env  31.env  32.env
+</code></pre></div></div>
+
+<p><a href="https://virtual-thom.github.io/archives/ecrire-sa-queue-batch-vtom-cygwin-php-perl/">Ecrire sa queue batch VTOM</a></p>
+
+  </article>
+  
+<nav>
+  <ul class="pager">
+    
+     
+    <li class="previous">
+      <a href="https://virtual-thom.github.io/archives/export-consignes-vtom-html-docker/"><span aria-hidden="true">←</span> VTOM export consigne html - Docker et python</a> 
+    </li>
+    
+     
+     <li class="next">
+      <a class="next" href="https://virtual-thom.github.io/archives/vtplan/">vtplan VTOM <span aria-hidden="true">→</span></a> 
+    </li>
+     
+    
+  </ul>
+</nav>
+
+
+  <footer class="post-footer">
+    
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>queue</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>queue batch</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>Visual TOM</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>VTOM</a>
+      
+    
+    <span itemprop="author publisher" class="hidden">Virtual Thom</span>
+  </footer>
+  
+  <div id="disqus_thread"></div>
+  <script>
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'thomas-asnar'; // required: replace example with your forum shortname
+  
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+</div>
+
+      <footer id="site-footer">
+    <div>©<a href="https://github.com/virtual-thom/" title="Github Virtual-Thom">Virtual-Thom</a>
+</div>
+    <div>
+            <a href="https://virtual-thom.github.io/archives/plan" title="Plan du site">sitemap</a> | <a href="https://virtual-thom.github.io/about" rel="publisher author" title="Curriculum vitae Thom">A propos</a>
+    </div>
+    <div>
+        <a id="goto-site-header" href="#site-header" title="Retourner au début">⇑ Top</a>
+    </div>
+    <div id="footer-disclaimer">
+        <p>Avertissement : vous ne devez pas prendre pour argent comptant le contenu de ce site. Testez toujours la solution en environnement de test.</p>
+        <p>Malgré le sérieux que je m'efforce de mettre dans le contenu de ces billets, je ne pourrai être tenu responsable d'éventuelles erreurs que cela pourrait engendrer.</p>
+    </div>
+    <div>
+        <a class="hidden" href="https://virtual-thom.github.io/archives/sitemap.xml" title="SiteMap">sitemap</a>
+    </div>
+</footer>
+
+    </div>
+  </body>
+
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="apple-touch-icon" href="https://virtual-thom.github.io/archives/apple-touch-icon.png">
+  <link rel="icon" href="https://virtual-thom.github.io/archives/favicon.ico" />
+  <!-- Remplacé par Jekyll SEO (sinon apparait en double)
+  <title>Recherche dans un site Jekyll statique en JS hébergé sur Github</title>
+  <meta name="description" content="&lt;edit 2019&gt;Puisque je vois que ça peut intéresser des personnes, vous trouverez ci-après un bout de code beaucoup plus synthétique (et moderne :p) que ...">
+  --> 
+  
+  <link rel="canonical" href="https://virtual-thom.github.io/archives/comment-rechercher-des-mots-site-jekyll-javascript/">
+  
+  <link rel="stylesheet" media="screen" href="https://virtual-thom.github.io/archives/assets/main.css">
+  
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Recherche dans un site Jekyll statique en JS hébergé sur Github | Virtual-Thom Blog-notes VTOM et informatique</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Recherche dans un site Jekyll statique en JS hébergé sur Github" />
+<meta name="author" content="Virtual Thom" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="&lt;edit 2019&gt; Puisque je vois que ça peut intéresser des personnes, vous trouverez ci-après un bout de code beaucoup plus synthétique (et moderne :p) que celui utilisé dans le post original (sans jQuery mais le principe est le même) Voici le code complet : https://github.com/virtual-thom/blob/master/search.html" />
+<meta property="og:description" content="&lt;edit 2019&gt; Puisque je vois que ça peut intéresser des personnes, vous trouverez ci-après un bout de code beaucoup plus synthétique (et moderne :p) que celui utilisé dans le post original (sans jQuery mais le principe est le même) Voici le code complet : https://github.com/virtual-thom/blob/master/search.html" />
+<link rel="canonical" href="https://virtual-thom.github.io/archives/comment-rechercher-des-mots-site-jekyll-javascript/" />
+<meta property="og:url" content="https://virtual-thom.github.io/archives/comment-rechercher-des-mots-site-jekyll-javascript/" />
+<meta property="og:site_name" content="Virtual-Thom Blog-notes VTOM et informatique" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-08-18T09:14:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Recherche dans un site Jekyll statique en JS hébergé sur Github" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Virtual Thom"},"dateModified":"2019-08-18T09:14:00+00:00","datePublished":"2019-08-18T09:14:00+00:00","description":"&lt;edit 2019&gt; Puisque je vois que ça peut intéresser des personnes, vous trouverez ci-après un bout de code beaucoup plus synthétique (et moderne :p) que celui utilisé dans le post original (sans jQuery mais le principe est le même) Voici le code complet : https://github.com/virtual-thom/blob/master/search.html","headline":"Recherche dans un site Jekyll statique en JS hébergé sur Github","mainEntityOfPage":{"@type":"WebPage","@id":"https://virtual-thom.github.io/archives/comment-rechercher-des-mots-site-jekyll-javascript/"},"url":"https://virtual-thom.github.io/archives/comment-rechercher-des-mots-site-jekyll-javascript/"}</script>
+<!-- End Jekyll SEO tag -->
+
+  
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z8Y7902GRV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Z8Y7902GRV');
+</script>
+
+
+  <body>
+    <div class="container">
+      <header id="site-header">
+  <h1>Blog-notes VTOM, informatique, industrialisation, ordonnancement, DevOps</h1>
+  <nav>
+    <ul>
+      <li>
+        <a href="https://virtual-thom.github.io/archives" title="Home">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M18.121,9.88l-7.832-7.836c-0.155-0.158-0.428-0.155-0.584,0L1.842,9.913c-0.262,0.263-0.073,0.705,0.292,0.705h2.069v7.042c0,0.227,0.187,0.414,0.414,0.414h3.725c0.228,0,0.414-0.188,0.414-0.414v-3.313h2.483v3.313c0,0.227,0.187,0.414,0.413,0.414h3.726c0.229,0,0.414-0.188,0.414-0.414v-7.042h2.068h0.004C18.331,10.617,18.389,10.146,18.121,9.88 M14.963,17.245h-2.896v-3.313c0-0.229-0.186-0.415-0.414-0.415H8.342c-0.228,0-0.414,0.187-0.414,0.415v3.313H5.032v-6.628h9.931V17.245z M3.133,9.79l6.864-6.868l6.867,6.868H3.133z"></path>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a href="https://virtual-thom.github.io/archives/vos-commentaires-livre-d-or/" title="Commentaires - livre d'or">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M17.657,2.982H2.342c-0.234,0-0.425,0.191-0.425,0.426v10.21c0,0.234,0.191,0.426,0.425,0.426h3.404v2.553c0,0.397,0.48,0.547,0.725,0.302l2.889-2.854h8.298c0.234,0,0.426-0.191,0.426-0.426V3.408C18.083,3.174,17.892,2.982,17.657,2.982M17.232,13.192H9.185c-0.113,0-0.219,0.045-0.3,0.124l-2.289,2.262v-1.96c0-0.233-0.191-0.426-0.425-0.426H2.767V3.833h14.465V13.192z M10,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.488-0.668,1.488-1.489C11.488,7.905,10.821,7.237,10,7.237 M10,9.364c-0.352,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C10.638,9.077,10.351,9.364,10,9.364 M14.254,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489s1.489-0.668,1.489-1.489C15.743,7.905,15.075,7.237,14.254,7.237 M14.254,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.352,0,0.639,0.287,0.639,0.638C14.893,9.077,14.605,9.364,14.254,9.364 M5.746,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.489-0.668,1.489-1.489C7.234,7.905,6.566,7.237,5.746,7.237 M5.746,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C6.384,9.077,6.096,9.364,5.746,9.364"></path>
+          </svg>
+        </a>
+      </li>
+      
+      <li>
+        <a href="https://virtual-thom.github.io/about" title="Curriculum Vitae Thom">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z"></path>
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+      <div itemscope itemtype ="http://schema.org/Article" class="post">
+  
+  <header class="post-header">
+    <h1 itemprop="name about headline" class="post-title">Recherche dans un site Jekyll statique en JS hébergé sur Github</h1>
+    <p class="post-meta">
+      <time itemprop="datePublished dateModified" datetime="2019-08-18T09:14:00+00:00">18-08-2019</time></p>
+  </header>
+
+  <article class="post-content" itemprop="articleBody">
+    <h1 class="hidden">Recherche dans un site Jekyll statique en JS hébergé sur Github</h1>
+    <p>&lt;edit 2019&gt;
+Puisque je vois que ça peut intéresser des personnes, vous trouverez ci-après un bout de code beaucoup plus synthétique (et moderne :p) que celui utilisé dans le post original (sans jQuery mais le principe est le même)</p>
+
+<p>Voici le code complet : <a href="https://github.com/virtual-thom/blob/master/search.html">https://github.com/virtual-thom/blob/master/search.html</a></p>
+
+<!--more-->
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// l'idée c'est de récupérer le contenu du fichier /feed.xml que vous construisez dans votre template Jekyll </span>
+<span class="c1">// on parse le contenu en XML et on va chercher le mot clé (ici par exemple "jekyll") dans le noeud qui contient tout le contenu des _posts, chez moi c'est le noeud "item" mais vous mettez ce que vous avez définit dans le template feed.xml de votre site</span>
+<span class="c1">// là pour l'exemple je ne fais que l'affichage en console.log des noeuds qui contiennent le mot clé, mais l'idée ça va être de récupérer par exemple l'url du post avec la baslise &lt;link&gt; du flux RSS"</span>
+
+<span class="nf">fetch</span><span class="p">(</span><span class="dl">"</span><span class="s2">/feed.xml</span><span class="dl">"</span><span class="p">)</span>
+  <span class="p">.</span><span class="nf">then</span><span class="p">(</span><span class="nx">r</span> <span class="o">=&gt;</span> <span class="nx">r</span><span class="p">.</span><span class="nf">text</span><span class="p">())</span>
+  <span class="p">.</span><span class="nf">then</span><span class="p">(</span><span class="nx">xmlAsText</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">responseDoc</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">DOMParser</span><span class="p">().</span><span class="nf">parseFromString</span><span class="p">(</span><span class="nx">xmlAsText</span><span class="p">,</span> <span class="dl">'</span><span class="s1">application/xml</span><span class="dl">'</span><span class="p">)</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span>
+      <span class="nb">Array</span><span class="p">.</span><span class="k">from</span><span class="p">(</span><span class="nx">responseDoc</span><span class="p">.</span><span class="nf">getElementsByTagName</span><span class="p">(</span><span class="dl">'</span><span class="s1">item</span><span class="dl">'</span><span class="p">))</span>
+        <span class="p">.</span><span class="nf">filter</span><span class="p">(</span><span class="nx">item</span> <span class="o">=&gt;</span> <span class="nx">item</span><span class="p">.</span><span class="nx">textContent</span><span class="p">.</span><span class="nf">match</span><span class="p">(</span><span class="dl">"</span><span class="s2">jekyll</span><span class="dl">"</span><span class="p">)</span>
+     <span class="p">)</span>
+    <span class="p">)</span>
+   <span class="p">})</span>
+</code></pre></div></div>
+
+<p><img src="https://virtual-thom.github.io/archives/wp-content/uploads/resultat_console_log_js.JPG" alt="Résultat" /></p>
+
+<p>exemple de template de <code class="language-plaintext highlighter-rouge">feed.xml</code>, on retrouve le contenu du post dans le noeud <item></item></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+---
+layout: null
+---
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"&gt;
+  &lt;channel&gt;
+    &lt;title&gt;{{ site.title | xml_escape }}&lt;/title&gt;
+    &lt;description&gt;{{ site.description | xml_escape }}&lt;/description&gt;
+    &lt;link&gt;{{ site.url }}{{ site.baseurl }}/&lt;/link&gt;
+    &lt;atom:link href="{{ "/feed.xml" | prepend: site.baseurl | prepend: site.url }}" rel="self" type="application/rss+xml"/&gt;
+    &lt;pubDate&gt;{{ site.time | date_to_rfc822 }}&lt;/pubDate&gt;
+    &lt;lastBuildDate&gt;{{ site.time | date_to_rfc822 }}&lt;/lastBuildDate&gt;
+    &lt;generator&gt;Jekyll v{{ jekyll.version }}&lt;/generator&gt;
+    {% for post in site.posts %}
+      &lt;item&gt;
+        &lt;title&gt;{{ post.title | xml_escape }}&lt;/title&gt;
+        &lt;description&gt;{{ post.content | xml_escape }}&lt;/description&gt;
+        &lt;pubDate&gt;{{ post.date | date_to_rfc822 }}&lt;/pubDate&gt;
+        &lt;link&gt;{{ post.url | prepend: site.baseurl | prepend: site.url }}&lt;/link&gt;
+        &lt;guid isPermaLink="true"&gt;{{ post.url | prepend: site.baseurl | prepend: site.url }}&lt;/guid&gt;
+        {% for tag in post.tags %}
+        &lt;category&gt;{{ tag | xml_escape }}&lt;/category&gt;
+        {% endfor %}
+        {% for cat in post.categories %}
+        &lt;category&gt;{{ cat | xml_escape }}&lt;/category&gt;
+        {% endfor %}
+      &lt;/item&gt;
+    {% endfor %}
+  &lt;/channel&gt;
+&lt;/rss&gt;
+
+</code></pre></div></div>
+
+<p>fin de l’édit 2019 :)</p>
+
+<p>J’utilise <a href="http://jekyllrb.com">Jekyll</a> pour générer les pages statiques que vous êtes en train de lire.</p>
+
+<p>Le problème d’un site statique, c’est qu’on ne peut pas interroger son serveur web (php, node js ou autre) pour obtenir des informations.</p>
+
+<p>En PHP, par exemple, si l’on veut rajouter un module de recherche sur son site, il suffit d’interroger un contrôleur qui va se charger d’aller chercher dans un modèle les mots recherchés en POST.</p>
+
+<p>Mais qu’à cela ne tienne. Avec un peu de javascript / ajax, c’est facile.</p>
+
+<p>Je ne dis pas que ma solution est la meilleure, mais elle fonctionne. Le principe est de générer un fichier xml avec tous les mots de mon blog et de pouvoir récupérer le titre et l’url du post en question.</p>
+
+<p>J’ai trouvé que le plus simple était d’étoffer un peu le feed.xml proposé par défaut. Après, il est vrai que mon blog n’est pas bien gros, et je me suis permis de mettre tout le contenu dans feed.xml. Mais on peut se restreindre aux mots clés et à un excerpt par exemple.</p>
+
+<h2 id="exemple-feedxml"><a href="https://github.com/virtual-thom/blob/master/feed.xml">Exemple feed.xml</a></h2>
+
+<p>Ensuite, l’idée est de charger avec ajax le fichier feed.xml et de chercher les mots. Puis je rajoute les éléments dans le DOM avec javascript (jQuery).</p>
+
+<p>Voici ma fonction. L’avantage de la fonction, c’est que je peux créer ensuite plusieurs events (recherche par menu, par click sur les catégories, etc.)</p>
+
+<h2 id="fonction-de-recherche-de-mots-dans-un-site-statique-jekyll">Fonction de recherche de mots dans un site statique Jekyll</h2>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nf">searchSite</span><span class="p">(</span><span class="nx">words</span><span class="p">){</span>
+  <span class="nx">$</span><span class="p">.</span><span class="nf">ajax</span><span class="p">({</span>
+    <span class="na">type</span><span class="p">:</span><span class="dl">'</span><span class="s1">GET</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">url</span><span class="p">:</span><span class="dl">'</span><span class="s1">/feed.xml</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">dataType</span><span class="p">:</span> <span class="dl">'</span><span class="s1">xml</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">success</span><span class="p">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">xml</span><span class="p">){</span>
+    <span class="kd">var</span> <span class="nx">heading</span> <span class="o">=</span> <span class="nf">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">.page-heading</span><span class="dl">'</span><span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">heading</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">){</span>
+      <span class="kd">var</span> <span class="nx">items</span> <span class="o">=</span> <span class="nf">$</span><span class="p">(</span><span class="nx">xml</span><span class="p">).</span><span class="nf">find</span><span class="p">(</span><span class="dl">'</span><span class="s1">item:contains(</span><span class="dl">'</span><span class="o">+</span><span class="nx">words</span><span class="o">+</span><span class="dl">'</span><span class="s1">)</span><span class="dl">'</span><span class="p">)</span> <span class="p">;</span>
+      <span class="nf">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">.post-list</span><span class="dl">'</span><span class="p">).</span><span class="nf">remove</span><span class="p">();</span>
+      <span class="nf">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">.pagination</span><span class="dl">'</span><span class="p">).</span><span class="nf">remove</span><span class="p">();</span>
+      
+      
+      <span class="k">if</span><span class="p">(</span><span class="nx">items</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">){</span>
+        <span class="kd">var</span> <span class="nx">postListHtml</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">&lt;ul class="post-list"&gt;</span><span class="dl">'</span><span class="p">;</span>
+        <span class="nx">items</span><span class="p">.</span><span class="nf">each</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">index</span><span class="p">){</span>
+          <span class="kd">var</span> <span class="nx">categoriesButtons</span> <span class="o">=</span> <span class="dl">''</span> <span class="p">;</span>
+          <span class="kd">var</span> <span class="nx">categories</span> <span class="o">=</span> <span class="nf">$</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">index</span><span class="p">]).</span><span class="nf">find</span><span class="p">(</span><span class="dl">'</span><span class="s1">category</span><span class="dl">'</span><span class="p">)</span> <span class="p">;</span>
+          <span class="nx">categories</span><span class="p">.</span><span class="nf">each</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">indexCat</span><span class="p">){</span>
+            <span class="nx">categoriesButtons</span> <span class="o">+=</span> <span class="dl">'</span><span class="s1">&lt;button type="button" class="btn btn-default btn-xs btn-categories hidden-xs"&gt;</span><span class="se">\</span><span class="s1">
+            &lt;span class="glyphicon glyphicon-asterisk"&gt;&lt;/span&gt;</span><span class="dl">'</span><span class="o">+</span><span class="nf">$</span><span class="p">(</span><span class="nx">categories</span><span class="p">[</span><span class="nx">indexCat</span><span class="p">]).</span><span class="nf">text</span><span class="p">()</span><span class="o">+</span><span class="dl">'</span><span class="s1">&lt;/button&gt; </span><span class="dl">'</span> <span class="p">;</span>
+            <span class="p">;</span> 
+          <span class="p">});</span>
+
+          <span class="nx">postListHtml</span> <span class="o">+=</span> <span class="dl">'</span><span class="se">\</span><span class="s1">
+&lt;li&gt;</span><span class="se">\</span><span class="s1">
+&lt;h3&gt;&lt;a class="post-link" href="</span><span class="dl">'</span><span class="o">+</span> <span class="nf">$</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">index</span><span class="p">]).</span><span class="nf">find</span><span class="p">(</span><span class="dl">'</span><span class="s1">link</span><span class="dl">'</span><span class="p">).</span><span class="nf">text</span><span class="p">()</span> <span class="o">+</span><span class="dl">'</span><span class="s1">"&gt;</span><span class="dl">'</span><span class="o">+</span> <span class="nf">$</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">index</span><span class="p">]).</span><span class="nf">find</span><span class="p">(</span><span class="dl">'</span><span class="s1">title</span><span class="dl">'</span><span class="p">).</span><span class="nf">text</span><span class="p">()</span> <span class="o">+</span><span class="dl">'</span><span class="s1">&lt;/a&gt;&lt;/h3&gt;</span><span class="se">\</span><span class="s1">
+&lt;footer class="post-footer"&gt;</span><span class="dl">'</span><span class="o">+</span><span class="nx">categoriesButtons</span><span class="o">+</span><span class="dl">'</span><span class="se">\</span><span class="s1">
+&lt;/footer&gt;</span><span class="se">\</span><span class="s1">
+&lt;/li&gt;</span><span class="se">\</span><span class="s1">
+          </span><span class="dl">'</span><span class="p">;</span>
+        <span class="p">});</span>
+        <span class="nx">postListHtml</span> <span class="o">+=</span> <span class="dl">'</span><span class="s1">&lt;/ul&gt;</span><span class="dl">'</span><span class="p">;</span>
+        <span class="nx">heading</span><span class="p">.</span><span class="nf">after</span><span class="p">(</span><span class="nx">postListHtml</span><span class="p">);</span>
+      <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+        <span class="nx">heading</span><span class="p">.</span><span class="nf">after</span><span class="p">(</span><span class="dl">'</span><span class="s1">&lt;div class="post-list"&gt;Aucun Résultat&lt;/div&gt;</span><span class="dl">'</span><span class="p">);</span>
+      <span class="p">}</span>
+    
+    
+    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+      <span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">href</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">/#!</span><span class="dl">'</span><span class="o">+</span><span class="nx">words</span> <span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="p">}</span>
+  <span class="p">});</span>
+<span class="p">}</span> <span class="cm">/* searchSite(words) */</span>
+</code></pre></div></div>
+
+<h2 id="exemples-devents-qui-trigger-la-fonction">Exemples d’events qui trigger la fonction</h2>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,</span><span class="dl">'</span><span class="s1">#exec-search</span><span class="dl">'</span><span class="p">,</span><span class="kd">function</span><span class="p">(){</span>
+  <span class="nf">searchSite</span><span class="p">(</span><span class="nf">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nf">siblings</span><span class="p">(</span><span class="dl">'</span><span class="s1">input</span><span class="dl">'</span><span class="p">).</span><span class="nf">val</span><span class="p">());</span>
+<span class="p">});</span>
+<span class="nf">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">#exec-search ~ input</span><span class="dl">'</span><span class="p">).</span><span class="nf">keypress</span><span class="p">(</span><span class="nf">function </span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+ <span class="kd">var</span> <span class="nx">key</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">which</span><span class="p">;</span>
+ <span class="k">if</span><span class="p">(</span><span class="nx">key</span> <span class="o">==</span> <span class="mi">13</span><span class="p">)</span>  <span class="c1">// the enter key code</span>
+  <span class="p">{</span>
+    <span class="nf">searchSite</span><span class="p">(</span><span class="nf">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nf">val</span><span class="p">());</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+<span class="nf">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">click</span><span class="dl">'</span><span class="p">,</span><span class="dl">'</span><span class="s1">.btn-categories</span><span class="dl">'</span><span class="p">,</span><span class="kd">function</span><span class="p">(){</span>
+  <span class="nf">searchSite</span><span class="p">(</span><span class="nf">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nf">text</span><span class="p">().</span><span class="nf">trim</span><span class="p">());</span>
+<span class="p">});</span>
+<span class="kd">var</span> <span class="nx">slug</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">href</span><span class="p">.</span><span class="nf">split</span><span class="p">(</span><span class="dl">"</span><span class="s2">#!</span><span class="dl">"</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="p">;</span>
+<span class="k">if</span><span class="p">(</span><span class="nx">slug</span><span class="p">){</span>
+  <span class="nf">searchSite</span><span class="p">(</span><span class="nx">slug</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+
+  </article>
+  
+<nav>
+  <ul class="pager">
+    
+     
+    <li class="previous">
+      <a href="https://virtual-thom.github.io/archives/erreur-queue-batch/"><span aria-hidden="true">&larr;</span> Erreur nouvelle queue windows</a> 
+    </li>
+    
+     
+     <li class="next">
+      <a class="next" href="https://virtual-thom.github.io/archives/creation-infrastructure-XLD-API/">Création infrastructure XLD via API <span aria-hidden="true">&rarr;</span></a> 
+    </li>
+     
+    
+  </ul>
+</nav>
+
+
+  <footer class="post-footer">
+    
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>jekyll</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>javascript</a>
+      
+        <a itemprop="articleSection" class="btn btn-default btn-xs btn-categories" href="https://virtual-thom.github.io/archives"><span class="glyphicon glyphicon-asterisk"></span>pages Github</a>
+      
+    
+    <span  itemprop="author publisher" class="hidden">Virtual Thom</span>
+  </footer>
+  
+  <div id="disqus_thread" ></div>
+  <script>
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'thomas-asnar'; // required: replace example with your forum shortname
+  
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+</div>
+
+      <footer id="site-footer">
+    <div>&copy;<a href="https://github.com/virtual-thom/" title="Github Virtual-Thom">Virtual-Thom</a></div>
+    <div>
+            <a href="https://virtual-thom.github.io/archives/plan" title="Plan du site">sitemap</a> | <a href="https://virtual-thom.github.io/about" rel="publisher author" title="Curriculum vitae Thom">A propos</a>
+    </div>
+    <div>
+        <a id="goto-site-header" href="#site-header" title="Retourner au début">&uArr; Top</a>
+    </div>
+    <div id="footer-disclaimer">
+        <p>Avertissement : vous ne devez pas prendre pour argent comptant le contenu de ce site. Testez toujours la solution en environnement de test.</p>
+        <p>Malgré le sérieux que je m'efforce de mettre dans le contenu de ces billets, je ne pourrai être tenu responsable d'éventuelles erreurs que cela pourrait engendrer.</p>
+    </div>
+    <div>
+        <a class="hidden" href="https://virtual-thom.github.io/archives/sitemap.xml" title="SiteMap">sitemap</a>
+    </div>
+</footer>
+
+    </div>
+  </body>
+
+</html>

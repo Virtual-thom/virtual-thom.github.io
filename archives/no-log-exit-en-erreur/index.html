@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="apple-touch-icon" href="https://virtual-thom.github.io/archives/apple-touch-icon.png">
+  <link rel="icon" href="https://virtual-thom.github.io/archives/favicon.ico" />
+  <!-- Remplacé par Jekyll SEO (sinon apparait en double)
+  <title>No log, exit en erreur, saut de ligne dans param</title>
+  <meta name="description" content="v7.1.1b5Petit bug mais plutôt sain en fait. Disons que je n’avais pas le cas avant mais ça me semble normal que ça plante.Saut de ligne dans Param du job vto...">
+  --> 
+  
+  <link rel="canonical" href="https://virtual-thom.github.io/archives/no-log-exit-en-erreur/">
+  
+  <link rel="stylesheet" media="screen" href="https://virtual-thom.github.io/archives/assets/main.css">
+  
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>No log, exit en erreur, saut de ligne dans param | Virtual-Thom Blog-notes VTOM et informatique</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="No log, exit en erreur, saut de ligne dans param" />
+<meta name="author" content="Virtual Thom" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="v7.1.1b5 Petit bug mais plutôt sain en fait. Disons que je n’avais pas le cas avant mais ça me semble normal que ça plante. Saut de ligne dans Param du job vtom == plantage du script, pas de log, et retour chelou dans vtom avec le bon tsend. Ca sent le vieux copié / collé depuis excel dans le param du job. Pour les repérer, vtexport -x et chercher la pattern regex ^]]&gt;&lt;/Parameter&gt;$ Editer le job en question et supprimer à la mano l’espace à la fin, ça règle le problème. # là on voit bien les sauts de lignes sur param 2, 3, 4, 5, 6, 7 &lt;Job name=&quot;put_luke_contacts&quot; retained=&quot;0&quot; family=&quot;leia&quot; comment=&quot;Depot du fichiers en provenance du cyberespac&quot; information=&quot; &quot; frequency=&quot;D&quot; onDemand=&quot;0&quot; isAsked=&quot;0&quot; cycleEnabled=&quot;0&quot; cycle=&quot;00:00:00&quot; minStart=&quot;04:10:00&quot; maxStart=&quot;23:10:00&quot; mode=&quot;E&quot; hostsGroup=&quot;starship&quot; queue=&quot;queue_sh&quot; user=&quot;skyw&quot; retcode=&quot;-1&quot; status=&quot;W&quot; statusTime=&quot;29-11-2023 09:55:12&quot; substatus=&quot;0&quot; appInErr=&quot;1&quot; descOnErr=&quot;0&quot; blockDate=&quot;0&quot; restartType=&quot;M&quot; restartCount=&quot;0&quot; restartMax=&quot;1&quot; restartDelay=&quot;00:00:00&quot; restartLabel=&quot;0&quot; timeBegin=&quot;1701251193&quot; timeEnd=&quot;1701251195&quot; ipid=&quot;0&quot; mepType=&quot;E&quot;&gt; &lt;Script&gt;&lt;![CDATA[#/usr/local/spool/SCRIPTS/transfert_ftp.sh]]&gt;&lt;/Script&gt; &lt;Parameters&gt; &lt;Parameter&gt;&lt;![CDATA[--client &quot;anakin&quot;]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--ip 1.1.1.1 ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--action put ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--rep-source &quot;/usr/local/spool/leia/EM&quot; ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--rep-cible /ImportAuto/ ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--on-error stop ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--file-name csv ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--delete]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--function sftp]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--ftp-mode --ftp-pasv]]&gt;&lt;/Parameter&gt; &lt;/Parameters&gt; &lt;Node objectType=&quot;job&quot; x=&quot;270&quot; y=&quot;260&quot; z=&quot;0&quot;/&gt; &lt;/Job&gt;" />
+<meta property="og:description" content="v7.1.1b5 Petit bug mais plutôt sain en fait. Disons que je n’avais pas le cas avant mais ça me semble normal que ça plante. Saut de ligne dans Param du job vtom == plantage du script, pas de log, et retour chelou dans vtom avec le bon tsend. Ca sent le vieux copié / collé depuis excel dans le param du job. Pour les repérer, vtexport -x et chercher la pattern regex ^]]&gt;&lt;/Parameter&gt;$ Editer le job en question et supprimer à la mano l’espace à la fin, ça règle le problème. # là on voit bien les sauts de lignes sur param 2, 3, 4, 5, 6, 7 &lt;Job name=&quot;put_luke_contacts&quot; retained=&quot;0&quot; family=&quot;leia&quot; comment=&quot;Depot du fichiers en provenance du cyberespac&quot; information=&quot; &quot; frequency=&quot;D&quot; onDemand=&quot;0&quot; isAsked=&quot;0&quot; cycleEnabled=&quot;0&quot; cycle=&quot;00:00:00&quot; minStart=&quot;04:10:00&quot; maxStart=&quot;23:10:00&quot; mode=&quot;E&quot; hostsGroup=&quot;starship&quot; queue=&quot;queue_sh&quot; user=&quot;skyw&quot; retcode=&quot;-1&quot; status=&quot;W&quot; statusTime=&quot;29-11-2023 09:55:12&quot; substatus=&quot;0&quot; appInErr=&quot;1&quot; descOnErr=&quot;0&quot; blockDate=&quot;0&quot; restartType=&quot;M&quot; restartCount=&quot;0&quot; restartMax=&quot;1&quot; restartDelay=&quot;00:00:00&quot; restartLabel=&quot;0&quot; timeBegin=&quot;1701251193&quot; timeEnd=&quot;1701251195&quot; ipid=&quot;0&quot; mepType=&quot;E&quot;&gt; &lt;Script&gt;&lt;![CDATA[#/usr/local/spool/SCRIPTS/transfert_ftp.sh]]&gt;&lt;/Script&gt; &lt;Parameters&gt; &lt;Parameter&gt;&lt;![CDATA[--client &quot;anakin&quot;]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--ip 1.1.1.1 ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--action put ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--rep-source &quot;/usr/local/spool/leia/EM&quot; ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--rep-cible /ImportAuto/ ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--on-error stop ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--file-name csv ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--delete]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--function sftp]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--ftp-mode --ftp-pasv]]&gt;&lt;/Parameter&gt; &lt;/Parameters&gt; &lt;Node objectType=&quot;job&quot; x=&quot;270&quot; y=&quot;260&quot; z=&quot;0&quot;/&gt; &lt;/Job&gt;" />
+<link rel="canonical" href="https://virtual-thom.github.io/archives/no-log-exit-en-erreur/" />
+<meta property="og:url" content="https://virtual-thom.github.io/archives/no-log-exit-en-erreur/" />
+<meta property="og:site_name" content="Virtual-Thom Blog-notes VTOM et informatique" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-11-30T12:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="No log, exit en erreur, saut de ligne dans param" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Virtual Thom"},"dateModified":"2023-11-30T12:00:00+00:00","datePublished":"2023-11-30T12:00:00+00:00","description":"v7.1.1b5 Petit bug mais plutôt sain en fait. Disons que je n’avais pas le cas avant mais ça me semble normal que ça plante. Saut de ligne dans Param du job vtom == plantage du script, pas de log, et retour chelou dans vtom avec le bon tsend. Ca sent le vieux copié / collé depuis excel dans le param du job. Pour les repérer, vtexport -x et chercher la pattern regex ^]]&gt;&lt;/Parameter&gt;$ Editer le job en question et supprimer à la mano l’espace à la fin, ça règle le problème. # là on voit bien les sauts de lignes sur param 2, 3, 4, 5, 6, 7 &lt;Job name=&quot;put_luke_contacts&quot; retained=&quot;0&quot; family=&quot;leia&quot; comment=&quot;Depot du fichiers en provenance du cyberespac&quot; information=&quot; &quot; frequency=&quot;D&quot; onDemand=&quot;0&quot; isAsked=&quot;0&quot; cycleEnabled=&quot;0&quot; cycle=&quot;00:00:00&quot; minStart=&quot;04:10:00&quot; maxStart=&quot;23:10:00&quot; mode=&quot;E&quot; hostsGroup=&quot;starship&quot; queue=&quot;queue_sh&quot; user=&quot;skyw&quot; retcode=&quot;-1&quot; status=&quot;W&quot; statusTime=&quot;29-11-2023 09:55:12&quot; substatus=&quot;0&quot; appInErr=&quot;1&quot; descOnErr=&quot;0&quot; blockDate=&quot;0&quot; restartType=&quot;M&quot; restartCount=&quot;0&quot; restartMax=&quot;1&quot; restartDelay=&quot;00:00:00&quot; restartLabel=&quot;0&quot; timeBegin=&quot;1701251193&quot; timeEnd=&quot;1701251195&quot; ipid=&quot;0&quot; mepType=&quot;E&quot;&gt; &lt;Script&gt;&lt;![CDATA[#/usr/local/spool/SCRIPTS/transfert_ftp.sh]]&gt;&lt;/Script&gt; &lt;Parameters&gt; &lt;Parameter&gt;&lt;![CDATA[--client &quot;anakin&quot;]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--ip 1.1.1.1 ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--action put ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--rep-source &quot;/usr/local/spool/leia/EM&quot; ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--rep-cible /ImportAuto/ ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--on-error stop ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--file-name csv ]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--delete]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--function sftp]]&gt;&lt;/Parameter&gt; &lt;Parameter&gt;&lt;![CDATA[--ftp-mode --ftp-pasv]]&gt;&lt;/Parameter&gt; &lt;/Parameters&gt; &lt;Node objectType=&quot;job&quot; x=&quot;270&quot; y=&quot;260&quot; z=&quot;0&quot;/&gt; &lt;/Job&gt;","headline":"No log, exit en erreur, saut de ligne dans param","mainEntityOfPage":{"@type":"WebPage","@id":"https://virtual-thom.github.io/archives/no-log-exit-en-erreur/"},"url":"https://virtual-thom.github.io/archives/no-log-exit-en-erreur/"}</script>
+<!-- End Jekyll SEO tag -->
+
+  
+</head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z8Y7902GRV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Z8Y7902GRV');
+</script>
+
+
+  <body>
+    <div class="container">
+      <header id="site-header">
+  <h1>Blog-notes VTOM, informatique, industrialisation, ordonnancement, DevOps</h1>
+  <nav>
+    <ul>
+      <li>
+        <a href="https://virtual-thom.github.io/archives" title="Home">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M18.121,9.88l-7.832-7.836c-0.155-0.158-0.428-0.155-0.584,0L1.842,9.913c-0.262,0.263-0.073,0.705,0.292,0.705h2.069v7.042c0,0.227,0.187,0.414,0.414,0.414h3.725c0.228,0,0.414-0.188,0.414-0.414v-3.313h2.483v3.313c0,0.227,0.187,0.414,0.413,0.414h3.726c0.229,0,0.414-0.188,0.414-0.414v-7.042h2.068h0.004C18.331,10.617,18.389,10.146,18.121,9.88 M14.963,17.245h-2.896v-3.313c0-0.229-0.186-0.415-0.414-0.415H8.342c-0.228,0-0.414,0.187-0.414,0.415v3.313H5.032v-6.628h9.931V17.245z M3.133,9.79l6.864-6.868l6.867,6.868H3.133z"></path>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a href="https://virtual-thom.github.io/archives/vos-commentaires-livre-d-or/" title="Commentaires - livre d'or">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M17.657,2.982H2.342c-0.234,0-0.425,0.191-0.425,0.426v10.21c0,0.234,0.191,0.426,0.425,0.426h3.404v2.553c0,0.397,0.48,0.547,0.725,0.302l2.889-2.854h8.298c0.234,0,0.426-0.191,0.426-0.426V3.408C18.083,3.174,17.892,2.982,17.657,2.982M17.232,13.192H9.185c-0.113,0-0.219,0.045-0.3,0.124l-2.289,2.262v-1.96c0-0.233-0.191-0.426-0.425-0.426H2.767V3.833h14.465V13.192z M10,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.488-0.668,1.488-1.489C11.488,7.905,10.821,7.237,10,7.237 M10,9.364c-0.352,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C10.638,9.077,10.351,9.364,10,9.364 M14.254,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489s1.489-0.668,1.489-1.489C15.743,7.905,15.075,7.237,14.254,7.237 M14.254,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.352,0,0.639,0.287,0.639,0.638C14.893,9.077,14.605,9.364,14.254,9.364 M5.746,7.237c-0.821,0-1.489,0.668-1.489,1.489c0,0.821,0.668,1.489,1.489,1.489c0.821,0,1.489-0.668,1.489-1.489C7.234,7.905,6.566,7.237,5.746,7.237 M5.746,9.364c-0.351,0-0.638-0.288-0.638-0.638c0-0.351,0.287-0.638,0.638-0.638c0.351,0,0.638,0.287,0.638,0.638C6.384,9.077,6.096,9.364,5.746,9.364"></path>
+          </svg>
+        </a>
+      </li>
+      
+      <li>
+        <a href="https://virtual-thom.github.io/about" title="Curriculum Vitae Thom">
+          <svg class="svg-icon" viewBox="0 0 20 20">
+            <path d="M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z"></path>
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+      <div itemscope itemtype ="http://schema.org/Article" class="post">
+  
+  <header class="post-header">
+    <h1 itemprop="name about headline" class="post-title">No log, exit en erreur, saut de ligne dans param</h1>
+    <p class="post-meta">
+      <time itemprop="datePublished dateModified" datetime="2023-11-30T12:00:00+00:00">30-11-2023</time></p>
+  </header>
+
+  <article class="post-content" itemprop="articleBody">
+    <h1 class="hidden">No log, exit en erreur, saut de ligne dans param</h1>
+    <p>v7.1.1b5<br />
+Petit bug mais plutôt sain en fait. Disons que je n’avais pas le cas avant mais ça me semble normal que ça plante.<br />
+Saut de ligne dans Param du job vtom == plantage du script, pas de log, et retour chelou dans vtom avec le bon tsend.<br />
+Ca sent le vieux copié / collé depuis excel dans le param du job.<br />
+Pour les repérer, <code class="language-plaintext highlighter-rouge">vtexport -x</code> et chercher la pattern regex <code class="language-plaintext highlighter-rouge">^]]&gt;&lt;/Parameter&gt;$</code></p>
+
+<p>Editer le job en question et supprimer à la mano l’espace à la fin, ça règle le problème.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># là on voit bien les sauts de lignes sur param 2, 3, 4, 5, 6, 7
+            &lt;Job name="put_luke_contacts" retained="0" family="leia" comment="Depot du fichiers en provenance du cyberespac" information=" " frequency="D" onDemand="0" isAsked="0" cycleEnabled="0" cycle="00:00:00" minStart="04:10:00" maxStart="23:10:00" mode="E" hostsGroup="starship" queue="queue_sh" user="skyw" retcode="-1" status="W" statusTime="29-11-2023 09:55:12" substatus="0" appInErr="1" descOnErr="0" blockDate="0" restartType="M" restartCount="0" restartMax="1" restartDelay="00:00:00" restartLabel="0" timeBegin="1701251193" timeEnd="1701251195" ipid="0" mepType="E"&gt;
+              &lt;Script&gt;&lt;![CDATA[#/usr/local/spool/SCRIPTS/transfert_ftp.sh]]&gt;&lt;/Script&gt;
+              &lt;Parameters&gt;
+                &lt;Parameter&gt;&lt;![CDATA[--client "anakin"]]&gt;&lt;/Parameter&gt;
+                &lt;Parameter&gt;&lt;![CDATA[--ip 1.1.1.1
+]]&gt;&lt;/Parameter&gt;
+                &lt;Parameter&gt;&lt;![CDATA[--action put
+]]&gt;&lt;/Parameter&gt;
+                &lt;Parameter&gt;&lt;![CDATA[--rep-source "/usr/local/spool/leia/EM"
+]]&gt;&lt;/Parameter&gt;
+                &lt;Parameter&gt;&lt;![CDATA[--rep-cible /ImportAuto/
+]]&gt;&lt;/Parameter&gt;
+                &lt;Parameter&gt;&lt;![CDATA[--on-error stop
+]]&gt;&lt;/Parameter&gt;
+                &lt;Parameter&gt;&lt;![CDATA[--file-name csv
+]]&gt;&lt;/Parameter&gt;
+                &lt;Parameter&gt;&lt;![CDATA[--delete]]&gt;&lt;/Parameter&gt;
+                &lt;Parameter&gt;&lt;![CDATA[--function sftp]]&gt;&lt;/Parameter&gt;
+                &lt;Parameter&gt;&lt;![CDATA[--ftp-mode --ftp-pasv]]&gt;&lt;/Parameter&gt;
+              &lt;/Parameters&gt;
+              &lt;Node objectType="job" x="270" y="260" z="0"/&gt;
+            &lt;/Job&gt;
+</code></pre></div></div>
+
+  </article>
+  
+<nav>
+  <ul class="pager">
+    
+     
+    <li class="previous">
+      <a href="https://virtual-thom.github.io/archives/warning-sid-unknown-sid/"><span aria-hidden="true">&larr;</span> WARNING SID UNKNOWN_SID vtexport</a> 
+    </li>
+    
+     
+     <li class="next">
+      <a class="next" href="https://virtual-thom.github.io/archives/queue-wnt-bug/">Bug queue_wnt de base Absyss <span aria-hidden="true">&rarr;</span></a> 
+    </li>
+     
+    
+  </ul>
+</nav>
+
+
+  <footer class="post-footer">
+    
+      
+    
+    <span  itemprop="author publisher" class="hidden">Virtual Thom</span>
+  </footer>
+  
+  <div id="disqus_thread" ></div>
+  <script>
+      /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+      var disqus_shortname = 'thomas-asnar'; // required: replace example with your forum shortname
+  
+      /* * * DON'T EDIT BELOW THIS LINE * * */
+      (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+  </script>
+</div>
+
+      <footer id="site-footer">
+    <div>&copy;<a href="https://github.com/virtual-thom/" title="Github Virtual-Thom">Virtual-Thom</a></div>
+    <div>
+            <a href="https://virtual-thom.github.io/archives/plan" title="Plan du site">sitemap</a> | <a href="https://virtual-thom.github.io/about" rel="publisher author" title="Curriculum vitae Thom">A propos</a>
+    </div>
+    <div>
+        <a id="goto-site-header" href="#site-header" title="Retourner au début">&uArr; Top</a>
+    </div>
+    <div id="footer-disclaimer">
+        <p>Avertissement : vous ne devez pas prendre pour argent comptant le contenu de ce site. Testez toujours la solution en environnement de test.</p>
+        <p>Malgré le sérieux que je m'efforce de mettre dans le contenu de ces billets, je ne pourrai être tenu responsable d'éventuelles erreurs que cela pourrait engendrer.</p>
+    </div>
+    <div>
+        <a class="hidden" href="https://virtual-thom.github.io/archives/sitemap.xml" title="SiteMap">sitemap</a>
+    </div>
+</footer>
+
+    </div>
+  </body>
+
+</html>
