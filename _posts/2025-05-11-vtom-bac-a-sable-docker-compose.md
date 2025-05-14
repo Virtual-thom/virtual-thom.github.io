@@ -180,6 +180,8 @@ volumes:
 les différents "types" de container : agent, server, apiserver, db, shell  (ce sont les options de l'entrypoint de l'image docker)  
 Vous pouvez vous connecter dans les containers : `docker compose exec server bash`
 
+Tips : si vous faites un exec sur la db, pensez à `export LD_LIBRARY_PATH=${TOM_HOME}/sgbd/lib` pour pouvoir `${TOM_HOME}/sgbd/bin/psql -Uvtom -dvtom -p30009`
+
 
 Le fichier `.vtom.ini` (exemple) :
 ```
