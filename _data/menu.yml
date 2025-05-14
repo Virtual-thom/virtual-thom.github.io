@@ -1,4 +1,6 @@
 entries:
+    - title: Recherche dans le blog
+      url: search.html
     - title: tous les posts
       post_list:
             limit: 50
