@@ -173,7 +173,7 @@ volumes:
 #      device: ":/vtom/data"
 
 # External example
-#    external: true
+    external: true
     name: visual-tom_customer-data
 ```
 
