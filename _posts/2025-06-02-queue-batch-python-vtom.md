@@ -24,7 +24,7 @@ Et pour faire simple, il y a 3 grandes étapes dans une queue :
     * facultatif, on fait ce qu'on veut en fait MAIS fortement conseillé d'utiliser les variables officielles à minima du tom_submit.aff (si on veut utiliser les alarmes vtom et logs joints par exemple, besoin du tom_job_id etc)
 
  * lancer ce qu'on a dans TOM_SCRIPT
-    * comme déjà dit, pas forcément, on fait ce qu'on veut de nos variables d'environnements, mais à la pelle, on lance TOM_SCRIPT avec ses arguments %*, $*, sys.argv, etc.
+    * comme déjà dit, pas forcément, on fait ce qu'on veut de nos variables d'environnements, mais à la pelle, on lance TOM_SCRIPT avec ses arguments %\*, $\*, sys.argv, etc.
 
  * renvoyer au serveur le résultat de l'exécution via `tsend`
     * obligatoire même si l'agent est en DMZ vtom.ini [BDAEMON] connectToServer=0 (auquel cas, c'est le serveur qui viendra check le `$TOM_HOME/abm/spool`)
