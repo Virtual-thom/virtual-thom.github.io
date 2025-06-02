@@ -304,6 +304,7 @@ ps -eaf | grep vtom
 -python3 /opt/absyss/visual-tom/admin/tom_submit.python3
 ```
 
+(j'ai fait un agent DMZ connectToServer=0 pour être sûr)  
 Une fois terminé, dans la queue, il y a un envoi de `tsend` qui créé un fichier .dmp :  
 ```
 job_9.dmp
