@@ -43,7 +43,7 @@ On est d'accord que si vous voulez lancer du python, pas besoin de faire tout ce
 Changez juste :  `call "%TOM_SCRIPT%" %*`  en  `python "%TOM_SCRIPT%" %*`
 
 Une "vraie" queue python est écrite en python et pas en shell ou bat.  
-Pourquoi ? parce que ! parce que c'est dimanche, qu'il pleut.  
+Pourquoi ? parce que ! c'est dimanche, et il pleut.  
 [Ecrire sa queue_batch](/archives/ecrire-sa-queue-batch-vtom-cygwin-php-perl/) est l'article le plus lu de mon blog. Du coup, petite mise à jour.   
 
 Mais plus sérieusement, pour prouver que ça n'est "que" du script, et que vous pouvez faire (presque) ce que vous voulez dans votre queue batch.  
@@ -52,7 +52,7 @@ Mais plus sérieusement, pour prouver que ça n'est "que" du script, et que vous
 je vais faire exprès de nommer différemment les choses pour que vous compreniez le mécanisme (mais en prod, il vaut mieux nommer tout pareil pour plus de clarté) :
 
 `$TOM_HOME/abm/config/queues`  
-queue_peuimporte, c'est le nom de queue dans VTOM
+queue_peuimporte, c'est le dossier et vraiment, peu importe le nom
 ```
 cp -r queue_batch queue_peuimporte
 ```
