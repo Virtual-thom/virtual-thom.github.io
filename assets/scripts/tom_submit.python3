@@ -1,0 +1,129 @@
+#!/usr/bin/python3
+import os
+import re
+import sys
+import subprocess
+from datetime import datetime
+
+python_executable = sys.executable or 'python3'  # Fallback si sys.executable est vide
+
+env_vars = {}
+
+# Définit une valeur par défaut si TOM_ADMIN n'est pas dans les variables d'environnement
+if "TOM_ADMIN" not in os.environ:
+    os.environ["TOM_ADMIN"] = "/opt/absyss/visual-tom/admin"
+
+script_path = os.path.expandvars("$TOM_ADMIN/vtom_init.ksh")
+
+# on charge les variables d'environnements du vtom_init.ksh
+with open(script_path) as f:
+    for line in f:
+        line = line.strip()
+
+        # Ignore les commentaires et les lignes vides
+        if not line or line.startswith('#'):
+            continue
+
+        # Matche les affectations simples comme VAR=val ; export VAR
+        match = re.match(r'^([A-Z0-9_]+)=([^;]*);\s*export\s+.*$', line)
+        if match:
+            key, value = match.groups()
+            # Nettoyage des quotes éventuelles
+            value = value.strip('"').strip("'")
+            env_vars[key] = value
+
+# on affiche les variables d'environnement TOM_ comme le tom_submit.aff
+print("_______________________________________________________________________")
+print("Visual TOM context of the job")
+print(" ")
+print(f"IPID : {os.environ.get('job_id', '')}")
+# Filtrer les variables qui commencent par "TOM_"
+tom_vars = {key: value for key, value in os.environ.items() if key.startswith("TOM_")}
+# Trouver la longueur maximale des clés
+max_key_len = max(len(key) for key in tom_vars)
+for key, value in os.environ.items():
+    if key.startswith("TOM_"):
+        print(f"{key:<{max_key_len}}: {value}")
+
+# Si vide on quitte
+if not os.environ.get('TOM_JOB_ID','') :
+    print(" ")
+    print("--> Job not submitted by a Visual TOM engine")
+    print(" ")
+    sys.exit(0)
+
+# ----------------------------------------------------- #
+# 		    TOM SUBMITTER - PYTHON                      #
+# ----------------------------------------------------- #
+
+
+def tsend(status_type: str, return_code: int, message: str):
+    abm_bin = os.environ.get("ABM_BIN")
+    if not abm_bin:
+        print("[WARN] ABM_BIN not set, skipping tsend")
+        return
+    tsend_path = os.path.join(abm_bin, "tsend")
+    if os.path.isfile(tsend_path):
+        exCmd = subprocess.run(
+            [tsend_path, f"-s{status_type}", f"-r{return_code}", f"-m{message}"],
+            check=True
+        )
+    else:
+        print(f"[WARN] tsend not found at: {tsend_path}")
+        return 123
+
+    return exCmd.returncode
+
+def print_banner(message: str):
+    print("_______________________________________________________________________")
+    print(datetime.now().strftime("%A %d/%m/%Y - %H:%M:%S"))
+    print(message)
+    print("_______________________________________________________________________")
+    print()
+
+def run_tom_script(tom_script: str, args: list) -> int:
+    if not tom_script:
+        print("[ERROR] TOM_SCRIPT is empty.")
+        return 1
+
+    if os.path.isfile(tom_script):
+        # Cas : tom_script est un chemin vers un fichier Python
+        cmd = [python_executable, tom_script] + args[1:]  
+        print(cmd) 
+    else:
+        # Cas : code inline exécuter dans une sous-commande
+        cmd = [python_executable, "-c", tom_script] + args[1:]
+        print(cmd) 
+
+    sys.stdout.flush()
+    sys.stderr.flush()
+    exCmd = subprocess.run(cmd)
+    
+    sys.stdout.flush()
+    sys.stderr.flush()
+    
+    return exCmd.returncode
+
+print_banner("Begin of the script...")
+
+if os.environ.get('TOM_JOB_EXEC','') == "TEST":
+    print("Job in TEST mode")
+    print("[tsend] Job finished (TEST mode)")
+    tsend("T", 0, "Job finished (TEST mode)")
+    sys.exit(0)
+
+stat_fin_job = run_tom_script(os.environ.get('TOM_SCRIPT',''), sys.argv)
+
+print_banner("End of the script.")
+
+if stat_fin_job == 0:
+    print(f"--> Exit [{stat_fin_job}] then acknowledgment")
+    print(f"[tsend] Job finished ({stat_fin_job})")
+    tsend("T", stat_fin_job, f"Job finished ({stat_fin_job})")
+else:
+    print(f"--> Exit [{stat_fin_job}] then no acknowledgment")
+    print(f"[tsend] Job in error ({stat_fin_job})")
+    tsend("E", stat_fin_job, f"Job in error ({stat_fin_job})")
+
+sys.exit(stat_fin_job)
+
