@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ page.lang | default: "en" }}">
+<html lang="{{ page.lang | default: "fr" }}">
   {%- include head.html -%}
   <body a="{{ site.theme_config.appearance | default: "auto" }}">
     <main class="page-content" aria-label="Content">
@@ -14,17 +14,18 @@
 
     {% if page.custom_js %}
       {% for js_file in page.custom_js %}
-        <script type="text/javascript" src="{{ site.baseurl }}/assets/js/{{ js_file }}.js"></script>
+        <script type="text/javascript" src="{{ site.baseurl  | prepend: site.url }}/assets/js/{{ js_file }}.js"></script>
       {% endfor %}
     {% endif %}
+    {%- include footer.html -%}
     <div id="disqus_thread"></div>
-  <script>
-      var disqus_shortname = atob('dGhvbWFzLWFzbmFy'); 
-      (function() {
-          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-      })();
-  </script>
+      <script>
+          var disqus_shortname = atob('dGhvbWFzLWFzbmFy'); 
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+      </script>
   </body>
 </html>

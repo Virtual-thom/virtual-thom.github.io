@@ -2,3 +2,21 @@
 ---
 
 @import "no-style-please";
+    /* --------- THEME TOGGLE BUTTON --------- */
+    #theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      z-index: 1000;
+      border-radius: 10%;
+      border: 0;
+    }
+
+body[a="dark"] { @include dark-appearance; }
+
+@media (prefers-color-scheme: dark) {
+  body[a="auto"] { @include dark-appearance; }
+}
+

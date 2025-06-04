@@ -1,0 +1,25 @@
+services:
+  jekyll-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    user: "1000:1000"
+    command: >
+      bundle exec jekyll serve --config _config.yml,_config_dev.yml --livereload --host 0.0.0.0 
+    working_dir: /srv/jekyll
+    volumes:
+      - ./:/srv/jekyll:cached
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jekyll-dev.rule=Host(`virtualthom-dev.ddns.net`)"
+      - "traefik.http.routers.jekyll-dev.tls=true"
+      - "traefik.http.routers.jekyll-dev.tls.certResolver=myresolver"
+      - "traefik.http.routers.jekyll-dev.entrypoints=websecure"
+      - "traefik.http.services.jekyll-dev.loadbalancer.server.port=4000"
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
+
