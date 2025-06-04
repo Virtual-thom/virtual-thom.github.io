@@ -7,8 +7,8 @@ github_username:  Virtual-thom
 github_url: "https://github.com/Virtual-thom/virtual-thom.github.io"
 #permalink: /:title/
 permalink: /:slug.html
-#timezone: FR
-#locale: fr_FR
+timezone: Europe/Paris 
+locale: fr_FR
 
 favicon: "favicon.ico" # name+extension of favicon (which must be put on the root folder)
 
