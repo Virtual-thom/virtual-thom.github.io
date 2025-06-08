@@ -16,7 +16,7 @@ C'est déjà énorme, on peut presque tout faire. Mais comme d'hab, j'ai des bes
 Bienvenue en zone grise : les API internes.  
 
 Comme quasi tous les sites, F12 > network permet de voir ce qui se passe sous le capot. Le client web léger VTOM n'est pas différent.  
-[!VTOM client leger F12 network](/assets/img/vtom_client_leger_F12_network.png)  
+![VTOM client leger F12 network](/assets/img/vtom_client_leger_F12_network.png)  
 
 Mon but : parser tous les scripts de jobs VTOM pour vérifier un pattern (peu importe pourquoi).  
 Avant, on pouvait faire ça avec le vthttpd mais il n'existe plus.  
