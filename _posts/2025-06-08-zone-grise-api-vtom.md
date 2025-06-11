@@ -15,6 +15,8 @@ C'est déjà énorme, on peut presque tout faire. Mais comme d'hab, j'ai des bes
 
 Bienvenue en zone grise : les API internes (private).  
 
+Warning : *Une chose à garder en tête, les api privées ne sont pas maintenues et peuvent évoluer ou disparaître sans préavis.* Eric, Dev  
+
 Comme quasi tous les sites, F12 > network permet de voir ce qui se passe sous le capot. Le client web léger VTOM n'est pas différent.  
 ![VTOM client leger F12 network](/assets/img/vtom_client_leger_F12_network.png)  
 
