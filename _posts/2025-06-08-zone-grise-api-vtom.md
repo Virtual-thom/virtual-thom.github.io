@@ -13,7 +13,7 @@ Vous connaissez sans doute les API officielles VTOM ?
 En vérité, ce ne sont "que" les Visual TOM Public Domain API. 
 C'est déjà énorme, on peut presque tout faire. Mais comme d'hab, j'ai des besoins louches.  
 
-Bienvenue en zone grise : les API internes.  
+Bienvenue en zone grise : les API internes (private).  
 
 Comme quasi tous les sites, F12 > network permet de voir ce qui se passe sous le capot. Le client web léger VTOM n'est pas différent.  
 ![VTOM client leger F12 network](/assets/img/vtom_client_leger_F12_network.png)  
