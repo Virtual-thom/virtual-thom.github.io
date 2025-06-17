@@ -20,6 +20,8 @@ Je ne sais pas exactement qui fait quoi, mais perso, c'est au moment du lancemen
 14:37:50 12-06-2025 | th-0348 | 01 |          main_primary.c   160 | Error has occured during encryption key initialization
 ```
 
-Dans le futur, j'imagine un vtbackup cohérent avec les clés (ou pas). Mais en attendant, veillez à bien sauvegarder ce répertoire - sinon vos vtbackup seront inutilisables - et à synchroniser les répertoires TOM_HOME/keys quand c'est nécessaire.  
+Dans le futur, j'imagine un vtbackup cohérent avec les clés - ou pas, car le but justement, c'est que personne ne puisse déchiffrer votre vtbackup (qui contient forcément des données sensibles), même le support Absyss ne peut pas déchiffrer votre vtbackup sans la clé.  
+
+Mais en attendant, veillez à bien sauvegarder ce répertoire - sinon vos vtbackup seront inutilisables - et à synchroniser les répertoires TOM_HOME/keys quand c'est nécessaire.  
 
 
