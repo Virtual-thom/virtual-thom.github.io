@@ -12,7 +12,7 @@ title: vtbackup TOM_HOME keys
 *Pour un coffre-fort externe (type AWS, Azure), la clé de chiffrement est gérée par Visual TOM dans le répertoire `TOM_HOME/keys`, avec les fichiers 'default.key' (clé privée) et 'defaut.key.pub' (clé publique).*
 
 Ces infos sont passées un peu sous les radars, en tous cas des miens.  
-Ce que ça ne dit pas clairement, c'est que le `vtbackup` est chiffré avec la clé publique `TOM_HOME/keys/default.key.pub`.  
+Le `vtbackup` est chiffré avec la clé publique `TOM_HOME/keys/default.key.pub`.  
 Si comme moi, vous aviez l'habitude de sauvegarder vos vtbackup en cas de PRA ou gros crash ou même, en cas de refresh d'un bac à sable ou autre, pensez à bien intégrer la clé privée `TOM_HOME/keys/default.key` afin que le pgrestore ou le vtserver puisse déchiffrer le vtbackup.
 Je ne sais pas exactement qui fait quoi, mais perso, c'est au moment du lancement du vtserver que j'ai l'erreur :  
 ```
