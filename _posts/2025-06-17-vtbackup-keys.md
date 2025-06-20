@@ -3,8 +3,6 @@ layout: post
 slug: vtbackup TOM_HOME keys
 title: vtbackup TOM_HOME keys
 ---
-*A partir de la version 7.2.1b, une paire de clé de chiffrement est créée dans le répertoire 'keys'. En cas d'utilisation d'un serveur de backup, ce répertoire doit être synchronisé.*
-
 *A partir de la version 7.2.1b, une clé de chiffrement est créée dans le répertoire 'keys'. En cas d'utilisation d'un serveur de backup, ce répertoire doit être synchronisé... vtbackup : Option pour ne pas sauvegarder les clés de chiffrement et les fichiers de configuration. vtbackup -p /opt/backups / includeConfig 0*
 
 *15125: gestion des clés de chiffrement dans une sauvegarde, dans le modèle de Traitement 'Utilitaire de sauvegarde' et dans la commande 'vtbackup'*
