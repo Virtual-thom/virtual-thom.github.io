@@ -12,7 +12,7 @@ Rappel et doc : [fonction vtom](https://virtual-thom.github.io/archives/fonction
 le param commence par `=` et est interprété ce qu'il y a entre `{}`  
 
 Ici j'utiliserai une fonction de `replaceLast(text,old,new)` pour remplacer la dernière occurrence de `.zip` en `.OK` (mon fichier à supprimer)  
-et `getRes(nomRessource)` pour avoir la valeur de la ressource pile en cours de traitement (un path de ficheir zip)  
+et `getRes(nomRessource)` pour avoir la valeur de la ressource pile en cours de traitement (un path de fichier zip)  
 ```
 ="D:\monrep\{replaceLast(getRes(PI_APP_ZIP),.zip,.OK)}"
 ```
