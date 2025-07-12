@@ -19,6 +19,6 @@ et `getRes(nomRessource)` pour avoir la valeur de la ressource pile en cours de 
 
 Voilà c'est tout, ça fonctionne super bien.   
 C'est l'APIServer qui calcule et interprète.  
-Apparemment, il ne faut pas en abuser. Mais là c'était bien pratique dans mon cas (je n'avais pas la maitrise de ce qui rentrait dans la pile)  
+Apparemment, il ne faut pas en abuser. Mais là c'était bien pratique dans mon cas (je n'avais pas la maitrise de ce qu'il rentrait dans la pile)  
 
 Merci au Dieu de l'ordonnancement et à la prochaine.  
