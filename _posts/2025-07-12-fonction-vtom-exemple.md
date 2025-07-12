@@ -17,6 +17,8 @@ et `getRes(nomRessource)` pour avoir la valeur de la ressource pile en cours de 
 ="D:\monrep\{replaceLast(getRes(PI_APP_ZIP),.zip,.OK)}"
 ```
 
+![vtom fonction param](/assets/img/vtom_fonction_replace.png)  
+
 Voilà c'est tout, ça fonctionne super bien.   
 C'est l'APIServer qui calcule et interprète.  
 Apparemment, il ne faut pas en abuser. Mais là c'était bien pratique dans mon cas (je n'avais pas la maitrise de ce qu'il rentrait dans la pile)  
