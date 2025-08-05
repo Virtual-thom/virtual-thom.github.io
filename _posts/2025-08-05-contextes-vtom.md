@@ -54,7 +54,8 @@ bref autant qu'on veut avec les subtilités qu'on souhaite.
 ```
 
  * variabiliser par exemple les paths dans les chemins de scripts, paramètres, ressources fichiers (ou remplacer par des génériques avec tfile si ça ne fonctionne pas), etc. :
-   * exemple : /monpath/{CXT_MABU_PLT_COURT_MIN}/fluxpartenaireduchmol/reception
+   * exemple : /monpath/${CXT_MABU_PLT_COURT_MIN}/fluxpartenaireduchmol/reception
+     * ou %CXT_MABU_PLT_COURT_MIN% pour du Windaube cmd ou $env:CXT_MABU_PLT_COURT_MIN pour du Powershell
    * donnerait :
      * en dev     : /monpath/dev/fluxpartenaireduchmol/reception
      * en recette : /monpath/rec/fluxpartenaireduchmol/reception
