@@ -75,9 +75,9 @@ Petits plus, c'est dans la doc :
 
 On peut même appliquer plusieurs contextes sur un même serveur VTOM avec plusieurs plateformes (env de dev, rec par exemple en local sur le même serveur).  
 Auquel cas, on aurait : 
- * le contexte nommé `MABU_PLATEFORME_DEV` attaché à l'environnement VTOM MABUE_DEV avec les valeurs de dev,
+ * le contexte nommé `MABU_PLATEFORME_DEV` attaché à l'environnement VTOM MABU_DEV avec les valeurs de dev,
  `CXT_MABU_PLT_COURT_MIN = dev`
- * le contexte nommé `MABU_PLATEFORME`     attaché à l'environnement VTOM MABUE_REC avec les valeurs de rec,
+ * le contexte nommé `MABU_PLATEFORME`     attaché à l'environnement VTOM MABU_REC avec les valeurs de rec,
  `CXT_MABU_PLT_COURT_MIN = rec`
  * bien garder le nom de contexte sans le nom de la plateforme sur l'environnement qui va servir à la télédiffusion (comme ça en PPR et PRD, il gardera le nom propre sans besoin d'Alias contexte)
 
