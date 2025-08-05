@@ -54,7 +54,7 @@ bref autant qu'on veut avec les subtilités qu'on souhaite.
 ```
 
  * variabiliser par exemple les paths dans les chemins de scripts, paramètres, ressources fichiers (ou remplacer par des génériques avec tfile si ça ne fonctionne pas), etc. :
-   * exemple : /monpath/{COURT_min}/fluxpartenaireduchmol/reception
+   * exemple : /monpath/{CXT_MABU_PLT_COURT_MIN}/fluxpartenaireduchmol/reception
    * donnerait :
      * en dev     : /monpath/dev/fluxpartenaireduchmol/reception
      * en recette : /monpath/rec/fluxpartenaireduchmol/reception
