@@ -74,7 +74,7 @@ Petits plus, c'est dans la doc :
 *Les Ressources Texte, Numérique, Secret, Pile, Générique et Fichier sont utilisables pour définir les valeurs des variables, qu’elles soient utilisées en tant que Contexte ou directement en variable ; la valeur de la Ressource générique correspond à son script, la valeur de la Ressource Fichier correspond à sa valeur préfixée du nom de l'agent entre parenthèses.*
 
 On peut même appliquer plusieurs contextes sur un même serveur VTOM avec plusieurs plateformes (env de dev, rec par exemple en local sur le même serveur).  
-Auquel cas, on aurait par exemple : 
+Auquel cas, on aurait : 
  * le contexte nommé `MABU_PLATEFORME_DEV` attaché à l'environnement VTOM MABUE_DEV avec les valeurs de dev,
  `CXT_MABU_PLT_COURT_MIN = dev`
  * le contexte nommé `MABU_PLATEFORME`     attaché à l'environnement VTOM MABUE_REC avec les valeurs de rec,
