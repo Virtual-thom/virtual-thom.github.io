@@ -34,7 +34,8 @@ Mais quasi plus de transformation avec les Contextes.
 Tel que je le vois, mais j'aimerais bien vos retours d'expérience ou de pensées là-dessus, ça pourrait s'articuler comme ça :  
  * nommage du contexte : &lt;ENV&gt;(ou BU, ou Type d'application, etc)_&lt;fonction&gt;
     * exemple : MABU_PLATEFORME
- * contenu du contexte, les variables :  
+ * contenu du contexte, les variables :
+
 ```
 Honnêtement, ça fait un peu redondant, mais je pense qu'il faut préfixer chaque variable par quelque chose de reconnaissable du contexte (mais pas son nom, on verra après plusieurs contextes peuvent avoir la même variable et c'est le plus proche de l'objet qui aura le dernier mot - many to one).  
 
@@ -51,6 +52,7 @@ CXT_MABU_PLT_UNDER_MIN = _prod
 
 bref autant qu'on veut avec les subtilités qu'on souhaite.  
 ```
+
  * variabiliser par exemple les paths dans les chemins de scripts, paramètres, ressources fichiers (ou remplacer par des génériques avec tfile si ça ne fonctionne pas), etc. :
    * exemple : /monpath/{COURT_min}/fluxpartenaireduchmol/reception
    * donnerait :
@@ -58,6 +60,7 @@ bref autant qu'on veut avec les subtilités qu'on souhaite.
      * en recette : /monpath/rec/fluxpartenaireduchmol/reception
      * en préprod : /monpath/ppr/fluxpartenaireduchmol/reception
      * en prod    : /monpath/prd/fluxpartenaireduchmol/reception
+
 ```
 Un truc en passant, il faut arrêter de supprimer en prod le nom de la plateforme.
 genre /monpath/fluxpartenaireduchmol/reception au lieu de /monpath/prd/fluxpartenaireduchmol/reception  
