@@ -85,7 +85,7 @@ Auquel cas, on aurait :
 Je pense aux contextes surtout pour variabiliser les noms de plateformes (environnements applicatifs) mais ça peut aussi être vraiment pratique pour les cas de démultiplications - voir mon post sur [la télédiffusion en instances](/telediffusion-instance-vtom-modele-demultiplication-couloir.html).  
 
 Exemple : on démultiplie notre modèle vtom ZZ en plusieurs caisses de banques comme dans mon post.  
-On aura toujours les alias pour les noms d'objets VTOM (agents, u.s., commentaires, noms ress, env, app, job, etc.), mais on simplifie et économise une TONNE de transformations. Mais vraiment.  
+On aura toujours les alias pour les noms d'objets VTOM (agents, u.s., noms ress, env, app, job, etc.), mais on simplifie et économise une TONNE de transformations. Mais vraiment.  
 
 On variabilise notre modèle ZZ (si démult sur app on placera le contexte modèle sur l'app) avec un contexte qui aura un alias dans la télédiff par instance (yes on peut faire ça).
 Donc chaque app démultipliée aura son contexte par caisse de banque, c'est pile poil ce qu'on veut.  
