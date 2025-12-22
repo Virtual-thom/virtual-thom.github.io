@@ -5,6 +5,62 @@ date: 2017-12-13 20:14
 author: Virtual Thom
 categories: [tremote, vtcopy, vtom]
 ---
+<edit 2025> le tremote n'existant plusv version ps1 du vtcopy par exemple pour transferer un vtexport.xml d'un serveur vtom vers un agent : 
+ * job à lancer depuis l'agent du serveur VTOM
+ * params :
+     * source (chemin du fichier à copier depuis l'agent du job)
+     * dest (chemin répertoire de destination sur l'agent en 3ème param
+     * nom de l'agent sur lequel transférer le fichier
+  
+
+```ps1
+<#
+vtcopy.ps1
+Transfert d'un fichier via VTOM
+Doit être exécuté dans un environnement VTOM
+#>
+
+param(
+    [Parameter(Mandatory = $true, Position = 0)]
+    [string]$FIC_SOURCE,
+
+    [Parameter(Mandatory = $true, Position = 1)]
+    [string]$REP_DEST,
+
+    [Parameter(Mandatory = $true, Position = 2)]
+    [string]$AGENT
+
+)
+
+# Vérification du nombre de paramètres
+if ($PSBoundParameters.Count -lt 3) {
+    Write-Host "1 parametre = chemin complet du fichier source"
+    Write-Host "2 parametre = chemin complet du repertoire de destination"
+    Write-Host "3 parametre = agent vtom de destination"
+    exit 123
+}
+
+$TOM_REMOTE_SERVER_OLD=$env:TOM_REMOTE_SERVER
+$env:TOM_REMOTE_SERVER=$AGENT
+
+$cmd = "vtcopy -i `"$FIC_SOURCE`" -o `"$REP_DEST`""
+
+# Exécution de la commande
+Invoke-Expression $cmd
+
+# Vérification du code retour
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Erreur lors du transfert (code retour = $LASTEXITCODE)"
+    exit $LASTEXITCODE
+}
+
+$env:TOM_REMOTE_SERVER=$TOM_REMOTE_SERVER_OLD
+
+Write-Host "Transfert terminé avec succès"
+exit 0
+```
+
+
 Exemple de script de transfert via VTOM avec tremote et vtcopy
 ```sh
 #!/bin/ksh
