@@ -31,5 +31,7 @@ Merci au Dieu de l'ordonnancement et à la prochaine.
 
  Exemple de formule vtom pour faire une extract stats vtom `vtstools -x -e "dateUnAnAvant dateNow"` :  
  ```
+{% raw %}
 ="{366 BEFORE %TODAY AS 'dd-MM-yyyy'} 00:00:00 {%TODAY AS 'dd-MM-yyyy'} 23:59:00"
+{% endraw %}
 ```
