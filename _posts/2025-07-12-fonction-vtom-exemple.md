@@ -19,8 +19,17 @@ et `getRes(nomRessource)` pour avoir la valeur de la ressource pile en cours de 
 
 ![vtom fonction param](/assets/img/vtom_fonction_replace.png)  
 
+
 Voilà c'est tout, ça fonctionne super bien.   
 C'est l'APIServer qui calcule et interprète.  
 Apparemment, il ne faut pas en abuser. Mais là c'était bien pratique dans mon cas (je n'avais pas la maitrise de ce qui rentrait dans la pile)  
 
 Merci au Dieu de l'ordonnancement et à la prochaine.  
+
+
+## Petit rajout : Formules VTOM
+
+ Exemple de formule vtom pour faire une extract stats vtom `vtstools -x -e "dateUnAnAvant dateNow"` :  
+ ```
+="{366 BEFORE %TODAY AS 'dd-MM-yyyy'} 00:00:00 {%TODAY AS 'dd-MM-yyyy'} 23:59:00"
+```
