@@ -5,7 +5,7 @@ date: 2017-12-13 20:14
 author: Virtual Thom
 categories: [tremote, vtcopy, vtom]
 ---
-<edit 2025> le tremote n'existant plusv version ps1 du vtcopy par exemple pour transferer un vtexport.xml d'un serveur vtom vers un agent : 
+edit 2025 : le tremote n'existant plusv version ps1 du vtcopy par exemple pour transferer un vtexport.xml d'un serveur vtom vers un agent : 
  * job à lancer depuis l'agent du serveur VTOM
  * params :
      * source (chemin du fichier à copier depuis l'agent du job)
