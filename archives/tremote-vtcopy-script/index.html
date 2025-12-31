@@ -91,6 +91,67 @@
 
   <article class="post-content" itemprop="articleBody">
     <h1 class="hidden">tremote vtcopy transfert via VTOM</h1>
+
+<p>edit 2025 : le tremote n&#39;existant plusv version ps1 du vtcopy par exemple pour transferer un vtexport.xml d&#39;un serveur vtom vers un agent : </p>
+<ul>
+<li>job à lancer depuis l&#39;agent du serveur VTOM</li>
+<li>params :<ul>
+<li>source (chemin du fichier à copier depuis l&#39;agent du job)</li>
+<li>dest (chemin répertoire de destination sur l&#39;agent en 3ème param</li>
+<li>nom de l&#39;agent sur lequel transférer le fichier</li>
+</ul>
+</li>
+</ul>
+<pre><code class="lang-ps1"><span class="hljs-comment">&lt;#
+vtcopy.ps1
+Transfert d'un fichier via VTOM
+Doit être exécuté dans un environnement VTOM
+#&gt;</span>
+
+<span class="hljs-keyword">param</span>(
+    [Parameter(Mandatory = <span class="hljs-literal">$true</span>, Position = <span class="hljs-number">0</span>)]
+    [string]<span class="hljs-variable">$FIC_SOURCE</span>,
+
+    [Parameter(Mandatory = <span class="hljs-literal">$true</span>, Position = <span class="hljs-number">1</span>)]
+    [string]<span class="hljs-variable">$REP_DEST</span>,
+
+    [Parameter(Mandatory = <span class="hljs-literal">$true</span>, Position = <span class="hljs-number">2</span>)]
+    [string]<span class="hljs-variable">$AGENT</span>
+
+)
+
+<span class="hljs-comment"># Vérification du nombre de paramètres</span>
+<span class="hljs-keyword">if</span> (<span class="hljs-variable">$PSBoundParameters</span>.Count <span class="hljs-nomarkup">-lt</span> <span class="hljs-number">3</span>) {
+    <span class="hljs-built_in">Write-Host</span> <span class="hljs-string">"1 parametre = chemin complet du fichier source"</span>
+    <span class="hljs-built_in">Write-Host</span> <span class="hljs-string">"2 parametre = chemin complet du repertoire de destination"</span>
+    <span class="hljs-built_in">Write-Host</span> <span class="hljs-string">"3 parametre = agent vtom de destination"</span>
+    <span class="hljs-keyword">exit</span> <span class="hljs-number">123</span>
+}
+
+<span class="hljs-variable">$TOM_REMOTE_SERVER_OLD</span>=<span class="hljs-variable">$env:TOM_REMOTE_SERVER</span>
+<span class="hljs-variable">$env:TOM_REMOTE_SERVER</span>=<span class="hljs-variable">$AGENT</span>
+
+<span class="hljs-variable">$cmd</span> = <span class="hljs-string">"vtcopy -i `"<span class="hljs-variable">$FIC_SOURCE</span>`" -o `"<span class="hljs-variable">$REP_DEST</span>`""</span>
+
+<span class="hljs-comment"># Exécution de la commande</span>
+<span class="hljs-built_in">Invoke-Expression</span> <span class="hljs-variable">$cmd</span>
+
+<span class="hljs-comment"># Vérification du code retour</span>
+<span class="hljs-keyword">if</span> (<span class="hljs-variable">$LASTEXITCODE</span> <span class="hljs-nomarkup">-ne</span> <span class="hljs-number">0</span>) {
+    <span class="hljs-built_in">Write-Host</span> <span class="hljs-string">"Erreur lors du transfert (code retour = <span class="hljs-variable">$LASTEXITCODE</span>)"</span>
+    <span class="hljs-keyword">exit</span> <span class="hljs-variable">$LASTEXITCODE</span>
+}
+
+<span class="hljs-variable">$env:TOM_REMOTE_SERVER</span>=<span class="hljs-variable">$TOM_REMOTE_SERVER_OLD</span>
+
+<span class="hljs-built_in">Write-Host</span> <span class="hljs-string">"Transfert terminé avec succès"</span>
+<span class="hljs-keyword">exit</span> <span class="hljs-number">0</span>
+</code></pre>
+
+
+
+
+	  
     <p>Exemple de script de transfert via VTOM avec tremote et vtcopy</p>
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/ksh</span>
 <span class="c"># tremote_vtcopy.ksh</span>
